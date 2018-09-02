@@ -33,49 +33,49 @@ module TSOS {
 
             // ver
             sc = new ShellCommand(this.shellVer,
-                                  "ver",
+                                  ["ver", "v", "version"],
                                   "- Displays the current version data.");
             this.commandList[this.commandList.length] = sc;
 
             // help
             sc = new ShellCommand(this.shellHelp,
-                                  "help",
+                                  ["help"],
                                   "- This is the help command. Seek help.");
             this.commandList[this.commandList.length] = sc;
 
             // shutdown
             sc = new ShellCommand(this.shellShutdown,
-                                  "shutdown",
+                                  ["shutdown"],
                                   "- Shuts down the virtual OS but leaves the underlying host / hardware simulation running.");
             this.commandList[this.commandList.length] = sc;
 
             // cls
             sc = new ShellCommand(this.shellCls,
-                                  "cls",
+                                  ["cls"],
                                   "- Clears the screen and resets the cursor position.");
             this.commandList[this.commandList.length] = sc;
 
             // man <topic>
             sc = new ShellCommand(this.shellMan,
-                                  "man",
+                                  ["man"],
                                   "<topic> - Displays the MANual page for <topic>.");
             this.commandList[this.commandList.length] = sc;
 
             // trace <on | off>
             sc = new ShellCommand(this.shellTrace,
-                                  "trace",
+                                  ["trace"],
                                   "<on | off> - Turns the OS trace on or off.");
             this.commandList[this.commandList.length] = sc;
 
             // rot13 <string>
             sc = new ShellCommand(this.shellRot13,
-                                  "rot13",
+                                  ["rot13"],
                                   "<string> - Does rot13 obfuscation on <string>.");
             this.commandList[this.commandList.length] = sc;
 
             // prompt <string>
             sc = new ShellCommand(this.shellPrompt,
-                                  "prompt",
+                                  ["prompt"],
                                   "<string> - Sets the prompt.");
             this.commandList[this.commandList.length] = sc;
 
@@ -109,10 +109,16 @@ module TSOS {
             var found: boolean = false;
             var fn = undefined;
             while (!found && index < this.commandList.length) {
-                if (this.commandList[index].command === cmd) {
+                if (this.commandList[index].command[0] === cmd) {
                     found = true;
                     fn = this.commandList[index].func;
-                } else {
+                } else if (this.commandList[index].command[1] === cmd){
+                    found = true;
+                    fn = this.commandList[index].func;
+                } else if (this.commandList[index].command[2] === cmd){
+                    found = true;
+                    fn = this.commandList[index].func;
+                } else {  
                     ++index;
                 }
             }

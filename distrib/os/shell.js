@@ -55,6 +55,9 @@ var TSOS;
             // whereami
             sc = new TSOS.ShellCommand(this.shellWhereami, ["whereami"], "- Displays the current location.");
             this.commandList[this.commandList.length] = sc;
+            // melon
+            sc = new TSOS.ShellCommand(this.shellMelon, ["melon"], "- Displays 16 types of melons in the world because who doesn't love melons?");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -266,6 +269,13 @@ var TSOS;
         };
         Shell.prototype.shellWhereami = function () {
             _StdOut.putText("Current location is Melon Country");
+        };
+        Shell.prototype.shellMelon = function () {
+            var melonArray = ["Watermelon", "Cantaloupe", "Horned", "Crenshaw", "Honeydew", "Gac", "Bitter", "Winter", "Sprite", "Korean", "Canary", "Charentais", "Bailan", "Hami", "Santa Claus", "MelonOS"];
+            _StdOut.putText("There are many types of melons in the world such as ");
+            for (var i = 0; i < melonArray.length; i++) {
+                _StdOut.putText(melonArray[i] + " ");
+            }
         };
         return Shell;
     }());

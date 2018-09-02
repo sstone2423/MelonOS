@@ -91,6 +91,12 @@ module TSOS {
                                   "- Displays the current location.");
                                   this.commandList[this.commandList.length] = sc;
 
+            // melon
+            sc = new ShellCommand(this.shellMelon,
+                ["melon"],
+                "- Displays 16 types of melons in the world because who doesn't love melons?");
+                this.commandList[this.commandList.length] = sc;
+
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -314,5 +320,12 @@ module TSOS {
             _StdOut.putText("Current location is Melon Country");
         }
 
+        public shellMelon() {
+            var melonArray = ["Watermelon", "Cantaloupe", "Horned", "Crenshaw", "Honeydew", "Gac", "Bitter", "Winter", "Sprite", "Korean", "Canary", "Charentais", "Bailan", "Hami", "Santa Claus", "MelonOS"]
+            _StdOut.putText("There are many types of melons in the world such as ");
+            for (var i = 0; i < melonArray.length; i++){
+                _StdOut.putText(melonArray[i] + " ");
+            }
+        }
     }
 }

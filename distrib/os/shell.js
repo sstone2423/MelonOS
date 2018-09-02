@@ -212,7 +212,45 @@ var TSOS;
                     case "help":
                         _StdOut.putText("Help displays a list of (hopefully) valid commands.");
                         break;
-                    // TODO: Make descriptive MANual page entries for the the rest of the shell commands here.
+                    case "curse":
+                        _StdOut.putText("Curse issues all of your derogatory remarks for you!");
+                        break;
+                    case "apology":
+                        _StdOut.putText("Apology mends your relationship with MelonOS because it has feelings too.");
+                        break;
+                    case "ver":
+                        _StdOut.putText("Ver displays the current version.");
+                        break;
+                    case "v":
+                        _StdOut.putText("V displays the current version.");
+                        break;
+                    case "version":
+                        _StdOut.putText("Version displays the current version.");
+                        break;
+                    case "shutdown":
+                        _StdOut.putText("Shutdown calls the kernel shutdown routine.");
+                        break;
+                    case "cls":
+                        _StdOut.putText("Cls clears the screen for additional melons.");
+                        break;
+                    case "trace":
+                        _StdOut.putText("Trace displays the clock intervals.");
+                        break;
+                    case "rot13":
+                        _StdOut.putText("Rot13 converts characters in the string to character + 13. It was one of the first ciphers created.");
+                        break;
+                    case "prompt":
+                        _StdOut.putText("Prompt changes the initial prompt to the specific string.");
+                        break;
+                    case "date":
+                        _StdOut.putText("Date displays the current date.");
+                        break;
+                    case "whereami":
+                        _StdOut.putText("Whereami displays the current location.");
+                        break;
+                    case "melon":
+                        _StdOut.putText("Melon displays 16 different melons in the world. Yum.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }

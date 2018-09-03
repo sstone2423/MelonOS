@@ -61,6 +61,9 @@ var TSOS;
             // status
             sc = new TSOS.ShellCommand(this.shellStatus, ["status"], "- Changes the status display bar to whatever your heart desires.");
             this.commandList[this.commandList.length] = sc;
+            // load
+            sc = new TSOS.ShellCommand(this.shellLoad, ["load"], "- Loads and validates the user code in the user input area. Only hex digits and spaces are valid.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -257,6 +260,9 @@ var TSOS;
                     case "status":
                         _StdOut.putText("Status changes the status display bar to whatever string your heart desires.");
                         break;
+                    case "load":
+                        _StdOut.putText("Load validates the user input program to ensure only hex digits and spaces exist.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -329,6 +335,10 @@ var TSOS;
             else {
                 _StdOut.putText("Usage: status <string> Please supply a string.");
             }
+        };
+        Shell.prototype.shellLoad = function () {
+            var userInputProgram = document.getElementById("taProgramInput");
+            //Check for anything besides hex or spaces (use regex)
         };
         return Shell;
     }());

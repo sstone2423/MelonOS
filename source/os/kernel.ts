@@ -41,6 +41,12 @@ module TSOS {
             _krnKeyboardDriver.driverEntry();                    // Call the driverEntry() initialization routine.
             this.krnTrace(_krnKeyboardDriver.status);
 
+            // Load current date/time
+            var htmlDateTime = document.getElementById("currentDate");
+            var currentDateTime = new Date();
+            htmlDateTime.innerHTML = currentDateTime + "";
+
+
             //
             // ... more?
             //

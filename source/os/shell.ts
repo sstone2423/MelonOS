@@ -377,7 +377,8 @@ module TSOS {
 
         public shellStatus(args) {
             if (args.length > 0) {
-                _StdOut.putText(args);
+                var htmlStatus = document.getElementById("status");
+                htmlStatus.innerHTML = "Status: " + args;
             }
             else {
                 _StdOut.putText("Usage: status <string> Please supply a string.");

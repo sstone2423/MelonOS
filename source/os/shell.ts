@@ -97,6 +97,12 @@ module TSOS {
                 "- Displays 16 types of melons in the world because who doesn't love melons?");
                 this.commandList[this.commandList.length] = sc;
 
+            // status
+            sc = new ShellCommand(this.shellStatus,
+                ["status"],
+                "- Changes the status display bar to whatever your heart desires.");
+                this.commandList[this.commandList.length] = sc;
+
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -300,6 +306,9 @@ module TSOS {
                     case "melon":
                         _StdOut.putText("Melon displays 16 different melons in the world. Yum.");
                         break;
+                    case "status":
+                        _StdOut.putText("Status changes the status display bar to whatever string your heart desires.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -363,6 +372,15 @@ module TSOS {
             _StdOut.putText("There are many types of melons in the world such as ");
             for (var i = 0; i < melonArray.length; i++){
                 _StdOut.putText(melonArray[i] + " ");
+            }
+        }
+
+        public shellStatus(args) {
+            if (args.length > 0) {
+                _StdOut.putText(args);
+            }
+            else {
+                _StdOut.putText("Usage: status <string> Please supply a string.");
             }
         }
     }

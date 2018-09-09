@@ -84,19 +84,13 @@
                         </a>
                 </li>
                 <li class="nav-item">
-                        <a class="nav-link" id="currentDate">
-                                Current Date/time:
-                        </a>
+                        <a class="nav-link" id="currentDate"></a>
                 </li>
         </ul>
    </nav>
    
-
-   <div id="divConsole" style="margin:4px; width:500px; height:500px; float:left;">
-      <canvas id="display"
-              width="500px"
-              height="500px"
-              tabindex="3">
+   <div id="divConsole" style="margin:4px; width:500px; height:500px; float:left; overflow:auto;">
+      <canvas id="display" width="495px" height="5000px" tabindex="3" style="overflow-x:hidden;">
       </canvas>
    </div>
 

@@ -35,6 +35,7 @@ module TSOS {
             // Parse the params.    TODO: Check that the params are valid and osTrapError if not.
             var keyCode = params[0];
             var isShifted = params[1];
+
             _Kernel.krnTrace("Key code:" + keyCode + " shifted:" + isShifted);
             var chr = "";
             // Check to see if we even want to deal with the key that was pressed.
@@ -54,7 +55,10 @@ module TSOS {
                         (keyCode == 13)) {                       // enter
                 chr = String.fromCharCode(keyCode);
                 _KernelInputQueue.enqueue(chr);
-            }
+            } //else if (keyCode == 8) {
+                //console.log(_KernelInputQueue);
+                //_KernelInputQueue.pop();
+            //}
         }
     }
 }

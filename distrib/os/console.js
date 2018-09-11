@@ -66,11 +66,19 @@ var TSOS;
             // UPDATE: Even though we are now working in TypeScript, char and string remain undistinguished.
             //         Consider fixing that.
             if (text !== "") {
-                // Draw the text at the current X and Y coordinates.
-                _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
-                // Move the current X position.
-                var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
-                this.currentXPosition = this.currentXPosition + offset;
+                // If the x position reaches 510, advance the line and continue drawing
+                var textSplitArray = text.split(" ");
+                for (var i = 0; i < text.length; i++) {
+                    if (this.currentXPosition > 510) {
+                        _StdOut.advanceLine();
+                        this.currentXPosition = 15;
+                    }
+                    // Draw the text at the current X and Y coordinates.
+                    _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text[i]);
+                    // Move the current X position.
+                    var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text[i]);
+                    this.currentXPosition = this.currentXPosition + offset;
+                }
             }
         };
         Console.prototype.advanceLine = function () {

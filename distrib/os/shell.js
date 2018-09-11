@@ -23,7 +23,6 @@ var TSOS;
         }
         Shell.prototype.init = function () {
             var sc;
-            //
             // Load the command list.
             // ver
             sc = new TSOS.ShellCommand(this.shellVer, ["ver", "v", "version"], "- Displays the current version data.");
@@ -337,8 +336,18 @@ var TSOS;
             }
         };
         Shell.prototype.shellLoad = function () {
-            var userInputProgram = document.getElementById("taProgramInput");
-            //Check for anything besides hex or spaces (use regex)
+            // Get value inside program input (the program)
+            var userInputProgram = document.getElementById("taProgramInput").value;
+            // Create regex pattern
+            var hexRegex = new RegExp("^[a-fA-F0-9\s]+$");
+            // Check for anything besides hex or spaces (A-Fa-f0-9)
+            if (hexRegex.test(userInputProgram)) {
+                // Load program into memory (currently just outputs success)
+                _StdOut.putText("Success");
+            }
+            else {
+                _StdOut.putText("Program must only contain hexadecimal values (A-F, a-f, 0-9) or spaces.");
+            }
         };
         return Shell;
     }());

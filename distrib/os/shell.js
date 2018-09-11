@@ -22,6 +22,7 @@ var TSOS;
             this.commandList = [];
             this.curses = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
             this.apologies = "[sorry]";
+            this.commandsUsedList = [];
         }
         Shell.prototype.init = function () {
             var sc;
@@ -86,18 +87,26 @@ var TSOS;
             var index = 0;
             var found = false;
             var fn = undefined;
+            // Loop until every command in the commandList has been read
             while (!found && index < this.commandList.length) {
+                // First commandList entry
                 if (this.commandList[index].command[0] === cmd) {
                     found = true;
                     fn = this.commandList[index].func;
+                    // Save the command in commandsUsedList for a command history
+                    this.commandsUsedList.push(this.commandList[index].command);
+                    // Second commandList entry
                 }
                 else if (this.commandList[index].command[1] === cmd) {
                     found = true;
                     fn = this.commandList[index].func;
+                    this.commandsUsedList.push(this.commandList[index].command);
+                    // Third commandList entry
                 }
                 else if (this.commandList[index].command[2] === cmd) {
                     found = true;
                     fn = this.commandList[index].func;
+                    this.commandsUsedList.push(this.commandList[index].command);
                 }
                 else {
                     ++index;

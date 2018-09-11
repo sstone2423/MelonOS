@@ -25,6 +25,8 @@ module TSOS {
             this.q.push(element);
         }
 
+        // Dequeue pops the first element of the array off.
+        // ex. [a, b, c, d].shift() = a
         public dequeue() {
             var retVal = null;
             if (this.q.length > 0) {

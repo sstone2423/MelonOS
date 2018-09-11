@@ -63,17 +63,20 @@ module TSOS {
             // between the two.  So rather than be like PHP and write two (or more) functions that
             // do the same thing, thereby encouraging confusion and decreasing readability, I
             // decided to write one function and use the term "text" to connote string or char.
-            //
+
             // UPDATE: Even though we are now working in TypeScript, char and string remain undistinguished.
             //         Consider fixing that.
             if (text !== "") {
-                // If the x position reaches 510, advance the line and continue drawing
-
+                // Split all incoming text so that it can be checked for x position as it is handled
                 var textSplitArray = text.split(" ");
 
                 for (var i = 0; i < text.length; i++){
+                    // If the x position reaches 510, advance the line and continue drawing
                     if (this.currentXPosition > 510) {
                         _StdOut.advanceLine();
+
+                        // Advance the position so that it is easier to see that you are still working within
+                        // the same command line number
                         this.currentXPosition = 15;
                     }
                     // Draw the text at the current X and Y coordinates.
@@ -82,7 +85,6 @@ module TSOS {
                     var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text[i]);
                     this.currentXPosition = this.currentXPosition + offset;
                 }
-                
             }
          }
 

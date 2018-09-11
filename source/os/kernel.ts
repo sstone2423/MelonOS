@@ -16,9 +16,8 @@
 module TSOS {
 
     export class Kernel {
-        //
         // OS Startup and Shutdown Routines
-        //
+
         public krnBootstrap() {      // Page 8. {
             Control.hostLog("bootstrap", "host");  // Use hostLog because we ALWAYS want this, even if _Trace is off.
 
@@ -46,10 +45,7 @@ module TSOS {
             var currentDateTime = new Date();
             htmlDateTime.innerHTML = currentDateTime + "";
 
-
-            //
             // ... more?
-            //
 
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
@@ -72,13 +68,11 @@ module TSOS {
             // ... Disable the Interrupts.
             this.krnTrace("Disabling the interrupts.");
             this.krnDisableInterrupts();
-            //
+
             // Unload the Device Drivers?
             // More?
-            //
             this.krnTrace("end shutdown OS");
         }
-
 
         public krnOnCPUClockPulse() {
             /* This gets called from the host hardware simulation every time there is a hardware clock pulse.
@@ -99,10 +93,8 @@ module TSOS {
             }
         }
 
-
-        //
         // Interrupt Handling
-        //
+
         public krnEnableInterrupts() {
             // Keyboard
             Devices.hostEnableKeyboardInterrupt();
@@ -142,25 +134,22 @@ module TSOS {
             // Check multiprogramming parameters and enforce quanta here. Call the scheduler / context switch here if necessary.
         }
 
-        //
-        // System Calls... that generate software interrupts via tha Application Programming Interface library routines.
-        //
-        // Some ideas:
-        // - ReadConsole
-        // - WriteConsole
-        // - CreateProcess
-        // - ExitProcess
-        // - WaitForProcessToExit
-        // - CreateFile
-        // - OpenFile
-        // - ReadFile
-        // - WriteFile
-        // - CloseFile
+        /* System Calls... that generate software interrupts via tha Application Programming Interface library routines.
 
+         Some ideas:
+         - ReadConsole
+         - WriteConsole
+         - CreateProcess
+         - ExitProcess
+         - WaitForProcessToExit
+         - CreateFile
+         - OpenFile
+         - ReadFile
+         - WriteFile
+         - CloseFile
 
-        //
-        // OS Utility Routines
-        //
+        // OS Utility Routines */
+
         public krnTrace(msg: string) {
              // Check globals to see if trace is set ON.  If so, then (maybe) log the message.
              if (_Trace) {

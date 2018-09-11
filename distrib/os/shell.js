@@ -7,10 +7,12 @@
 
    The OS Shell - The "command line interface" (CLI) for the console.
 
-    Note: While fun and learning are the primary goals of all enrichment center activities,
-          serious injuries may occur when trying to write your own Operating System.
+    Note: While fun and learning are the primary goals of all enrichment
+          center activities, serious injuries may occur when trying to
+          write your own Operating System.
    ------------ */
-// TODO: Write a base class / prototype for system services and let Shell inherit from it.
+// TODO: Write a base class / prototype for system services and let 
+// Shell inherit from it.
 var TSOS;
 (function (TSOS) {
     var Shell = /** @class */ (function () {
@@ -55,7 +57,7 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellWhereami, ["whereami"], "- Displays the current location.");
             this.commandList[this.commandList.length] = sc;
             // melon
-            sc = new TSOS.ShellCommand(this.shellMelon, ["melon"], "- Displays 16 types of melons in the world because who doesn't love melons?");
+            sc = new TSOS.ShellCommand(this.shellMelon, ["melon"], "- Displays wonderful melon puns for the world to see.");
             this.commandList[this.commandList.length] = sc;
             // status
             sc = new TSOS.ShellCommand(this.shellStatus, ["status"], "- Changes the status display bar to whatever your heart desires.");
@@ -65,7 +67,6 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
-            //
             // Display the initial prompt.
             this.putPrompt();
         };
@@ -74,16 +75,12 @@ var TSOS;
         };
         Shell.prototype.handleInput = function (buffer) {
             _Kernel.krnTrace("Shell Command~" + buffer);
-            //
             // Parse the input...
-            //
             var userCommand = this.parseInput(buffer);
             // ... and assign the command and args to local variables.
             var cmd = userCommand.command;
             var args = userCommand.args;
-            //
             // Determine the command and execute it.
-            //
             // TypeScript/JavaScript may not support associative arrays in all browsers so we have to iterate over the
             // command list in attempt to find a match.  TODO: Is there a better way? Probably. Someone work it out and tell me in class.
             var index = 0;
@@ -158,10 +155,8 @@ var TSOS;
             }
             return retVal;
         };
-        //
         // Shell Command Functions.  Kinda not part of Shell() class exactly, but
         // called from here, so kept here to avoid violating the law of least astonishment.
-        //
         Shell.prototype.shellInvalidCommand = function () {
             _StdOut.putText("Invalid Command. ");
             if (_SarcasticMode) {
@@ -254,7 +249,7 @@ var TSOS;
                         _StdOut.putText("Whereami displays the current location.");
                         break;
                     case "melon":
-                        _StdOut.putText("Melon displays 16 different melons in the world. Yum.");
+                        _StdOut.putText("Melon will give you juicy puns to use with all of your friends!");
                         break;
                     case "status":
                         _StdOut.putText("Status changes the status display bar to whatever string your heart desires.");
@@ -320,10 +315,34 @@ var TSOS;
             _StdOut.putText("Current location is Melon Country");
         };
         Shell.prototype.shellMelon = function () {
-            var melonArray = ["Watermelon", "Cantaloupe", "Horned", "Crenshaw", "Honeydew", "Gac", "Bitter", "Winter", "Sprite", "Korean", "Canary", "Charentais", "Bailan", "Hami", "Santa Claus", "MelonOS"];
-            _StdOut.putText("There are many types of melons in the world such as ");
-            for (var i = 0; i < melonArray.length; i++) {
-                _StdOut.putText(melonArray[i] + " ");
+            // Get a random number between 1 and 8
+            var randomPun = Math.floor(Math.random() * 8) + 1;
+            // Find an excellent pun for our melonicious users
+            switch (randomPun) {
+                case 1:
+                    _StdOut.putText("Sur-round yourself with melons.");
+                    break;
+                case 2:
+                    _StdOut.putText("It's not pulp fiction.");
+                    break;
+                case 3:
+                    _StdOut.putText("This may sound a little 'fruity,' but we think you'll like it.");
+                    break;
+                case 4:
+                    _StdOut.putText("Who says you cant(alope)?");
+                    break;
+                case 5:
+                    _StdOut.putText("With melons you can!");
+                    break;
+                case 6:
+                    _StdOut.putText("MelonOS has a thick skin and a fruity interior.");
+                    break;
+                case 7:
+                    _StdOut.putText("Dew, or dew not, there is no try.");
+                    break;
+                case 8:
+                    _StdOut.putText("Things aren't jellin with these melons.");
+                    break;
             }
         };
         Shell.prototype.shellStatus = function (args) {

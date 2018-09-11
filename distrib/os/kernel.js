@@ -16,9 +16,7 @@ var TSOS;
     var Kernel = /** @class */ (function () {
         function Kernel() {
         }
-        //
         // OS Startup and Shutdown Routines
-        //
         Kernel.prototype.krnBootstrap = function () {
             TSOS.Control.hostLog("bootstrap", "host"); // Use hostLog because we ALWAYS want this, even if _Trace is off.
             // Initialize our global queues.
@@ -40,9 +38,7 @@ var TSOS;
             var htmlDateTime = document.getElementById("currentDate");
             var currentDateTime = new Date();
             htmlDateTime.innerHTML = currentDateTime + "";
-            //
             // ... more?
-            //
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
             this.krnEnableInterrupts();
@@ -61,10 +57,8 @@ var TSOS;
             // ... Disable the Interrupts.
             this.krnTrace("Disabling the interrupts.");
             this.krnDisableInterrupts();
-            //
             // Unload the Device Drivers?
             // More?
-            //
             this.krnTrace("end shutdown OS");
         };
         Kernel.prototype.krnOnCPUClockPulse = function () {
@@ -86,9 +80,7 @@ var TSOS;
                 this.krnTrace("Idle");
             }
         };
-        //
         // Interrupt Handling
-        //
         Kernel.prototype.krnEnableInterrupts = function () {
             // Keyboard
             TSOS.Devices.hostEnableKeyboardInterrupt();
@@ -123,23 +115,21 @@ var TSOS;
             // The built-in TIMER (not clock) Interrupt Service Routine (as opposed to an ISR coming from a device driver). {
             // Check multiprogramming parameters and enforce quanta here. Call the scheduler / context switch here if necessary.
         };
-        //
-        // System Calls... that generate software interrupts via tha Application Programming Interface library routines.
-        //
-        // Some ideas:
-        // - ReadConsole
-        // - WriteConsole
-        // - CreateProcess
-        // - ExitProcess
-        // - WaitForProcessToExit
-        // - CreateFile
-        // - OpenFile
-        // - ReadFile
-        // - WriteFile
-        // - CloseFile
-        //
-        // OS Utility Routines
-        //
+        /* System Calls... that generate software interrupts via tha Application Programming Interface library routines.
+
+         Some ideas:
+         - ReadConsole
+         - WriteConsole
+         - CreateProcess
+         - ExitProcess
+         - WaitForProcessToExit
+         - CreateFile
+         - OpenFile
+         - ReadFile
+         - WriteFile
+         - CloseFile
+
+        // OS Utility Routines */
         Kernel.prototype.krnTrace = function (msg) {
             // Check globals to see if trace is set ON.  If so, then (maybe) log the message.
             if (_Trace) {

@@ -73,10 +73,12 @@ var TSOS;
                 var interrupt = _KernelInterruptQueue.dequeue();
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             }
-            else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
+            else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is
+                // anything being processed.
                 _CPU.cycle();
             }
-            else { // If there are no interrupts and there is nothing being executed then just be idle. {
+            else { // If there are no interrupts and there is nothing being executed
+                // then just be idle.
                 this.krnTrace("Idle");
             }
         };
@@ -112,8 +114,10 @@ var TSOS;
             }
         };
         Kernel.prototype.krnTimerISR = function () {
-            // The built-in TIMER (not clock) Interrupt Service Routine (as opposed to an ISR coming from a device driver). {
-            // Check multiprogramming parameters and enforce quanta here. Call the scheduler / context switch here if necessary.
+            /* The built-in TIMER (not clock) Interrupt Service Routine (as opposed to an ISR coming from
+            a device driver).
+            Check multiprogramming parameters and enforce quanta here. Call the scheduler / context
+            switch here if necessary. */
         };
         /* System Calls... that generate software interrupts via tha Application Programming Interface library routines.
 
@@ -135,7 +139,7 @@ var TSOS;
             if (_Trace) {
                 if (msg === "Idle") {
                     // We can't log every idle clock pulse because it would lag the browser very quickly.
-                    if (_OSclock % 10 == 0) {
+                    if (_OSclock % 10 === 0) {
                         // Check the CPU_CLOCK_INTERVAL in globals.ts for an
                         // idea of the tick rate and adjust this line accordingly.
                         TSOS.Control.hostLog(msg, "OS");

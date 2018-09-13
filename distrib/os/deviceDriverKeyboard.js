@@ -30,7 +30,7 @@ var TSOS;
             var _this = 
             // The code below cannot run because "this" can only be
             // accessed after calling super.
-            //super(this.krnKbdDriverEntry, this.krnKbdDispatchKeyPress);
+            // super(this.krnKbdDriverEntry, this.krnKbdDispatchKeyPress);
             _super.call(this) || this;
             _this.driverEntry = _this.krnKbdDriverEntry;
             _this.isr = _this.krnKbdDispatchKeyPress;
@@ -61,14 +61,16 @@ var TSOS;
                 _KernelInputQueue.enqueue(chr);
             }
             else if (((keyCode >= 48) && (keyCode <= 57)) || // digits
-                (keyCode == 32) || // space
-                (keyCode == 13)) { // enter
+                (keyCode === 32) || // space
+                (keyCode === 13) ||
+            // enter
+            ) { // enter
                 chr = String.fromCharCode(keyCode);
                 _KernelInputQueue.enqueue(chr);
-            } //else if (keyCode == 8) {
-            //console.log(_KernelInputQueue);
-            //_KernelInputQueue.pop();
-            //}
+            } // else if (keyCode == 8) {
+            // console.log(_KernelInputQueue);
+            // _KernelInputQueue.pop();
+            // }
         };
         return DeviceDriverKeyboard;
     }(TSOS.DeviceDriver));

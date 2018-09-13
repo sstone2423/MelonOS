@@ -26,19 +26,13 @@ var TSOS;
             this.clearScreen();
             this.resetXY();
         };
-        Console.prototype.clearScreen = function () {
-            _DrawingContext.clearRect(0, 0, _Canvas.width, _Canvas.height);
-        };
-        Console.prototype.resetXY = function () {
-            this.currentXPosition = 0;
-            this.currentYPosition = this.currentFontSize;
-        };
         Console.prototype.handleInput = function () {
             while (_KernelInputQueue.getSize() > 0) {
                 // Get the next character from the kernel input queue.
                 var chr = _KernelInputQueue.dequeue();
                 console.log(chr);
-                // Check to see if it's "special" (enter or ctrl-c) or "normal" (anything else that the keyboard device driver gave us).
+                // Check to see if it's "special" (enter or ctrl-c) or "normal"
+                // (anything else that the keyboard device driver gave us).
                 if (chr === String.fromCharCode(13)) { //     Enter key
                     // The enter key marks the end of a console command, so ...
                     // ... tell the shell ...
@@ -93,6 +87,13 @@ var TSOS;
             this.currentYPosition += _DefaultFontSize +
                 _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
                 _FontHeightMargin;
+        };
+        Console.prototype.clearScreen = function () {
+            _DrawingContext.clearRect(0, 0, _Canvas.width, _Canvas.height);
+        };
+        Console.prototype.resetXY = function () {
+            this.currentXPosition = 0;
+            this.currentYPosition = this.currentFontSize;
         };
         return Console;
     }());

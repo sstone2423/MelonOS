@@ -41,8 +41,8 @@ module TSOS {
             this.krnTrace(_krnKeyboardDriver.status);
 
             // Load current date/time
-            var htmlDateTime = document.getElementById("currentDate");
-            var currentDateTime = new Date();
+            const htmlDateTime = document.getElementById("currentDate");
+            const currentDateTime = new Date();
             htmlDateTime.innerHTML = currentDateTime + "";
 
             // ... more?
@@ -84,11 +84,13 @@ module TSOS {
             if (_KernelInterruptQueue.getSize() > 0) {
                 // Process the first interrupt on the interrupt queue.
                 // TODO: Implement a priority queue based on the IRQ number/id to enforce interrupt priority.
-                var interrupt = _KernelInterruptQueue.dequeue();
+                const interrupt = _KernelInterruptQueue.dequeue();
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
-            } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
+            } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is
+                                           // anything being processed.
                 _CPU.cycle();
-            } else {                      // If there are no interrupts and there is nothing being executed then just be idle. {
+            } else {                      // If there are no interrupts and there is nothing being executed
+                                          // then just be idle.
                 this.krnTrace("Idle");
             }
         }
@@ -130,8 +132,10 @@ module TSOS {
         }
 
         public krnTimerISR() {
-            // The built-in TIMER (not clock) Interrupt Service Routine (as opposed to an ISR coming from a device driver). {
-            // Check multiprogramming parameters and enforce quanta here. Call the scheduler / context switch here if necessary.
+            /* The built-in TIMER (not clock) Interrupt Service Routine (as opposed to an ISR coming from
+            a device driver).
+            Check multiprogramming parameters and enforce quanta here. Call the scheduler / context
+            switch here if necessary. */
         }
 
         /* System Calls... that generate software interrupts via tha Application Programming Interface library routines.
@@ -155,7 +159,7 @@ module TSOS {
              if (_Trace) {
                 if (msg === "Idle") {
                     // We can't log every idle clock pulse because it would lag the browser very quickly.
-                    if (_OSclock % 10 == 0) {
+                    if (_OSclock % 10 === 0) {
                         // Check the CPU_CLOCK_INTERVAL in globals.ts for an
                         // idea of the tick rate and adjust this line accordingly.
                         Control.hostLog(msg, "OS");

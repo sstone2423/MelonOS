@@ -25,21 +25,13 @@ module TSOS {
             this.resetXY();
         }
 
-        private clearScreen(): void {
-            _DrawingContext.clearRect(0, 0, _Canvas.width, _Canvas.height);
-        }
-
-        private resetXY(): void {
-            this.currentXPosition = 0;
-            this.currentYPosition = this.currentFontSize;
-        }
-
         public handleInput(): void {
             while (_KernelInputQueue.getSize() > 0) {
                 // Get the next character from the kernel input queue.
-                var chr = _KernelInputQueue.dequeue();
+                const chr = _KernelInputQueue.dequeue();
                 console.log(chr);
-                // Check to see if it's "special" (enter or ctrl-c) or "normal" (anything else that the keyboard device driver gave us).
+                // Check to see if it's "special" (enter or ctrl-c) or "normal"
+                // (anything else that the keyboard device driver gave us).
                 if (chr === String.fromCharCode(13)) { //     Enter key
                     // The enter key marks the end of a console command, so ...
                     // ... tell the shell ...
@@ -68,9 +60,9 @@ module TSOS {
             //         Consider fixing that.
             if (text !== "") {
                 // Split all incoming text so that it can be checked for x position as it is handled
-                var textSplitArray = text.split(" ");
+                const textSplitArray = text.split(" ");
 
-                for (var i = 0; i < text.length; i++){
+                for (let i = 0; i < text.length; i++) {
                     // If the x position reaches 510, advance the line and continue drawing
                     if (this.currentXPosition > 510) {
                         _StdOut.advanceLine();
@@ -80,9 +72,10 @@ module TSOS {
                         this.currentXPosition = 15;
                     }
                     // Draw the text at the current X and Y coordinates.
-                    _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text[i]);
+                    _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition,
+                                            this.currentYPosition, text[i]);
                     // Move the current X position.
-                    var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text[i]);
+                    const offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text[i]);
                     this.currentXPosition = this.currentXPosition + offset;
                 }
             }
@@ -95,9 +88,18 @@ module TSOS {
              * Font descent measures from the baseline to the lowest point in the font.
              * Font height margin is extra spacing between the lines.
              */
-            this.currentYPosition += _DefaultFontSize + 
+            this.currentYPosition += _DefaultFontSize +
                                      _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
                                      _FontHeightMargin;
+        }
+
+        private clearScreen(): void {
+            _DrawingContext.clearRect(0, 0, _Canvas.width, _Canvas.height);
+        }
+
+        private resetXY(): void {
+            this.currentXPosition = 0;
+            this.currentYPosition = this.currentFontSize;
         }
     }
  }

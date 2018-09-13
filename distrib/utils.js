@@ -27,11 +27,13 @@ var TSOS;
                trouble explaining it in the future.  There's a lot to be said for obvious code.
             */
             var retVal = "";
-            for (var i in str) { // We need to cast the string to any for use in the for...in construct.
+            for (var _i = 0, _a = str; _i < _a.length; _i++) { // We need to cast the string to any for use in the for...in construct.
+                var i = _a[_i];
                 var ch = str[i];
                 var code = 0;
                 if ("abcedfghijklmABCDEFGHIJKLM".indexOf(ch) >= 0) {
-                    code = str.charCodeAt(Number(i)) + 13; // It's okay to use 13.  It's not a magic number, it's called rot13.
+                    code = str.charCodeAt(Number(i)) + 13; // It's okay to use 13.  It's not a magic number,
+                    // it's called rot13.
                     retVal = retVal + String.fromCharCode(code);
                 }
                 else if ("nopqrstuvwxyzNOPQRSTUVWXYZ".indexOf(ch) >= 0) {

@@ -18,7 +18,7 @@ var TSOS;
             return this.q.length;
         };
         Queue.prototype.isEmpty = function () {
-            return (this.q.length == 0);
+            return (this.q.length === 0);
         };
         Queue.prototype.enqueue = function (element) {
             this.q.push(element);

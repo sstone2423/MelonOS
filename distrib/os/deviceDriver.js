@@ -7,8 +7,8 @@ var TSOS;
 (function (TSOS) {
     var DeviceDriver = /** @class */ (function () {
         function DeviceDriver() {
-            this.version = '0.07';
-            this.status = 'unloaded';
+            this.version = "0.07";
+            this.status = "unloaded";
             this.preemptable = false;
             this.driverEntry = null;
             this.isr = null;

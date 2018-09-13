@@ -17,8 +17,8 @@ module TSOS {
             return this.q.length;
         }
 
-        public isEmpty(){
-            return (this.q.length == 0);
+        public isEmpty() {
+            return (this.q.length === 0);
         }
 
         public enqueue(element) {
@@ -28,7 +28,7 @@ module TSOS {
         // Dequeue pops the first element of the array off.
         // ex. [a, b, c, d].shift() = a
         public dequeue() {
-            var retVal = null;
+            let retVal = null;
             if (this.q.length > 0) {
                 retVal = this.q.shift();
             }
@@ -36,8 +36,8 @@ module TSOS {
         }
 
         public toString() {
-            var retVal = "";
-            for (var i in this.q) {
+            let retVal = "";
+            for (const i in this.q) {
                 retVal += "[" + this.q[i] + "] ";
             }
             return retVal;

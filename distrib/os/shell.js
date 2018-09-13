@@ -11,7 +11,7 @@
           center activities, serious injuries may occur when trying to
           write your own Operating System.
    ------------ */
-// TODO: Write a base class / prototype for system services and let 
+// TODO: Write a base class / prototype for system services and let
 // Shell inherit from it.
 var TSOS;
 (function (TSOS) {
@@ -34,7 +34,8 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellHelp, ["help"], "- This is the help command. Seek help.");
             this.commandList[this.commandList.length] = sc;
             // shutdown
-            sc = new TSOS.ShellCommand(this.shellShutdown, ["shutdown"], "- Shuts down the virtual OS but leaves the underlying host / hardware simulation running.");
+            sc = new TSOS.ShellCommand(this.shellShutdown, ["shutdown"], "- Shuts down the virtual OS but leaves the "
+                + "underlying host / hardware simulation running.");
             this.commandList[this.commandList.length] = sc;
             // cls
             sc = new TSOS.ShellCommand(this.shellCls, ["cls"], "- Clears the screen and resets the cursor position.");
@@ -64,7 +65,8 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellStatus, ["status"], "- Changes the status display bar to whatever your heart desires.");
             this.commandList[this.commandList.length] = sc;
             // load
-            sc = new TSOS.ShellCommand(this.shellLoad, ["load"], "- Loads and validates the user code in the user input area. Only hex digits and spaces are valid.");
+            sc = new TSOS.ShellCommand(this.shellLoad, ["load"], "- Loads and validates the user code in the user input area. Only"
+                + " hex digits and spaces are valid.");
             this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
@@ -78,15 +80,16 @@ var TSOS;
             _Kernel.krnTrace("Shell Command~" + buffer);
             // Parse the input...
             var userCommand = this.parseInput(buffer);
-            // ... and assign the command and args to local variables.
+            // ... and assign the command and args to local letiables.
             var cmd = userCommand.command;
             var args = userCommand.args;
             // Determine the command and execute it.
             // TypeScript/JavaScript may not support associative arrays in all browsers so we have to iterate over the
-            // command list in attempt to find a match.  TODO: Is there a better way? Probably. Someone work it out and tell me in class.
+            // command list in attempt to find a match.  TODO: Is there a better way? Probably. Someone work it out
+            // and tell me in class.
             var index = 0;
             var found = false;
-            var fn = undefined;
+            var fn;
             // Loop until every command in the commandList has been read
             while (!found && index < this.commandList.length) {
                 // First commandList entry
@@ -158,7 +161,7 @@ var TSOS;
             // 5. Now create the args array from what's left.
             for (var i in tempList) {
                 var arg = TSOS.Utils.trim(tempList[i]);
-                if (arg != "") {
+                if (arg !== "") {
                     retVal.args[retVal.args.length] = tempList[i];
                 }
             }
@@ -246,7 +249,8 @@ var TSOS;
                         _StdOut.putText("Trace displays the clock intervals.");
                         break;
                     case "rot13":
-                        _StdOut.putText("Rot13 converts characters in the string to character + 13. It was one of the first ciphers created.");
+                        _StdOut.putText("Rot13 converts characters in the string to character + 13. "
+                            + "It was one of the first ciphers created.");
                         break;
                     case "prompt":
                         _StdOut.putText("Prompt changes the initial prompt to the specific string.");
@@ -261,10 +265,12 @@ var TSOS;
                         _StdOut.putText("Melon will give you juicy puns to use with all of your friends!");
                         break;
                     case "status":
-                        _StdOut.putText("Status changes the status display bar to whatever string your heart desires.");
+                        _StdOut.putText("Status changes the status display bar to whatever string your"
+                            + " heart desires.");
                         break;
                     case "load":
-                        _StdOut.putText("Load validates the user input program to ensure only hex digits and spaces exist.");
+                        _StdOut.putText("Load validates the user input program to ensure only hex digits"
+                            + " and spaces exist.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -302,7 +308,7 @@ var TSOS;
         Shell.prototype.shellRot13 = function (args) {
             if (args.length > 0) {
                 // Requires Utils.ts for rot13() function.
-                _StdOut.putText(args.join(' ') + " = '" + TSOS.Utils.rot13(args.join(' ')) + "'");
+                _StdOut.putText(args.join(" ") + " = '" + TSOS.Utils.rot13(args.join(" ")) + "'");
             }
             else {
                 _StdOut.putText("Usage: rot13 <string>  Please supply a string.");

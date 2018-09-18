@@ -97,6 +97,13 @@ module TSOS {
             _DrawingContext.clearRect(0, 0, _Canvas.width, _Canvas.height);
         }
 
+        public backspaceClear(): void {
+            // Clear the last character from the canvas
+            console.log();
+            this.currentXPosition -= 10;  // TODO: this needs to be changed to the width of the character
+            _DrawingContext.clearRect(this.currentXPosition, (this.currentYPosition - 12), 20, 20);
+        }
+
         private resetXY(): void {
             this.currentXPosition = 0;
             this.currentYPosition = this.currentFontSize;

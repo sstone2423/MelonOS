@@ -34,6 +34,9 @@ var TSOS;
             _super.call(this) || this;
             // Instantiate the characterArray to keep track of all characters being input
             _this.characterArray = [];
+            // Instantiate a isScrollingCommands boolean variable
+            _this.isScrollingCommands = false;
+            _this.scrollingCommandIndex = 0;
             _this.driverEntry = _this.krnKbdDriverEntry;
             _this.isr = _this.krnKbdDispatchKeyPress;
             return _this;
@@ -70,6 +73,7 @@ var TSOS;
                 ((keyCode === 61) && !isShifted) || // =
                 ((keyCode === 59) && !isShifted)) { // ;
                 if (keyCode === 13) {
+                    this.isScrollingCommands = false;
                     chr = String.fromCharCode(keyCode);
                     _KernelInputQueue.enqueue(chr);
                     this.characterArray = [];
@@ -153,11 +157,31 @@ var TSOS;
                 if (_KernelInputQueue.length > 0) {
                 }
             }
-            else if (keyCode === 38) {
-                chr = _OsShell.commandsUsedList[_OsShell.commandsUsedList.length - 1];
-                _KernelInputQueue.enqueue(chr);
-                console.log(_OsShell.commandsUsedList);
-                console.log(chr);
+            else if (keyCode === 38) { // up arrow
+                // Find the last command and put it in the queue
+                if (!this.isScrollingCommands) {
+                    this.scrollingCommandIndex = _OsShell.commandsUsedList.length - 1;
+                    chr = _OsShell.commandsUsedList[this.scrollingCommandIndex];
+                    _KernelInputQueue.enqueue(chr);
+                    this.isScrollingCommands = true;
+                }
+                else if (this.isScrollingCommands) {
+                    if (this.scrollingCommandIndex != 0) {
+                        this.scrollingCommandIndex--;
+                    }
+                    else {
+                        this.scrollingCommandIndex = _OsShell.commandsUsedList.length - 1;
+                    }
+                    _Console.buffer = "";
+                    _Console.currentXPosition = 13;
+                    _DrawingContext.clearRect(_Console.currentXPosition, (_Console.currentYPosition - 12), 100, 100);
+                    chr = _OsShell.commandsUsedList[this.scrollingCommandIndex];
+                    _KernelInputQueue.enqueue(chr);
+                }
+                console.log("isScrolling: " + this.isScrollingCommands);
+                console.log("command list: " + _OsShell.commandsUsedList);
+                console.log("chr: " + chr);
+                console.log("index: " + this.scrollingCommandIndex);
             }
         };
         // This function gets the character from the keyCode, pushes into the InputQueue,

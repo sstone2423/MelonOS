@@ -128,8 +128,33 @@ module TSOS {
                     _StdOut.backspaceClear(previousChar);
                 }
             } else if (keyCode === 9) {                         // tab
-                if (_KernelInputQueue.length > 0 ) {
-
+                if (_Console.buffer.length != 0) {
+                    // Instantiate the currentBuffer
+                    console.log("buffer length: " + _Console.buffer.length);
+                    console.log("buffer: " + _Console.buffer);
+                    let currentBuffer = _Console.buffer;
+                    let tabIndex = 0;
+                    let match = false;
+                    
+                    while (!match) {
+                        console.log("enter while loop");
+                        // First commandList entry
+                        if (_OsShell.commandList[tabIndex].command.substring(0, currentBuffer.length).toLowerCase()
+                            == currentBuffer.toLowerCase()) {
+                            _StdOut.backspaceClear(_Console.buffer);
+                            _Console.buffer = "";
+                            chr = _OsShell.commandList[tabIndex].command;
+                            _KernelInputQueue.enqueue(chr);
+                            match = true;
+                            console.log("enter first if");
+                        } else if (tabIndex == _OsShell.commandList.length) {
+                            match = true;
+                            console.log("tabIndex == commandList length");
+                        } else {
+                            tabIndex++;
+                            console.log("tab index: " + tabIndex);
+                        }
+                    }
                 }
             } else if (keyCode === 38) {                        // up arrow
                 // Check to see if user is already scrolling commands
@@ -167,11 +192,10 @@ module TSOS {
             } else if (keyCode === 40) {         // down arrow
                 // Check to see if user is already scrolling
                 if (this.isScrollingCommands) {
-                    // If so, check to see if the index is already at 0 (the end of the list)
+                    // If so, check to see if the index is already at the end of the list 
                     if (this.scrollingCommandIndex != _OsShell.commandsUsedList.length - 1) {
                         // If not, add 1 to the index
                         this.scrollingCommandIndex++;
-
                         // Reset the buffer because we're not using the previous command anymore
                         _Console.buffer = "";
                         // Reset the x position to the prompt

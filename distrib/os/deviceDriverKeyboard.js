@@ -32,6 +32,7 @@ var TSOS;
             // accessed after calling super.
             // super(this.krnKbdDriverEntry, this.krnKbdDispatchKeyPress);
             _super.call(this) || this;
+            // Instantiate the characterArray to keep track of all characters being input
             _this.characterArray = [];
             _this.driverEntry = _this.krnKbdDriverEntry;
             _this.isr = _this.krnKbdDispatchKeyPress;
@@ -148,9 +149,15 @@ var TSOS;
                     _StdOut.backspaceClear(previousChar);
                 }
             }
-            else if (keyCode === 9) {
+            else if (keyCode === 9) { // tab
                 if (_KernelInputQueue.length > 0) {
                 }
+            }
+            else if (keyCode === 38) {
+                chr = _OsShell.commandsUsedList[_OsShell.commandsUsedList.length - 1];
+                _KernelInputQueue.enqueue(chr);
+                console.log(_OsShell.commandsUsedList);
+                console.log(chr);
             }
         };
         // This function gets the character from the keyCode, pushes into the InputQueue,

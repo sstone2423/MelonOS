@@ -27,45 +27,51 @@ var TSOS;
         Shell.prototype.init = function () {
             var sc;
             // Load the command list.
+            // v
+            sc = new TSOS.ShellCommand(this.shellVer, "v", "- Displays the current version data.");
+            this.commandList[this.commandList.length] = sc;
             // ver
-            sc = new TSOS.ShellCommand(this.shellVer, ["ver", "v", "version"], "- Displays the current version data.");
+            sc = new TSOS.ShellCommand(this.shellVer, "ver", "- Displays the current version data.");
+            this.commandList[this.commandList.length] = sc;
+            // version
+            sc = new TSOS.ShellCommand(this.shellVer, "version", "- Displays the current version data.");
             this.commandList[this.commandList.length] = sc;
             // help
-            sc = new TSOS.ShellCommand(this.shellHelp, ["help"], "- This is the help command. Seek help.");
+            sc = new TSOS.ShellCommand(this.shellHelp, "help", "- This is the help command. Seek help.");
             this.commandList[this.commandList.length] = sc;
             // shutdown
-            sc = new TSOS.ShellCommand(this.shellShutdown, ["shutdown"], "- Shuts down the virtual OS but leaves the "
+            sc = new TSOS.ShellCommand(this.shellShutdown, "shutdown", "- Shuts down the virtual OS but leaves the "
                 + "underlying host / hardware simulation running.");
             this.commandList[this.commandList.length] = sc;
             // cls
-            sc = new TSOS.ShellCommand(this.shellCls, ["cls"], "- Clears the screen and resets the cursor position.");
+            sc = new TSOS.ShellCommand(this.shellCls, "cls", "- Clears the screen and resets the cursor position.");
             this.commandList[this.commandList.length] = sc;
             // man <topic>
-            sc = new TSOS.ShellCommand(this.shellMan, ["man"], "<topic> - Displays the MANual page for <topic>.");
+            sc = new TSOS.ShellCommand(this.shellMan, "man", "<topic> - Displays the MANual page for <topic>.");
             this.commandList[this.commandList.length] = sc;
             // trace <on | off>
-            sc = new TSOS.ShellCommand(this.shellTrace, ["trace"], "<on | off> - Turns the OS trace on or off.");
+            sc = new TSOS.ShellCommand(this.shellTrace, "trace", "<on | off> - Turns the OS trace on or off.");
             this.commandList[this.commandList.length] = sc;
             // rot13 <string>
-            sc = new TSOS.ShellCommand(this.shellRot13, ["rot13"], "<string> - Does rot13 obfuscation on <string>.");
+            sc = new TSOS.ShellCommand(this.shellRot13, "rot13", "<string> - Does rot13 obfuscation on <string>.");
             this.commandList[this.commandList.length] = sc;
             // prompt <string>
-            sc = new TSOS.ShellCommand(this.shellPrompt, ["prompt"], "<string> - Sets the prompt.");
+            sc = new TSOS.ShellCommand(this.shellPrompt, "prompt", "<string> - Sets the prompt.");
             this.commandList[this.commandList.length] = sc;
             // date
-            sc = new TSOS.ShellCommand(this.shellDate, ["date"], "- Displays the current date and time.");
+            sc = new TSOS.ShellCommand(this.shellDate, "date", "- Displays the current date and time.");
             this.commandList[this.commandList.length] = sc;
             // whereami
-            sc = new TSOS.ShellCommand(this.shellWhereami, ["whereami"], "- Displays the current location.");
+            sc = new TSOS.ShellCommand(this.shellWhereami, "whereami", "- Displays the current location.");
             this.commandList[this.commandList.length] = sc;
             // melon
-            sc = new TSOS.ShellCommand(this.shellMelon, ["melon"], "- Displays wonderful melon puns for the world to see.");
+            sc = new TSOS.ShellCommand(this.shellMelon, "melon", "- Displays wonderful melon puns for the world to see.");
             this.commandList[this.commandList.length] = sc;
             // status
-            sc = new TSOS.ShellCommand(this.shellStatus, ["status"], "- Changes the status display bar to whatever your heart desires.");
+            sc = new TSOS.ShellCommand(this.shellStatus, "status", "- Changes the status display bar to whatever your heart desires.");
             this.commandList[this.commandList.length] = sc;
             // load
-            sc = new TSOS.ShellCommand(this.shellLoad, ["load"], "- Loads and validates the user code in the user input area. Only"
+            sc = new TSOS.ShellCommand(this.shellLoad, "load", "- Loads and validates the user code in the user input area. Only"
                 + " hex digits and spaces are valid.");
             this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
@@ -93,23 +99,12 @@ var TSOS;
             // Loop until every command in the commandList has been read
             while (!found && index < this.commandList.length) {
                 // First commandList entry
-                if (this.commandList[index].command[0] === cmd) {
+                if (this.commandList[index].command === cmd) {
                     found = true;
                     fn = this.commandList[index].func;
                     // Save the command in commandsUsedList for a command history
                     this.commandsUsedList.push(this.commandList[index].command);
                     // Second commandList entry
-                }
-                else if (this.commandList[index].command[1] === cmd) {
-                    found = true;
-                    fn = this.commandList[index].func;
-                    this.commandsUsedList.push(this.commandList[index].command);
-                    // Third commandList entry
-                }
-                else if (this.commandList[index].command[2] === cmd) {
-                    found = true;
-                    fn = this.commandList[index].func;
-                    this.commandsUsedList.push(this.commandList[index].command);
                 }
                 else {
                     ++index;

@@ -26,86 +26,97 @@ module TSOS {
         public commandsUsedList = [];
 
         public init() {
-            let sc;
-
+            let sc;      
             // Load the command list.
+
+            // v
+            sc = new ShellCommand(this.shellVer,
+                                  "v",
+                                  "- Displays the current version data.");
+            this.commandList[this.commandList.length] = sc;
 
             // ver
             sc = new ShellCommand(this.shellVer,
-                                  ["ver", "v", "version"],
+                                  "ver",
+                                  "- Displays the current version data.");
+            this.commandList[this.commandList.length] = sc;
+
+            // version
+            sc = new ShellCommand(this.shellVer,
+                                  "version",
                                   "- Displays the current version data.");
             this.commandList[this.commandList.length] = sc;
 
             // help
             sc = new ShellCommand(this.shellHelp,
-                                  ["help"],
+                                  "help",
                                   "- This is the help command. Seek help.");
             this.commandList[this.commandList.length] = sc;
 
             // shutdown
             sc = new ShellCommand(this.shellShutdown,
-                                  ["shutdown"],
+                                  "shutdown",
                                   "- Shuts down the virtual OS but leaves the "
                                   + "underlying host / hardware simulation running.");
             this.commandList[this.commandList.length] = sc;
 
             // cls
             sc = new ShellCommand(this.shellCls,
-                                  ["cls"],
+                                  "cls",
                                   "- Clears the screen and resets the cursor position.");
             this.commandList[this.commandList.length] = sc;
 
             // man <topic>
             sc = new ShellCommand(this.shellMan,
-                                  ["man"],
+                                  "man",
                                   "<topic> - Displays the MANual page for <topic>.");
             this.commandList[this.commandList.length] = sc;
 
             // trace <on | off>
             sc = new ShellCommand(this.shellTrace,
-                                  ["trace"],
+                                  "trace",
                                   "<on | off> - Turns the OS trace on or off.");
             this.commandList[this.commandList.length] = sc;
 
             // rot13 <string>
             sc = new ShellCommand(this.shellRot13,
-                                  ["rot13"],
+                                  "rot13",
                                   "<string> - Does rot13 obfuscation on <string>.");
             this.commandList[this.commandList.length] = sc;
 
             // prompt <string>
             sc = new ShellCommand(this.shellPrompt,
-                                  ["prompt"],
+                                  "prompt",
                                   "<string> - Sets the prompt.");
             this.commandList[this.commandList.length] = sc;
 
             // date
             sc = new ShellCommand(this.shellDate,
-                                  ["date"],
+                                  "date",
                                   "- Displays the current date and time.");
             this.commandList[this.commandList.length] = sc;
 
             // whereami
             sc = new ShellCommand(this.shellWhereami,
-                                  ["whereami"],
+                                  "whereami",
                                   "- Displays the current location.");
             this.commandList[this.commandList.length] = sc;
 
             // melon
             sc = new ShellCommand(this.shellMelon,
-                                  ["melon"],
+                                  "melon",
                                   "- Displays wonderful melon puns for the world to see.");
             this.commandList[this.commandList.length] = sc;
 
             // status
             sc = new ShellCommand(this.shellStatus,
-                                  ["status"],
+                                  "status",
                                   "- Changes the status display bar to whatever your heart desires.");
             this.commandList[this.commandList.length] = sc;
 
             // load
             sc = new ShellCommand(this.shellLoad,
-                                  ["load"],
+                                  "load",
                                   "- Loads and validates the user code in the user input area. Only"
                                   + " hex digits and spaces are valid.");
             this.commandList[this.commandList.length] = sc;
@@ -143,22 +154,12 @@ module TSOS {
             // Loop until every command in the commandList has been read
             while (!found && index < this.commandList.length) {
                 // First commandList entry
-                if (this.commandList[index].command[0] === cmd) {
+                if (this.commandList[index].command === cmd) {
                     found = true;
                     fn = this.commandList[index].func;
-
                     // Save the command in commandsUsedList for a command history
                     this.commandsUsedList.push(this.commandList[index].command);
                 // Second commandList entry
-                } else if (this.commandList[index].command[1] === cmd) {
-                    found = true;
-                    fn = this.commandList[index].func;
-                    this.commandsUsedList.push(this.commandList[index].command);
-                // Third commandList entry
-                } else if (this.commandList[index].command[2] === cmd) {
-                    found = true;
-                    fn = this.commandList[index].func;
-                    this.commandsUsedList.push(this.commandList[index].command);
                 } else {
                     ++index;
                 }

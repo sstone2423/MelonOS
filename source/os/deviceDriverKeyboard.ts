@@ -24,7 +24,8 @@ module TSOS {
             this.driverEntry = this.krnKbdDriverEntry;
             this.isr = this.krnKbdDispatchKeyPress;
         }
-
+        
+        // Instantiate the characterArray to keep track of all characters being input
         public characterArray = [];
 
         public krnKbdDriverEntry() {
@@ -121,10 +122,15 @@ module TSOS {
                     // Clear the area of the last character on canvas
                     _StdOut.backspaceClear(previousChar);
                 }
-            } else if (keyCode === 9) {
+            } else if (keyCode === 9) {                         // tab
                 if (_KernelInputQueue.length > 0 ) {
 
                 }
+            } else if (keyCode === 38) {
+                chr = _OsShell.commandsUsedList[_OsShell.commandsUsedList.length - 1];
+                _KernelInputQueue.enqueue(chr);
+                console.log(_OsShell.commandsUsedList);
+                console.log(chr);
             }
         }
 

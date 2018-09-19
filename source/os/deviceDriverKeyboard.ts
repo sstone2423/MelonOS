@@ -112,16 +112,15 @@ module TSOS {
                       (keyCode === 191)) {                      // /
                 this.basicKeyPress((keyCode - 144));
             } else if (keyCode == 8) { // backspace
-                // Initialize the previous character
-                console.log(this.characterArray);
-                let previousChar = this.characterArray[this.characterArray.length - 1];
-                this.characterArray.pop();
-                console.log(previousChar);
-                console.log(this.characterArray);
-                // Take the character out of the buffer
-                _StdOut.buffer = _StdOut.buffer.substring(0, (_StdOut.buffer.length - 1));
-                // Clear the area of the last character on canvas
-                _StdOut.backspaceClear(previousChar);
+                if (this.characterArray.length > 0) {
+                    // Initialize the previous character
+                    let previousChar = this.characterArray[this.characterArray.length - 1];
+                    this.characterArray.pop();
+                    // Take the character out of the buffer
+                    _StdOut.buffer = _StdOut.buffer.substring(0, (_StdOut.buffer.length - 1));
+                    // Clear the area of the last character on canvas
+                    _StdOut.backspaceClear(previousChar);
+                }
             } else if (keyCode === 9) {
                 if (_KernelInputQueue.length > 0 ) {
 
@@ -129,6 +128,8 @@ module TSOS {
             }
         }
 
+        // This function gets the character from the keyCode, pushes into the InputQueue,
+        // then pushes the character into the characterArray
         public basicKeyPress(keyCode): void {
             let chr = String.fromCharCode(keyCode);
             console.log(chr);

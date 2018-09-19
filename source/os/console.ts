@@ -49,14 +49,14 @@ module TSOS {
         }
 
         public putText(text): void {
-            // My first inclination here was to write two functions: putChar() and putString().
-            // Then I remembered that JavaScript is (sadly) untyped and it won't differentiate
-            // between the two.  So rather than be like PHP and write two (or more) functions that
-            // do the same thing, thereby encouraging confusion and decreasing readability, I
-            // decided to write one function and use the term "text" to connote string or char.
+            /* My first inclination here was to write two functions: putChar() and putString().
+              Then I remembered that JavaScript is (sadly) untyped and it won't differentiate
+              between the two.  So rather than be like PHP and write two (or more) functions that
+              do the same thing, thereby encouraging confusion and decreasing readability, I
+              decided to write one function and use the term "text" to connote string or char.
 
-            // UPDATE: Even though we are now working in TypeScript, char and string remain undistinguished.
-            //         Consider fixing that.
+              UPDATE: Even though we are now working in TypeScript, char and string remain undistinguished.
+                     Consider fixing that. */
             if (text !== "") {
                 // Split all incoming text so that it can be checked for x position as it is handled
                 const textSplitArray = text.split(" ");
@@ -97,16 +97,12 @@ module TSOS {
         }
 
         public backspaceClear(character): void {
-            // Clear the last character from the canvas
+            // Find the width of the previous character
             let offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, character);
-            console.log("offset: " + offset);
-            console.log("current x: " + this.currentXPosition);
-            console.log("current width: " + CanvasTextFunctions.letter(character).width);
-            this.currentXPosition = (this.currentXPosition - CanvasTextFunctions.letter(character).width) + offset;
-            
-            console.log("after bs x: " + this.currentXPosition);
+            // Change the currentXPosition
+            this.currentXPosition = this.currentXPosition - offset;
+            // Clear the previous character's space
             _DrawingContext.clearRect(this.currentXPosition, (this.currentYPosition - 12), 20, 20);
-            
         }
 
         private resetXY(): void {

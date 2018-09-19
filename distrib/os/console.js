@@ -30,7 +30,6 @@ var TSOS;
             while (_KernelInputQueue.getSize() > 0) {
                 // Get the next character from the kernel input queue.
                 var chr = _KernelInputQueue.dequeue();
-                console.log(chr);
                 // Check to see if it's "special" (enter or ctrl-c) or "normal"
                 // (anything else that the keyboard device driver gave us).
                 if (chr === String.fromCharCode(13)) { //     Enter key
@@ -91,10 +90,14 @@ var TSOS;
         Console.prototype.clearScreen = function () {
             _DrawingContext.clearRect(0, 0, _Canvas.width, _Canvas.height);
         };
-        Console.prototype.backspaceClear = function () {
+        Console.prototype.backspaceClear = function (character) {
             // Clear the last character from the canvas
-            console.log();
-            this.currentXPosition -= 10; // TODO: this needs to be changed to the width of the character
+            var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, character);
+            console.log("offset: " + offset);
+            console.log("current x: " + this.currentXPosition);
+            console.log("current width: " + TSOS.CanvasTextFunctions.letter(character).width);
+            this.currentXPosition = (this.currentXPosition - TSOS.CanvasTextFunctions.letter(character).width) + offset;
+            console.log("after bs x: " + this.currentXPosition);
             _DrawingContext.clearRect(this.currentXPosition, (this.currentYPosition - 12), 20, 20);
         };
         Console.prototype.resetXY = function () {

@@ -132,30 +132,57 @@ module TSOS {
 
                 }
             } else if (keyCode === 38) {                        // up arrow
-                // Find the last command and put it in the queue
+                // Check to see if user is already scrolling commands
                 if (!this.isScrollingCommands) {
+                    // If not, set the commandIndex of the commandsUsedList
                     this.scrollingCommandIndex = _OsShell.commandsUsedList.length - 1;
+                    // Change chr to the indexed command
                     chr = _OsShell.commandsUsedList[this.scrollingCommandIndex];
+                    // Then queue the indexed command
                     _KernelInputQueue.enqueue(chr);
+                    // Set the isScrollingCommands to true for the purpose of the enter key
+                    // and to further scroll the commandList
                     this.isScrollingCommands = true;
-                
+                // Check to see if user is already scrolling
                 } else if (this.isScrollingCommands) {
+                    // If so, check to see if the index is already at 0 (the end of the list)
                     if (this.scrollingCommandIndex != 0) {
+                        // If not, subtract 1 from the index
                         this.scrollingCommandIndex--;
                     } else {
+                        // If so, reset the index to continue scrolling
                         this.scrollingCommandIndex = _OsShell.commandsUsedList.length - 1;
                     }
+                    // Reset the buffer because we're not using the previous command anymore
                     _Console.buffer = "";
+                    // Reset the x position to the prompt
                     _Console.currentXPosition = 13;
+                    // Clear that shit out of here
                     _DrawingContext.clearRect(_Console.currentXPosition, (_Console.currentYPosition - 12), 100, 100);
 
+                    // Then, add the next command to the queue
                     chr = _OsShell.commandsUsedList[this.scrollingCommandIndex];
                     _KernelInputQueue.enqueue(chr);
                 }
-                console.log("isScrolling: " + this.isScrollingCommands);
-                console.log("command list: " + _OsShell.commandsUsedList);
-                console.log("chr: " + chr);
-                console.log("index: " + this.scrollingCommandIndex);
+            } else if (keyCode === 40) {         // down arrow
+                // Check to see if user is already scrolling
+                if (this.isScrollingCommands) {
+                    // If so, check to see if the index is already at 0 (the end of the list)
+                    if (this.scrollingCommandIndex != _OsShell.commandsUsedList.length - 1) {
+                        // If not, add 1 to the index
+                        this.scrollingCommandIndex++;
+
+                        // Reset the buffer because we're not using the previous command anymore
+                        _Console.buffer = "";
+                        // Reset the x position to the prompt
+                        _Console.currentXPosition = 13;
+                        // Clear that shit out of here
+                        _DrawingContext.clearRect(_Console.currentXPosition, (_Console.currentYPosition - 12), 100, 100);
+                        // Then, add the next command to the queue
+                        chr = _OsShell.commandsUsedList[this.scrollingCommandIndex];
+                        _KernelInputQueue.enqueue(chr);
+                    }
+                }
             }
         }
 

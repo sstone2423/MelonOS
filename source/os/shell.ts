@@ -121,6 +121,12 @@ module TSOS {
                                   + " hex digits and spaces are valid.");
             this.commandList[this.commandList.length] = sc;
 
+            // dropit
+            sc = new ShellCommand(this.shellDropit,
+                                  "dropit",
+                                  "- Please don't drop those..");
+            this.commandList[this.commandList.length] = sc;
+
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -332,6 +338,10 @@ module TSOS {
                         _StdOut.putText("Load validates the user input program to ensure only hex digits"
                                         + " and spaces exist.");
                         break;
+                    case "dropit":
+                        _StdOut.putText("Dropit can not be undone.. Please don't drop the melons."
+                                        + " and spaces exist.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -446,6 +456,11 @@ module TSOS {
             } else {
                 _StdOut.putText("Program must only contain hexadecimal values (A-F, a-f, 0-9) or spaces.");
             }
+        }
+
+        public shellDropit() {
+            const oops = "Who dropped those?";
+            _Kernel.krnTrapError(oops);
         }
     }
 }

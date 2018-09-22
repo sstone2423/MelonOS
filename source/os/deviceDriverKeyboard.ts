@@ -127,36 +127,42 @@ module TSOS {
                     // Clear the area of the last character on canvas
                     _StdOut.backspaceClear(previousChar);
                 }
-            } else if (keyCode === 9) {                         // tab
+            } else if (keyCode === 9) {           // tab
                 if (_Console.buffer.length != 0) {
-                    // Instantiate the currentBuffer
                     console.log("buffer length: " + _Console.buffer.length);
                     console.log("buffer: " + _Console.buffer);
-                    let currentBuffer = _Console.buffer;
+                    // Instantiate the tabIndex and match boolean
                     let tabIndex = 0;
                     let match = false;
                     
+                    // Find first match
                     while (!match) {
                         console.log("enter while loop");
-                        // First commandList entry
-                        if (_OsShell.commandList[tabIndex].command.substring(0, currentBuffer.length).toLowerCase()
-                            == currentBuffer.toLowerCase()) {
+                        // If the substring of a command == to the buffer, grab it
+                        if (_OsShell.commandList[tabIndex].command.substring(0, _Console.buffer.length).toLowerCase()
+                            == _Console.buffer.toLowerCase()) {
+                            // Remove the current characters
                             _StdOut.backspaceClear(_Console.buffer);
+                            // Reset the buffer
                             _Console.buffer = "";
+                            // Add the command to the queue
                             chr = _OsShell.commandList[tabIndex].command;
                             _KernelInputQueue.enqueue(chr);
+                            // Set the boolean to true to escape the loop
                             match = true;
                             console.log("enter first if");
+                        // If the entire list has been searched, escape the loop
                         } else if (tabIndex == _OsShell.commandList.length) {
                             match = true;
                             console.log("tabIndex == commandList length");
+                        // Otherwise, add 1 to the index and continue the search
                         } else {
                             tabIndex++;
                             console.log("tab index: " + tabIndex);
                         }
                     }
                 }
-            } else if (keyCode === 38) {                        // up arrow
+            } else if (keyCode === 38) {            // up arrow
                 // Check to see if user is already scrolling commands
                 if (!this.isScrollingCommands) {
                     // If not, set the commandIndex of the commandsUsedList
@@ -189,7 +195,7 @@ module TSOS {
                     chr = _OsShell.commandsUsedList[this.scrollingCommandIndex];
                     _KernelInputQueue.enqueue(chr);
                 }
-            } else if (keyCode === 40) {         // down arrow
+            } else if (keyCode === 40) {          // down arrow
                 // Check to see if user is already scrolling
                 if (this.isScrollingCommands) {
                     // If so, check to see if the index is already at the end of the list 
@@ -205,6 +211,12 @@ module TSOS {
                         // Then, add the next command to the queue
                         chr = _OsShell.commandsUsedList[this.scrollingCommandIndex];
                         _KernelInputQueue.enqueue(chr);
+                    } else {
+                        _Console.buffer = "";
+                        // Reset the x position to the prompt
+                        _Console.currentXPosition = 13;
+                        // Clear that shit out of here
+                        _DrawingContext.clearRect(_Console.currentXPosition, (_Console.currentYPosition - 12), 100, 100);
                     }
                 }
             }

@@ -14,11 +14,23 @@ var CPU_CLOCK_INTERVAL = 100; // This is in ms (milliseconds) so 1000 = 1 second
 var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 var KEYBOARD_IRQ = 1;
-// Global letiables
+// Global variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 var _CPU; // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
 var _OSclock = 0; // Page 23.
 var _Mode = 0; // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
+// Memory related global variables
+var _Memory;
+var _MemoryAccessor;
+var _MemoryManager;
+var _MemorySize = 768; // 786 bytes, 3 segments of 256 bytes
+var _SegementSize = 256;
+// Process related global variables
+var _CurrentPCB;
+var _ProcessCount = 0;
+var _PCBList = [];
+var _ProcessManager;
+// Canvas and font variables
 var _Canvas; // Initialized in Control.hostInit().
 var _DrawingContext; // = _Canvas.getContext("2d");  // Assigned here for type safety, but re-initialized in
 // Control.hostInit() for OCD and logic.
@@ -26,8 +38,8 @@ var _DefaultFontFamily = "sans"; // Ignored, I think. The was just a place-holde
 // canvas may have use for it.
 var _DefaultFontSize = 13;
 var _FontHeightMargin = 4; // Additional space added to font size when advancing a line.
-var _Trace = true; // Default the OS trace to be on.
 // The OS Kernel and its queues.
+var _Trace = true; // Default the OS trace to be on.
 var _Kernel;
 var _KernelInterruptQueue; // Initializing this to null (which I would normally do) would then require us to
 // specify the 'any' type, as below.

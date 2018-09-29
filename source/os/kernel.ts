@@ -206,7 +206,6 @@ module TSOS {
                     melon = melons[i];
                     ctx.drawImage(melon.image, melon.x, melon.y);
                 }
-                
                 // Call the move function to redraw the images to make them seem in motion
                 move();
             }
@@ -216,15 +215,15 @@ module TSOS {
                 // Loop through all of the melons
                 for (let i = 0; i < noOfMelons; i++) {
                     melon = melons[i];
-                    melon.y += melon.ys;
                     // Change the y coordinate to make them "fall"
+                    melon.y += melon.ys;
+                    // If melons go past the canvas height, redraw them at the top
                     if (melon.y > _Canvas.height) {
                         melon.x = Math.random() * _Canvas.width;
                         melon.y = -1 * 15;
                     }
                 }
             }
-            
             // Set the interval in which to draw the melons
             setInterval(draw, 30);
             // Shutdown the kernel

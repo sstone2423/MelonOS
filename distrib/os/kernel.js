@@ -191,8 +191,9 @@ var TSOS;
                 // Loop through all of the melons
                 for (var i_2 = 0; i_2 < noOfMelons; i_2++) {
                     melon = melons[i_2];
-                    melon.y += melon.ys;
                     // Change the y coordinate to make them "fall"
+                    melon.y += melon.ys;
+                    // If melons go past the canvas height, redraw them at the top
                     if (melon.y > _Canvas.height) {
                         melon.x = Math.random() * _Canvas.width;
                         melon.y = -1 * 15;

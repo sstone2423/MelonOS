@@ -127,6 +127,12 @@ module TSOS {
                                   "- Please don't drop those..");
             this.commandList[this.commandList.length] = sc;
 
+            // run
+            sc = new ShellCommand(this.shellRun,
+                                  "run",
+                                  "- Run the program currently loaded in memory.");
+            this.commandList[this.commandList.length] = sc;
+
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -342,6 +348,9 @@ module TSOS {
                         _StdOut.putText("Dropit can not be undone.. Please don't drop the melons."
                                         + " and spaces exist.");
                         break;
+                    case "run":
+                        _StdOut.putText("Run will run the current process loaded in memory.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -461,6 +470,10 @@ module TSOS {
         public shellDropit() {
             const oops = "Who dropped those?";
             _Kernel.krnTrapError(oops);
+        }
+
+        public shellRun() {
+            
         }
     }
 }

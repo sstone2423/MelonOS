@@ -23,18 +23,14 @@
 // Control Services
 
 module TSOS {
-
     export class Control {
 
         public static hostInit(): void {
             // This is called from index.html's onLoad event via the onDocumentLoad function pointer.
-
             // Get a global reference to the canvas.  TODO: Should we move this stuff into a Display Device Driver?
             _Canvas = document.getElementById("display") as HTMLCanvasElement;
-
             // Get a global reference to the drawing context.
             _DrawingContext = _Canvas.getContext("2d");
-
             // Enable the added-in canvas text functions (see canvastext.ts for provenance and details).
             CanvasTextFunctions.enable(_DrawingContext);   // Text functionality is now built in to the HTML5
                                                            // canvas. But this is old-school, and fun, so we'll keep it.
@@ -60,10 +56,8 @@ module TSOS {
         public static hostLog(msg: string, source: string = "?"): void {
             // Note the OS CLOCK.
             const clock: number = _OSclock;
-
             // Note the REAL clock in milliseconds since January 1, 1970.
             const now: number = new Date().getTime();
-
             // Build the log string.
             const str: string = "({ clock:" + clock + ", source:" + source + ", msg:" + msg + ", now:" + now
                                 + " })"  + "\n";
@@ -89,11 +83,14 @@ module TSOS {
             document.getElementById("display").focus();
 
             // ... Create and initialize the CPU (because it's part of the hardware)  ...
-            _CPU = new Cpu();  // Note: We could simulate multi-core systems by instantiating more than
+            _CPU = new TSOS.Cpu();  // Note: We could simulate multi-core systems by instantiating more than
                                // one instance of the CPU here.
             _CPU.init();       // There's more to do, like dealing with scheduling and such, but this
                                // would be a start. Pretty cool.
-
+            // Initialize Memory
+            _Memory = new TSOS.Memory();
+            _MemoryAccessor = new TSOS.MemoryAccessor();
+            
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
             // .. and call the OS Kernel Bootstrap routine.

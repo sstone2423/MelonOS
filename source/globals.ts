@@ -25,9 +25,8 @@ let _OSclock: number = 0;  // Page 23.
 let _Mode: number = 0;     // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
 
 // Memory related global variables
-let _Memory;
-let _MemoryAccessor;
-let _MemoryManager;
+let _Memory: TSOS.Memory;
+let _MemoryManager: TSOS.MemoryManager;
 let _MemorySize = 768; // 786 bytes, 3 segments of 256 bytes
 let _SegementSize = 256;
 

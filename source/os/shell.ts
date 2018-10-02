@@ -454,10 +454,8 @@ module TSOS {
         public shellLoad() {
             // Get value inside program input (the program)
             const userInputProgram = document.getElementById("taProgramInput").value;
-
             // Create regex pattern
             const hexRegex = new RegExp("^[a-fA-F0-9\s]+$");
-
             // Check for anything besides hex or spaces (A-Fa-f0-9)
             if (hexRegex.test(userInputProgram)) {
                 // Load program into memory (currently just outputs success)
@@ -465,6 +463,10 @@ module TSOS {
             } else {
                 _StdOut.putText("Program must only contain hexadecimal values (A-F, a-f, 0-9) or spaces.");
             }
+            // Split the program into 2-bit hex
+            let splitProgram = userInputProgram.split(" ");
+            // Create a process using the process manager
+            _MemoryManager.uploadProgram(splitProgram);
         }
 
         public shellDropit() {

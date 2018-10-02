@@ -88,9 +88,9 @@ module TSOS {
             _CPU.init();       // There's more to do, like dealing with scheduling and such, but this
                                // would be a start. Pretty cool.
             // Initialize Memory
-            _Memory = new TSOS.Memory();
-            _MemoryAccessor = new TSOS.MemoryAccessor();
-            
+            //_Memory = new TSOS.Memory();
+            //_MemoryAccessor = new TSOS.MemoryAccessor();
+
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
             // .. and call the OS Kernel Bootstrap routine.

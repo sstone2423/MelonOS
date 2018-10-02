@@ -56,3 +56,23 @@ h3 {
 #melonFall {
   display: none;
 }
+
+canvas {
+  overflow-x:hidden;
+}
+
+#divConsole {
+  margin:4px; 
+  width:550px; 
+  height:500px; 
+  float:left; 
+  overflow:auto;
+}
+
+#divLog {
+  margin-left:520px;
+}
+
+#divUserProgramInput {
+  margin-left:520px;
+}

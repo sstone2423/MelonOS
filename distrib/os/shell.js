@@ -390,6 +390,10 @@ var TSOS;
             else {
                 _StdOut.putText("Program must only contain hexadecimal values (A-F, a-f, 0-9) or spaces.");
             }
+            // Split the program into 2-bit hex
+            var splitProgram = userInputProgram.split(" ");
+            // Create a process using the process manager
+            _MemoryManager.uploadProgram(splitProgram);
         };
         Shell.prototype.shellDropit = function () {
             var oops = "Who dropped those?";

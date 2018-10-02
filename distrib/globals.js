@@ -25,7 +25,7 @@ var _MemoryManager;
 var _MemorySize = 768; // 786 bytes, 3 segments of 256 bytes
 var _SegementSize = 256;
 // Process related global variables
-var _CurrentPCB;
+var _PCB;
 var _ProcessCount = 0;
 var _PCBList = [];
 var _ProcessManager;

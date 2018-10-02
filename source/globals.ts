@@ -31,7 +31,7 @@ let _MemorySize = 768; // 786 bytes, 3 segments of 256 bytes
 let _SegementSize = 256;
 
 // Process related global variables
-let _CurrentPCB;
+let _PCB: TSOS.ProcessControlBlock;
 let _ProcessCount = 0;
 let _PCBList = [];
 let _ProcessManager;

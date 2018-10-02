@@ -34,7 +34,6 @@ let _SegementSize = 256;
 let _PCB: TSOS.ProcessControlBlock;
 let _ProcessCount = 0;
 let _PCBList = [];
-let _ProcessManager;
 
 // Canvas and font variables
 let _Canvas: HTMLCanvasElement;         // Initialized in Control.hostInit().

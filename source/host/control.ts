@@ -23,6 +23,7 @@
 // Control Services
 
 module TSOS {
+    
     export class Control {
 
         public static hostInit(): void {

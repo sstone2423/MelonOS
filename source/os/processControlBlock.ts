@@ -2,16 +2,21 @@
 
 module TSOS {
     export class ProcessControlBlock {
+    
+        constructor(public pId: number,
+            public state: String = "Ready",
+            public PC: number = 0,
+            public IR: String = "00",
+            public priority: number = 1,
+            public Acc: number = 0,
+            public xReg: number = 0,
+            public yReg: number = 0,
+            public zFlag: number = 0
+            ) {
+            
+        }
 
-        constructor(public processId = 0,
-            public state = "Ready",
-            public PC = 0, // program counter
-            public IR = "00", // instruction register
-            public priority = 1,
-            public ACC = 0,
-            public xReg = 0,
-            public yReg = 0,
-            public zFlag = 0) {
-        } 
     }
+
+
 }

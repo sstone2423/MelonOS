@@ -8,9 +8,7 @@
 var TSOS;
 (function (TSOS) {
     var Memory = /** @class */ (function () {
-        function Memory(memoryArray) {
-            if (memoryArray === void 0) { memoryArray = []; }
-            this.memoryArray = memoryArray;
+        function Memory() {
         }
         // Initializa the memory with 786 bytes
         Memory.prototype.init = function () {

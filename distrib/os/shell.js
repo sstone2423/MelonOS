@@ -393,7 +393,7 @@ var TSOS;
             // Split the program into 2-bit hex
             var splitProgram = userInputProgram.split(" ");
             // Create a process using the process manager
-            _MemoryManager.uploadProgram(splitProgram);
+            _MemoryManager.createProcess(splitProgram);
         };
         Shell.prototype.shellDropit = function () {
             var oops = "Who dropped those?";

@@ -10,13 +10,12 @@
      module TSOS {
 
         export class Memory {
-            constructor(public memoryArray = []) {
-            }
+
+            public memoryArray: Array<String>
             
             // Initializa the memory with 786 bytes
             public init(): void {
-                this.memoryArray = new Array(768);
-
+                this.memoryArray = new Array<String>(768);
                 // Initialize memory with 00's
                 for (let i = 0; i < this.memoryArray.length; i++) {
                     this.memoryArray[i] = "00";

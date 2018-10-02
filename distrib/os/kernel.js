@@ -13,12 +13,10 @@
      ------------ */
 var TSOS;
 (function (TSOS) {
-    var Kernel = (function () {
+    var Kernel = /** @class */ (function () {
         function Kernel() {
         }
-        //
         // OS Startup and Shutdown Routines
-        //
         Kernel.prototype.krnBootstrap = function () {
             TSOS.Control.hostLog("bootstrap", "host"); // Use hostLog because we ALWAYS want this, even if _Trace is off.
             // Initialize our global queues.
@@ -36,9 +34,12 @@ var TSOS;
             _krnKeyboardDriver = new TSOS.DeviceDriverKeyboard(); // Construct it.
             _krnKeyboardDriver.driverEntry(); // Call the driverEntry() initialization routine.
             this.krnTrace(_krnKeyboardDriver.status);
-            //
-            // ... more?
-            //
+            // Load current date/time
+            var htmlDateTime = document.getElementById("currentDate");
+            var currentDateTime = new Date();
+            htmlDateTime.innerHTML = currentDateTime + "";
+            // Initialize memory
+            _Memory.init();
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
             this.krnEnableInterrupts();
@@ -57,10 +58,8 @@ var TSOS;
             // ... Disable the Interrupts.
             this.krnTrace("Disabling the interrupts.");
             this.krnDisableInterrupts();
-            //
             // Unload the Device Drivers?
             // More?
-            //
             this.krnTrace("end shutdown OS");
         };
         Kernel.prototype.krnOnCPUClockPulse = function () {
@@ -75,16 +74,16 @@ var TSOS;
                 var interrupt = _KernelInterruptQueue.dequeue();
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             }
-            else if (_CPU.isExecuting) {
+            else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is
+                // anything being processed.
                 _CPU.cycle();
             }
-            else {
+            else { // If there are no interrupts and there is nothing being executed
+                // then just be idle.
                 this.krnTrace("Idle");
             }
         };
-        //
         // Interrupt Handling
-        //
         Kernel.prototype.krnEnableInterrupts = function () {
             // Keyboard
             TSOS.Devices.hostEnableKeyboardInterrupt();
@@ -116,32 +115,32 @@ var TSOS;
             }
         };
         Kernel.prototype.krnTimerISR = function () {
-            // The built-in TIMER (not clock) Interrupt Service Routine (as opposed to an ISR coming from a device driver). {
-            // Check multiprogramming parameters and enforce quanta here. Call the scheduler / context switch here if necessary.
+            /* The built-in TIMER (not clock) Interrupt Service Routine (as opposed to an ISR coming from
+            a device driver).
+            Check multiprogramming parameters and enforce quanta here. Call the scheduler / context
+            switch here if necessary. */
         };
-        //
-        // System Calls... that generate software interrupts via tha Application Programming Interface library routines.
-        //
-        // Some ideas:
-        // - ReadConsole
-        // - WriteConsole
-        // - CreateProcess
-        // - ExitProcess
-        // - WaitForProcessToExit
-        // - CreateFile
-        // - OpenFile
-        // - ReadFile
-        // - WriteFile
-        // - CloseFile
-        //
-        // OS Utility Routines
-        //
+        /* System Calls... that generate software interrupts via tha Application Programming Interface library routines.
+
+         Some ideas:
+         - ReadConsole
+         - WriteConsole
+         - CreateProcess
+         - ExitProcess
+         - WaitForProcessToExit
+         - CreateFile
+         - OpenFile
+         - ReadFile
+         - WriteFile
+         - CloseFile
+
+        // OS Utility Routines */
         Kernel.prototype.krnTrace = function (msg) {
             // Check globals to see if trace is set ON.  If so, then (maybe) log the message.
             if (_Trace) {
                 if (msg === "Idle") {
                     // We can't log every idle clock pulse because it would lag the browser very quickly.
-                    if (_OSclock % 10 == 0) {
+                    if (_OSclock % 10 === 0) {
                         // Check the CPU_CLOCK_INTERVAL in globals.ts for an
                         // idea of the tick rate and adjust this line accordingly.
                         TSOS.Control.hostLog(msg, "OS");
@@ -153,11 +152,61 @@ var TSOS;
             }
         };
         Kernel.prototype.krnTrapError = function (msg) {
+            // Display error
             TSOS.Control.hostLog("OS ERROR - TRAP: " + msg);
-            // TODO: Display error on console, perhaps in some sort of colored screen. (Maybe blue?)
+            // Initialize Canvas and melon variables
+            var ctx;
+            var noOfMelons = 20;
+            var melons = [];
+            var melon;
+            var melonImage = document.getElementById("melonFall");
+            // Set the context
+            ctx = _Canvas.getContext('2d');
+            // Change the background to blue for BSOD
+            _Canvas.style.backgroundColor = "blue";
+            // Change the canvas height
+            _Canvas.height = 500;
+            // Create the array of melons
+            for (var i = 0; i < noOfMelons; i++) {
+                melons.push({
+                    x: Math.random() * _Canvas.width,
+                    y: Math.random() * _Canvas.height,
+                    ys: Math.random() + 2,
+                    image: melonImage
+                });
+            }
+            // Draw the melon on the canvas using the melonImage
+            function draw() {
+                // Clear the canvas first
+                ctx.clearRect(0, 0, _Canvas.width, _Canvas.height);
+                // Draw the melons
+                for (var i_1 = 0; i_1 < noOfMelons; i_1++) {
+                    melon = melons[i_1];
+                    ctx.drawImage(melon.image, melon.x, melon.y);
+                }
+                // Call the move function to redraw the images to make them seem in motion
+                move();
+            }
+            // Move will continuously change the y coordinates to make them seem in motion
+            function move() {
+                // Loop through all of the melons
+                for (var i_2 = 0; i_2 < noOfMelons; i_2++) {
+                    melon = melons[i_2];
+                    // Change the y coordinate to make them "fall"
+                    melon.y += melon.ys;
+                    // If melons go past the canvas height, redraw them at the top
+                    if (melon.y > _Canvas.height) {
+                        melon.x = Math.random() * _Canvas.width;
+                        melon.y = -1 * 15;
+                    }
+                }
+            }
+            // Set the interval in which to draw the melons
+            setInterval(draw, 30);
+            // Shutdown the kernel
             this.krnShutdown();
         };
         return Kernel;
-    })();
+    }());
     TSOS.Kernel = Kernel;
 })(TSOS || (TSOS = {}));

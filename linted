@@ -1,0 +1,126 @@
+
+ERROR: /Users/temp/MelonOS/source/globals.ts[27, 5]: variable name must be in lowerCamelCase, PascalCase or UPPER_CASE
+ERROR: /Users/temp/MelonOS/source/globals.ts[29, 5]: variable name must be in lowerCamelCase, PascalCase or UPPER_CASE
+ERROR: /Users/temp/MelonOS/source/globals.ts[31, 5]: variable name must be in lowerCamelCase, PascalCase or UPPER_CASE
+ERROR: /Users/temp/MelonOS/source/globals.ts[32, 5]: variable name must be in lowerCamelCase, PascalCase or UPPER_CASE
+ERROR: /Users/temp/MelonOS/source/globals.ts[34, 5]: variable name must be in lowerCamelCase, PascalCase or UPPER_CASE
+ERROR: /Users/temp/MelonOS/source/globals.ts[36, 5]: variable name must be in lowerCamelCase, PascalCase or UPPER_CASE
+ERROR: /Users/temp/MelonOS/source/globals.ts[37, 5]: variable name must be in lowerCamelCase, PascalCase or UPPER_CASE
+ERROR: /Users/temp/MelonOS/source/globals.ts[39, 5]: variable name must be in lowerCamelCase, PascalCase or UPPER_CASE
+ERROR: /Users/temp/MelonOS/source/globals.ts[42, 5]: variable name must be in lowerCamelCase, PascalCase or UPPER_CASE
+ERROR: /Users/temp/MelonOS/source/globals.ts[43, 5]: variable name must be in lowerCamelCase, PascalCase or UPPER_CASE
+ERROR: /Users/temp/MelonOS/source/globals.ts[45, 5]: variable name must be in lowerCamelCase, PascalCase or UPPER_CASE
+ERROR: /Users/temp/MelonOS/source/globals.ts[47, 5]: variable name must be in lowerCamelCase, PascalCase or UPPER_CASE
+ERROR: /Users/temp/MelonOS/source/globals.ts[51, 5]: variable name must be in lowerCamelCase, PascalCase or UPPER_CASE
+ERROR: /Users/temp/MelonOS/source/globals.ts[52, 5]: variable name must be in lowerCamelCase, PascalCase or UPPER_CASE
+ERROR: /Users/temp/MelonOS/source/globals.ts[55, 5]: variable name must be in lowerCamelCase, PascalCase or UPPER_CASE
+ERROR: /Users/temp/MelonOS/source/globals.ts[56, 5]: variable name must be in lowerCamelCase, PascalCase or UPPER_CASE
+ERROR: /Users/temp/MelonOS/source/globals.ts[59, 5]: variable name must be in lowerCamelCase, PascalCase or UPPER_CASE
+ERROR: /Users/temp/MelonOS/source/globals.ts[62, 5]: variable name must be in lowerCamelCase, PascalCase or UPPER_CASE
+ERROR: /Users/temp/MelonOS/source/globals.ts[64, 5]: variable name must be in lowerCamelCase, PascalCase or UPPER_CASE
+ERROR: /Users/temp/MelonOS/source/globals.ts[68, 5]: variable name must be in lowerCamelCase, PascalCase or UPPER_CASE
+ERROR: /Users/temp/MelonOS/source/host/control.ts[1, 21]: <reference> is not allowed, use imports
+ERROR: /Users/temp/MelonOS/source/host/control.ts[2, 21]: <reference> is not allowed, use imports
+ERROR: /Users/temp/MelonOS/source/host/control.ts[25, 1]: The internal 'module' syntax is deprecated, use the 'namespace' keyword instead.
+ERROR: /Users/temp/MelonOS/source/host/control.ts[25, 1]: 'namespace' and 'module' are disallowed
+ERROR: /Users/temp/MelonOS/source/host/cpu.ts[1, 21]: <reference> is not allowed, use imports
+ERROR: /Users/temp/MelonOS/source/host/cpu.ts[18, 1]: 'namespace' and 'module' are disallowed
+ERROR: /Users/temp/MelonOS/source/host/cpu.ts[18, 1]: The internal 'module' syntax is deprecated, use the 'namespace' keyword instead.
+ERROR: /Users/temp/MelonOS/source/host/devices.ts[1, 21]: <reference> is not allowed, use imports
+ERROR: /Users/temp/MelonOS/source/host/devices.ts[22, 1]: The internal 'module' syntax is deprecated, use the 'namespace' keyword instead.
+ERROR: /Users/temp/MelonOS/source/host/devices.ts[22, 1]: 'namespace' and 'module' are disallowed
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[20, 1]: 'namespace' and 'module' are disallowed
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[20, 1]: The internal 'module' syntax is deprecated, use the 'namespace' keyword instead.
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[28, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[30, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[34, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[38, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[44, 13]: The key '(' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[44, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[46, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[53, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[57, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[59, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[62, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[64, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[68, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[72, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[75, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[78, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[83, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[86, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[94, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[97, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[100, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[102, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[105, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[110, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[114, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[117, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[120, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[122, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[125, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[127, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[131, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[134, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[139, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[142, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[147, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[149, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[152, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[154, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[157, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[160, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[163, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[166, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[170, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[173, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[175, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[178, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[181, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[184, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[186, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[189, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[191, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[194, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[197, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[199, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[201, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[208, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[214, 31]: The key 'points' is not sorted alphabetically
+ERROR: /Users/temp/MelonOS/source/os/canvastext.ts[263, 17]: Expected a 'for-of' loop instead of a 'for' loop with this simple iteration
+ERROR: /Users/temp/MelonOS/source/os/console.ts[1, 21]: <reference> is not allowed, use imports
+ERROR: /Users/temp/MelonOS/source/os/console.ts[12, 1]: The internal 'module' syntax is deprecated, use the 'namespace' keyword instead.
+ERROR: /Users/temp/MelonOS/source/os/console.ts[12, 1]: 'namespace' and 'module' are disallowed
+ERROR: /Users/temp/MelonOS/source/os/console.ts[32, 17]: Calls to 'console.log' are not allowed.
+ERROR: /Users/temp/MelonOS/source/os/console.ts[65, 17]: Expected a 'for-of' loop instead of a 'for' loop with this simple iteration
+ERROR: /Users/temp/MelonOS/source/os/deviceDriver.ts[7, 1]: The internal 'module' syntax is deprecated, use the 'namespace' keyword instead.
+ERROR: /Users/temp/MelonOS/source/os/deviceDriver.ts[7, 1]: 'namespace' and 'module' are disallowed
+ERROR: /Users/temp/MelonOS/source/os/deviceDriverKeyboard.ts[1, 21]: <reference> is not allowed, use imports
+ERROR: /Users/temp/MelonOS/source/os/deviceDriverKeyboard.ts[2, 21]: <reference> is not allowed, use imports
+ERROR: /Users/temp/MelonOS/source/os/deviceDriverKeyboard.ts[12, 1]: 'namespace' and 'module' are disallowed
+ERROR: /Users/temp/MelonOS/source/os/deviceDriverKeyboard.ts[12, 1]: The internal 'module' syntax is deprecated, use the 'namespace' keyword instead.
+ERROR: /Users/temp/MelonOS/source/os/interrupt.ts[5, 1]: The internal 'module' syntax is deprecated, use the 'namespace' keyword instead.
+ERROR: /Users/temp/MelonOS/source/os/interrupt.ts[5, 1]: 'namespace' and 'module' are disallowed
+ERROR: /Users/temp/MelonOS/source/os/kernel.ts[1, 21]: <reference> is not allowed, use imports
+ERROR: /Users/temp/MelonOS/source/os/kernel.ts[2, 21]: <reference> is not allowed, use imports
+ERROR: /Users/temp/MelonOS/source/os/kernel.ts[16, 1]: The internal 'module' syntax is deprecated, use the 'namespace' keyword instead.
+ERROR: /Users/temp/MelonOS/source/os/kernel.ts[16, 1]: 'namespace' and 'module' are disallowed
+ERROR: /Users/temp/MelonOS/source/os/queue.ts[11, 1]: The internal 'module' syntax is deprecated, use the 'namespace' keyword instead.
+ERROR: /Users/temp/MelonOS/source/os/queue.ts[11, 1]: 'namespace' and 'module' are disallowed
+ERROR: /Users/temp/MelonOS/source/os/queue.ts[40, 13]: for (... in ...) statements must be filtered with an if statement
+ERROR: /Users/temp/MelonOS/source/os/shell.ts[1, 21]: <reference> is not allowed, use imports
+ERROR: /Users/temp/MelonOS/source/os/shell.ts[2, 21]: <reference> is not allowed, use imports
+ERROR: /Users/temp/MelonOS/source/os/shell.ts[3, 21]: <reference> is not allowed, use imports
+ERROR: /Users/temp/MelonOS/source/os/shell.ts[4, 21]: <reference> is not allowed, use imports
+ERROR: /Users/temp/MelonOS/source/os/shell.ts[19, 1]: The internal 'module' syntax is deprecated, use the 'namespace' keyword instead.
+ERROR: /Users/temp/MelonOS/source/os/shell.ts[19, 1]: 'namespace' and 'module' are disallowed
+ERROR: /Users/temp/MelonOS/source/os/shell.ts[214, 13]: for (... in ...) statements must be filtered with an if statement
+ERROR: /Users/temp/MelonOS/source/os/shell.ts[261, 13]: for (... in ...) statements must be filtered with an if statement
+ERROR: /Users/temp/MelonOS/source/os/shellCommand.ts[1, 1]: 'namespace' and 'module' are disallowed
+ERROR: /Users/temp/MelonOS/source/os/shellCommand.ts[1, 1]: The internal 'module' syntax is deprecated, use the 'namespace' keyword instead.
+ERROR: /Users/temp/MelonOS/source/os/userCommand.ts[1, 1]: The internal 'module' syntax is deprecated, use the 'namespace' keyword instead.
+ERROR: /Users/temp/MelonOS/source/os/userCommand.ts[1, 1]: 'namespace' and 'module' are disallowed
+ERROR: /Users/temp/MelonOS/source/utils.ts[7, 1]: 'namespace' and 'module' are disallowed
+ERROR: /Users/temp/MelonOS/source/utils.ts[7, 1]: The internal 'module' syntax is deprecated, use the 'namespace' keyword instead.
+

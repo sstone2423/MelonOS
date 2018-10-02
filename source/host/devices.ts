@@ -23,13 +23,8 @@ module TSOS {
 
     export class Devices {
 
-        constructor() {
-            _hardwareClockID = -1;
-        }
-
-        //
         // Hardware/Host Clock Pulse
-        //
+
         public static hostClockPulse(): void {
             // Increment the hardware (host) clock.
             _OSclock++;
@@ -37,9 +32,8 @@ module TSOS {
             _Kernel.krnOnCPUClockPulse();
         }
 
-        //
         // Keyboard Interrupt, a HARDWARE Interrupt Request. (See pages 560-561 in our text book.)
-        //
+
         public static hostEnableKeyboardInterrupt(): void {
             // Listen for key press (keydown, actually) events in the Document
             // and call the simulation processor, which will in turn call the
@@ -57,10 +51,14 @@ module TSOS {
             if (event.target.id === "display") {
                 event.preventDefault();
                 // Note the pressed key code in the params (Mozilla-specific).
-                var params = new Array(event.which, event.shiftKey);
+                const params = new Array(event.which, event.shiftKey);
                 // Enqueue this interrupt on the kernel interrupt queue so that it gets to the Interrupt handler.
                 _KernelInterruptQueue.enqueue(new Interrupt(KEYBOARD_IRQ, params));
             }
+        }
+
+        constructor() {
+            _hardwareClockID = -1;
         }
     }
 }

@@ -7,32 +7,41 @@
 
    The OS Shell - The "command line interface" (CLI) for the console.
 
-    Note: While fun and learning are the primary goals of all enrichment center activities,
-          serious injuries may occur when trying to write your own Operating System.
+    Note: While fun and learning are the primary goals of all enrichment
+          center activities, serious injuries may occur when trying to
+          write your own Operating System.
    ------------ */
-// TODO: Write a base class / prototype for system services and let Shell inherit from it.
+// TODO: Write a base class / prototype for system services and let
+// Shell inherit from it.
 var TSOS;
 (function (TSOS) {
-    var Shell = (function () {
+    var Shell = /** @class */ (function () {
         function Shell() {
             // Properties
             this.promptStr = ">";
             this.commandList = [];
             this.curses = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
             this.apologies = "[sorry]";
+            this.commandsUsedList = [];
         }
         Shell.prototype.init = function () {
             var sc;
-            //
             // Load the command list.
+            // v
+            sc = new TSOS.ShellCommand(this.shellVer, "v", "- Displays the current version data.");
+            this.commandList[this.commandList.length] = sc;
             // ver
             sc = new TSOS.ShellCommand(this.shellVer, "ver", "- Displays the current version data.");
+            this.commandList[this.commandList.length] = sc;
+            // version
+            sc = new TSOS.ShellCommand(this.shellVer, "version", "- Displays the current version data.");
             this.commandList[this.commandList.length] = sc;
             // help
             sc = new TSOS.ShellCommand(this.shellHelp, "help", "- This is the help command. Seek help.");
             this.commandList[this.commandList.length] = sc;
             // shutdown
-            sc = new TSOS.ShellCommand(this.shellShutdown, "shutdown", "- Shuts down the virtual OS but leaves the underlying host / hardware simulation running.");
+            sc = new TSOS.ShellCommand(this.shellShutdown, "shutdown", "- Shuts down the virtual OS but leaves the "
+                + "underlying host / hardware simulation running.");
             this.commandList[this.commandList.length] = sc;
             // cls
             sc = new TSOS.ShellCommand(this.shellCls, "cls", "- Clears the screen and resets the cursor position.");
@@ -49,9 +58,30 @@ var TSOS;
             // prompt <string>
             sc = new TSOS.ShellCommand(this.shellPrompt, "prompt", "<string> - Sets the prompt.");
             this.commandList[this.commandList.length] = sc;
+            // date
+            sc = new TSOS.ShellCommand(this.shellDate, "date", "- Displays the current date and time.");
+            this.commandList[this.commandList.length] = sc;
+            // whereami
+            sc = new TSOS.ShellCommand(this.shellWhereami, "whereami", "- Displays the current location.");
+            this.commandList[this.commandList.length] = sc;
+            // melon
+            sc = new TSOS.ShellCommand(this.shellMelon, "melon", "- Displays wonderful melon puns for the world to see.");
+            this.commandList[this.commandList.length] = sc;
+            // status
+            sc = new TSOS.ShellCommand(this.shellStatus, "status", "- Changes the status display bar to whatever your heart desires.");
+            this.commandList[this.commandList.length] = sc;
+            // load
+            sc = new TSOS.ShellCommand(this.shellLoad, "load", "- Loads and validates the user code in the user input area. Only"
+                + " hex digits and spaces are valid.");
+            this.commandList[this.commandList.length] = sc;
+            // dropit
+            sc = new TSOS.ShellCommand(this.shellDropit, "dropit", "- Please don't drop those..");
+            this.commandList[this.commandList.length] = sc;
+            // run
+            sc = new TSOS.ShellCommand(this.shellRun, "run", "- Run the program currently loaded in memory.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
-            //
             // Display the initial prompt.
             this.putPrompt();
         };
@@ -60,25 +90,27 @@ var TSOS;
         };
         Shell.prototype.handleInput = function (buffer) {
             _Kernel.krnTrace("Shell Command~" + buffer);
-            //
             // Parse the input...
-            //
             var userCommand = this.parseInput(buffer);
-            // ... and assign the command and args to local variables.
+            // ... and assign the command and args to local letiables.
             var cmd = userCommand.command;
             var args = userCommand.args;
-            //
             // Determine the command and execute it.
-            //
             // TypeScript/JavaScript may not support associative arrays in all browsers so we have to iterate over the
-            // command list in attempt to find a match.  TODO: Is there a better way? Probably. Someone work it out and tell me in class.
+            // command list in attempt to find a match.  TODO: Is there a better way? Probably. Someone work it out
+            // and tell me in class.
             var index = 0;
             var found = false;
-            var fn = undefined;
+            var fn;
+            // Loop until every command in the commandList has been read
             while (!found && index < this.commandList.length) {
+                // First commandList entry
                 if (this.commandList[index].command === cmd) {
                     found = true;
                     fn = this.commandList[index].func;
+                    // Save the command in commandsUsedList for a command history
+                    this.commandsUsedList.push(this.commandList[index].command);
+                    // Second commandList entry
                 }
                 else {
                     ++index;
@@ -89,13 +121,13 @@ var TSOS;
             }
             else {
                 // It's not found, so check for curses and apologies before declaring the command invalid.
-                if (this.curses.indexOf("[" + TSOS.Utils.rot13(cmd) + "]") >= 0) {
+                if (this.curses.indexOf("[" + TSOS.Utils.rot13(cmd) + "]") >= 0) { // Check for curses.
                     this.execute(this.shellCurse);
                 }
-                else if (this.apologies.indexOf("[" + cmd + "]") >= 0) {
+                else if (this.apologies.indexOf("[" + cmd + "]") >= 0) { // Check for apologies.
                     this.execute(this.shellApology);
                 }
-                else {
+                else { // It's just a bad command. {
                     this.execute(this.shellInvalidCommand);
                 }
             }
@@ -130,16 +162,14 @@ var TSOS;
             // 5. Now create the args array from what's left.
             for (var i in tempList) {
                 var arg = TSOS.Utils.trim(tempList[i]);
-                if (arg != "") {
+                if (arg !== "") {
                     retVal.args[retVal.args.length] = tempList[i];
                 }
             }
             return retVal;
         };
-        //
         // Shell Command Functions.  Kinda not part of Shell() class exactly, but
         // called from here, so kept here to avoid violating the law of least astonishment.
-        //
         Shell.prototype.shellInvalidCommand = function () {
             _StdOut.putText("Invalid Command. ");
             if (_SarcasticMode) {
@@ -195,7 +225,61 @@ var TSOS;
                     case "help":
                         _StdOut.putText("Help displays a list of (hopefully) valid commands.");
                         break;
-                    // TODO: Make descriptive MANual page entries for the the rest of the shell commands here.
+                    case "curse":
+                        _StdOut.putText("Curse issues all of your derogatory remarks for you!");
+                        break;
+                    case "apology":
+                        _StdOut.putText("Apology mends your relationship with MelonOS because it has feelings too.");
+                        break;
+                    case "ver":
+                        _StdOut.putText("Ver displays the current version.");
+                        break;
+                    case "v":
+                        _StdOut.putText("V displays the current version.");
+                        break;
+                    case "version":
+                        _StdOut.putText("Version displays the current version.");
+                        break;
+                    case "shutdown":
+                        _StdOut.putText("Shutdown calls the kernel shutdown routine.");
+                        break;
+                    case "cls":
+                        _StdOut.putText("Cls clears the screen for additional melons.");
+                        break;
+                    case "trace":
+                        _StdOut.putText("Trace displays the clock intervals.");
+                        break;
+                    case "rot13":
+                        _StdOut.putText("Rot13 converts characters in the string to character + 13. "
+                            + "It was one of the first ciphers created.");
+                        break;
+                    case "prompt":
+                        _StdOut.putText("Prompt changes the initial prompt to the specific string.");
+                        break;
+                    case "date":
+                        _StdOut.putText("Date displays the current date.");
+                        break;
+                    case "whereami":
+                        _StdOut.putText("Whereami displays the current location.");
+                        break;
+                    case "melon":
+                        _StdOut.putText("Melon will give you juicy puns to use with all of your friends!");
+                        break;
+                    case "status":
+                        _StdOut.putText("Status changes the status display bar to whatever string your"
+                            + " heart desires.");
+                        break;
+                    case "load":
+                        _StdOut.putText("Load validates the user input program to ensure only hex digits"
+                            + " and spaces exist.");
+                        break;
+                    case "dropit":
+                        _StdOut.putText("Dropit can not be undone.. Please don't drop the melons."
+                            + " and spaces exist.");
+                        break;
+                    case "run":
+                        _StdOut.putText("Run will run the current process loaded in memory.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -232,7 +316,7 @@ var TSOS;
         Shell.prototype.shellRot13 = function (args) {
             if (args.length > 0) {
                 // Requires Utils.ts for rot13() function.
-                _StdOut.putText(args.join(' ') + " = '" + TSOS.Utils.rot13(args.join(' ')) + "'");
+                _StdOut.putText(args.join(" ") + " = '" + TSOS.Utils.rot13(args.join(" ")) + "'");
             }
             else {
                 _StdOut.putText("Usage: rot13 <string>  Please supply a string.");
@@ -246,7 +330,78 @@ var TSOS;
                 _StdOut.putText("Usage: prompt <string>  Please supply a string.");
             }
         };
+        Shell.prototype.shellDate = function () {
+            var currentDate = new Date();
+            _StdOut.putText("Current date is " + currentDate);
+        };
+        Shell.prototype.shellWhereami = function () {
+            _StdOut.putText("Current location is Melon Country");
+        };
+        Shell.prototype.shellMelon = function () {
+            // Get a random number between 1 and 8
+            var randomPun = Math.floor(Math.random() * 8) + 1;
+            // Find an excellent pun for our melonicious users
+            switch (randomPun) {
+                case 1:
+                    _StdOut.putText("Sur-round yourself with melons.");
+                    break;
+                case 2:
+                    _StdOut.putText("It's not pulp fiction.");
+                    break;
+                case 3:
+                    _StdOut.putText("This may sound a little 'fruity,' but we think you'll like it.");
+                    break;
+                case 4:
+                    _StdOut.putText("Who says you cant(alope)?");
+                    break;
+                case 5:
+                    _StdOut.putText("With melons you can!");
+                    break;
+                case 6:
+                    _StdOut.putText("MelonOS has a thick skin and a fruity interior.");
+                    break;
+                case 7:
+                    _StdOut.putText("Dew, or dew not, there is no try.");
+                    break;
+                case 8:
+                    _StdOut.putText("Things aren't jellin with these melons.");
+                    break;
+            }
+        };
+        Shell.prototype.shellStatus = function (args) {
+            if (args.length > 0) {
+                var htmlStatus = document.getElementById("status");
+                htmlStatus.innerHTML = "Status: " + args;
+            }
+            else {
+                _StdOut.putText("Usage: status <string> Please supply a string.");
+            }
+        };
+        Shell.prototype.shellLoad = function () {
+            // Get value inside program input (the program)
+            var userInputProgram = document.getElementById("taProgramInput").value;
+            // Create regex pattern
+            var hexRegex = new RegExp("^[a-fA-F0-9\s]+$");
+            // Check for anything besides hex or spaces (A-Fa-f0-9)
+            if (hexRegex.test(userInputProgram)) {
+                // Load program into memory (currently just outputs success)
+                _StdOut.putText("Success");
+            }
+            else {
+                _StdOut.putText("Program must only contain hexadecimal values (A-F, a-f, 0-9) or spaces.");
+            }
+            // Split the program into 2-bit hex
+            var splitProgram = userInputProgram.split(" ");
+            // Create a process using the process manager
+            _MemoryManager.uploadProgram(splitProgram);
+        };
+        Shell.prototype.shellDropit = function () {
+            var oops = "Who dropped those?";
+            _Kernel.krnTrapError(oops);
+        };
+        Shell.prototype.shellRun = function () {
+        };
         return Shell;
-    })();
+    }());
     TSOS.Shell = Shell;
 })(TSOS || (TSOS = {}));

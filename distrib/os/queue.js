@@ -9,7 +9,7 @@
    ------------ */
 var TSOS;
 (function (TSOS) {
-    var Queue = (function () {
+    var Queue = /** @class */ (function () {
         function Queue(q) {
             if (q === void 0) { q = new Array(); }
             this.q = q;
@@ -18,11 +18,13 @@ var TSOS;
             return this.q.length;
         };
         Queue.prototype.isEmpty = function () {
-            return (this.q.length == 0);
+            return (this.q.length === 0);
         };
         Queue.prototype.enqueue = function (element) {
             this.q.push(element);
         };
+        // Dequeue pops the first element of the array off.
+        // ex. [a, b, c, d].shift() = a
         Queue.prototype.dequeue = function () {
             var retVal = null;
             if (this.q.length > 0) {
@@ -38,6 +40,6 @@ var TSOS;
             return retVal;
         };
         return Queue;
-    })();
+    }());
     TSOS.Queue = Queue;
 })(TSOS || (TSOS = {}));

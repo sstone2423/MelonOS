@@ -20,38 +20,34 @@
      Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 978-0-470-12872-5
      ------------ */
 
-//
 // Control Services
-//
-module TSOS {
 
+module TSOS {
     export class Control {
 
         public static hostInit(): void {
             // This is called from index.html's onLoad event via the onDocumentLoad function pointer.
-
             // Get a global reference to the canvas.  TODO: Should we move this stuff into a Display Device Driver?
-            _Canvas = <HTMLCanvasElement>document.getElementById('display');
-
+            _Canvas = document.getElementById("display") as HTMLCanvasElement;
             // Get a global reference to the drawing context.
             _DrawingContext = _Canvas.getContext("2d");
-
             // Enable the added-in canvas text functions (see canvastext.ts for provenance and details).
-            CanvasTextFunctions.enable(_DrawingContext);   // Text functionality is now built in to the HTML5 canvas. But this is old-school, and fun, so we'll keep it.
+            CanvasTextFunctions.enable(_DrawingContext);   // Text functionality is now built in to the HTML5
+                                                           // canvas. But this is old-school, and fun, so we'll keep it.
 
             // Clear the log text box.
             // Use the TypeScript cast to HTMLInputElement
-            (<HTMLInputElement> document.getElementById("taHostLog")).value="";
+            (document.getElementById("taHostLog") as HTMLInputElement).value = "";
 
             // Set focus on the start button.
             // Use the TypeScript cast to HTMLInputElement
-            (<HTMLInputElement> document.getElementById("btnStartOS")).focus();
+            (document.getElementById("btnStartOS") as HTMLInputElement).focus();
 
             // Check for our testing and enrichment core, which
             // may be referenced here (from index.html) as function Glados().
             if (typeof Glados === "function") {
                 // function Glados() is here, so instantiate Her into
-                // the global (and properly capitalized) _GLaDOS variable.
+                // the global (and properly capitalized) _GLaDOS letiable.
                 _GLaDOS = new Glados();
                 _GLaDOS.init();
             }
@@ -59,39 +55,41 @@ module TSOS {
 
         public static hostLog(msg: string, source: string = "?"): void {
             // Note the OS CLOCK.
-            var clock: number = _OSclock;
-
+            const clock: number = _OSclock;
             // Note the REAL clock in milliseconds since January 1, 1970.
-            var now: number = new Date().getTime();
-
+            const now: number = new Date().getTime();
             // Build the log string.
-            var str: string = "({ clock:" + clock + ", source:" + source + ", msg:" + msg + ", now:" + now  + " })"  + "\n";
+            const str: string = "({ clock:" + clock + ", source:" + source + ", msg:" + msg + ", now:" + now
+                                + " })"  + "\n";
 
             // Update the log console.
-            var taLog = <HTMLInputElement> document.getElementById("taHostLog");
+            const taLog = document.getElementById("taHostLog") as HTMLInputElement;
             taLog.value = str + taLog.value;
 
             // TODO in the future: Optionally update a log database or some streaming service.
         }
 
-
-        //
         // Host Events
-        //
+
         public static hostBtnStartOS_click(btn): void {
             // Disable the (passed-in) start button...
             btn.disabled = true;
 
             // .. enable the Halt and Reset buttons ...
-            (<HTMLButtonElement>document.getElementById("btnHaltOS")).disabled = false;
-            (<HTMLButtonElement>document.getElementById("btnReset")).disabled = false;
+            (document.getElementById("btnHaltOS") as HTMLButtonElement).disabled = false;
+            (document.getElementById("btnReset") as HTMLButtonElement).disabled = false;
 
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
 
             // ... Create and initialize the CPU (because it's part of the hardware)  ...
-            _CPU = new Cpu();  // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
-            _CPU.init();       //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
+            _CPU = new TSOS.Cpu();  // Note: We could simulate multi-core systems by instantiating more than
+                               // one instance of the CPU here.
+            _CPU.init();       // There's more to do, like dealing with scheduling and such, but this
+                               // would be a start. Pretty cool.
+            // Initialize Memory
+            //_Memory = new TSOS.Memory();
+            //_MemoryAccessor = new TSOS.MemoryAccessor();
 
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(Devices.hostClockPulse, CPU_CLOCK_INTERVAL);

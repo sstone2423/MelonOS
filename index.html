@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-        <meta name="author"             content="Alan G. Labouseur" />
+        <meta name="author"             content="Stephen Stone" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
    
         <!-- Enable bootstrap -->
@@ -19,8 +19,6 @@
         <script type="text/javascript" src="distrib/host/memory.js"></script>
         <!-- Virtual OS Routines: Make sure Kernel code is last, since it needs those above it. -->
         <script type="text/javascript" src="distrib/os/interrupt.js"></script>
-        <script type="text/javascript" src="distrib/os/memoryManager.js"></script>
-        <script type="text/javascript" src="distrib/os/processControlBlock.js"></script>
         <script type="text/javascript" src="distrib/os/canvastext.js"></script>
         <script type="text/javascript" src="distrib/os/console.js"></script>
         <script type="text/javascript" src="distrib/os/deviceDriver.js"></script>
@@ -29,6 +27,8 @@
         <script type="text/javascript" src="distrib/os/shell.js"></script>
         <script type="text/javascript" src="distrib/os/shellCommand.js"></script>
         <script type="text/javascript" src="distrib/os/userCommand.js"></script>
+        <script type="text/javascript" src="distrib/os/memoryManager.js"></script>
+        <script type="text/javascript" src="distrib/os/processControlBlock.js"></script>
         <script type="text/javascript" src="distrib/os/kernel.js"></script>
         <!-- Other Routines -->
         <script type="text/javascript" src="distrib/utils.js"></script>
@@ -136,6 +136,31 @@
                                 </table>
                         </label>
                 </div>
+
+                <div id="divProcess">
+                        <label>
+                                Processes
+                                <br>
+                                <table id="tableProcesses">
+                                        <thead>
+                                                <tr>
+                                                        <td>PID</td>
+                                                        <td>PC</td>
+                                                        <td>ACC</td>
+                                                        <td>X</td>
+                                                        <td>Y</td>
+                                                        <td>Z</td>
+                                                        <td>Priority</td>
+                                                        <td>State</td>
+                                                </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                </table>
+                        </label>
+                </div>
+
+                <div id="ytWidget"></div><script src="https://translate.yandex.net/website-widget/v1/widget.js?widgetId=ytWidget&pageLang=en&widgetTheme=light&autoMode=false" type="text/javascript"></script>
 
                 <div id="divUserProgramInput">
                         <label>

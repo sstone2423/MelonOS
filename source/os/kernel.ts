@@ -1,5 +1,6 @@
 ///<reference path="../globals.ts" />
 ///<reference path="queue.ts" />
+///<reference path="../host/memory.ts" />
 
 /* ------------
      Kernel.ts
@@ -46,7 +47,11 @@ module TSOS {
             htmlDateTime.innerHTML = currentDateTime + "";
 
             // Initialize memory
+            _Memory = new Memory();
             _Memory.init();
+
+            // Initialize memory manager
+            _MemoryManager = new MemoryManager();
 
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");

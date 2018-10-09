@@ -1,54 +1,90 @@
 ///<reference path="../globals.ts" />
 ///<reference path="processControlBlock.ts" />
 ///<reference path="queue.ts" />
+///<reference path="shell.ts" />
 
    module TSOS {
 
     export class MemoryManager {
         // Initialize variables
-        public partitions: Array<any>;
-        public partitionLimit: number = 256;
-        public processIncrementor: number = 0;
-
-        constructor(){
-            this.partitions = [
-                {"base": 0, "limit": this.partitionLimit, "isEmpty": true},
-                {"base": 256, "limit": this.partitionLimit, "isEmpty": true},
-                {"base": 512, "limit": this.partitionLimit, "isEmpty": true}
-            ];
+        constructor(public processIncrementor: number = 0){
         }
         
-        public loadIntoMemory(opCodes, partition): void {
-            // Copy the textsplit program to the memoryArray
-            for (let i = 0; i < opCodes.length; i++) {
-                _Memory.memoryArray[i] = opCodes[i];
-            }
-            // Set boolean to let the OS know that this partition is being used
-            this.partitions[partition].isEmpty = false;
-        }
-        
+        // Create a process for the loaded program (called from shellLoad command)
         public createProcess(opCodes): void {
             // Check to see if the program is greater than the partition size
-            if (opCodes.length > this.partitionLimit) {
+            if (opCodes.length > _PartitionSize) {
                 _StdOut.putText("Program load failed. Program is over 256 bytes in length.")
-            }
-
-            // Check if there is a partition available
-            if (this.checkMemorySpace(opCodes.length)) {
-                // Create a new PCB
-                let pcb = new TSOS.ProcessControlBlock(this.processIncrementor);
-                
-            }
-        }
-
-        // Check the isEmpty booleans to see if there is any open partitions
-        public checkMemorySpace(opCodeLength): boolean {
-            for (let i = 0; i < this.partitions.length; i++) {
-                if (this.partitions[i].isEmpty) {
-                    return true;
+            } else {
+                // Check if there is a partition available
+                if (_Memory.checkMemorySpace()) {
+                    // Create a new PCB with the current processIncrementor
+                    let pcb = new ProcessControlBlock(this.processIncrementor);
+                    // Increment the processIncrementor
+                    this.processIncrementor++;
+                    // Get an empty partition
+                    let partition = _Memory.getEmptyPartition();
+                    // Initialize the values of the PCB
+                    pcb.init(partition);
+                    // Load into memory
+                    _Memory.loadIntoMemory(opCodes, pcb.partition);
+                    // Update the pcb info to the tableProcess
+                    // Initialize table variable
+                    let tableProcesses = document.getElementById("tableProcesses");
+                    // Create a new row for the new process
+                    let newRow = document.createElement("TR");
+                    newRow.setAttribute("id", "processTR");
+                    tableProcesses.appendChild(newRow);
+                    // Create a column for PID
+                    let colPID = document.createElement("TD");
+                    colPID.setAttribute("id", "colPID");
+                    newRow.appendChild(colPID);
+                    colPID.innerHTML = pcb.pId.toString();
+                    // Create a column for PC
+                    let colPC = document.createElement("TD");
+                    colPC.setAttribute("id", "colPC");
+                    newRow.appendChild(colPC);
+                    colPC.innerHTML = pcb.PC.toString();
+                    // Create a column for ACC
+                    let colACC = document.createElement("TD");
+                    colACC.setAttribute("id", "colACC");
+                    newRow.appendChild(colACC);
+                    colACC.innerHTML = pcb.Acc.toString();
+                    // Create a column for X
+                    let colX = document.createElement("TD");
+                    colX.setAttribute("id", "colX");
+                    newRow.appendChild(colX);
+                    colX.innerHTML = pcb.xReg.toString();
+                    // Create a column for Y
+                    let colY = document.createElement("TD");
+                    colY.setAttribute("id", "colY");
+                    newRow.appendChild(colY);
+                    colY.innerHTML = pcb.yReg.toString();
+                    // Create a column for Z flag
+                    let colZ = document.createElement("TD");
+                    colZ.setAttribute("id", "colZ");
+                    newRow.appendChild(colZ);
+                    colZ.innerHTML = pcb.zFlag.toString();
+                    // Create a column for Priority
+                    let colPriority = document.createElement("TD");
+                    colPriority.setAttribute("id", "colPriority");
+                    newRow.appendChild(colPriority);
+                    colPriority.innerHTML = pcb.priority.toString();
+                    // Create a column for State
+                    let colState = document.createElement("TD");
+                    colState.setAttribute("id", "colState");
+                    newRow.appendChild(colState);
+                    colState.innerHTML = pcb.state;
                 }
             }
-            return false;
+
+            
         }
+
+ 
+
+
+
+        
     }
 }

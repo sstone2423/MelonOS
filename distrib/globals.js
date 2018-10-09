@@ -22,8 +22,8 @@ var _Mode = 0; // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 
 // Memory related global variables
 var _Memory;
 var _MemoryManager;
-var _MemorySize = 768; // 786 bytes, 3 segments of 256 bytes
-var _SegementSize = 256;
+var _TotalMemorySize = 768; // 786 bytes, 3 segments of 256 bytes
+var _PartitionSize = 256;
 // Process related global variables
 var _PCB;
 var _ProcessCount = 0;

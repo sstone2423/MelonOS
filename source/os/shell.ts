@@ -475,8 +475,15 @@ module TSOS {
             _Kernel.krnTrapError(oops);
         }
 
-        public shellRun() {
-            
+        public shellRun(processId) {
+            // TODO: Ensure the processId exists
+            // Check to see if CPU is already executing
+            if (_CPU.isExecuting) {
+                _StdOut.putText("Process is already in execution");
+            } else {
+                _MemoryManager.startProcess(processId);
+                _StdOut.putText("Executing Process #: " + processId);
+            }
         }
     }
 }

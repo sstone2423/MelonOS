@@ -400,7 +400,16 @@ var TSOS;
             var oops = "Who dropped those?";
             _Kernel.krnTrapError(oops);
         };
-        Shell.prototype.shellRun = function () {
+        Shell.prototype.shellRun = function (processId) {
+            // TODO: Ensure the processId exists
+            // Check to see if CPU is already executing
+            if (_CPU.isExecuting) {
+                _StdOut.putText("Process is already in execution");
+            }
+            else {
+                _MemoryManager.startProcess(processId);
+                _StdOut.putText("Executing Process #: " + processId);
+            }
         };
         return Shell;
     }());

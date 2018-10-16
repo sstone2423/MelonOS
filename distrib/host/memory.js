@@ -39,11 +39,15 @@ var TSOS;
         };
         // Find the first empty partition -- First one served
         Memory.prototype.getEmptyPartition = function () {
-            for (var i = 0; i < this.partitions.length; i++) {
-                // When found, return the index and break from the loop
+            var found = false;
+            var i = 0;
+            while (found || i > 2) {
                 if (this.partitions[i].isEmpty) {
+                    found = true;
                     return i;
-                    break;
+                }
+                else {
+                    i++;
                 }
             }
         };
@@ -55,6 +59,9 @@ var TSOS;
             }
             // Set boolean to let the OS know that this partition is being used
             this.partitions[partition].isEmpty = false;
+        };
+        // Get the correct process out of memory and into CPU
+        Memory.prototype.getProcess = function (processId) {
         };
         return Memory;
     }());

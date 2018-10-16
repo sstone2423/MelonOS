@@ -6,9 +6,13 @@ var TSOS;
 (function (TSOS) {
     var MemoryManager = /** @class */ (function () {
         // Initialize variables
-        function MemoryManager(processIncrementor) {
+        function MemoryManager(processIncrementor, waitingQueue, readyQueue) {
             if (processIncrementor === void 0) { processIncrementor = 0; }
+            if (waitingQueue === void 0) { waitingQueue = new TSOS.Queue; }
+            if (readyQueue === void 0) { readyQueue = new TSOS.Queue; }
             this.processIncrementor = processIncrementor;
+            this.waitingQueue = waitingQueue;
+            this.readyQueue = readyQueue;
         }
         // Create a process for the loaded program (called from shellLoad command)
         MemoryManager.prototype.createProcess = function (opCodes) {
@@ -29,6 +33,8 @@ var TSOS;
                     pcb.init(partition);
                     // Load into memory
                     _Memory.loadIntoMemory(opCodes, pcb.partition);
+                    // Add pcb to waitingQueue
+                    this.waitingQueue.enqueue(pcb);
                     // Update the pcb info to the tableProcess
                     // Initialize table variable
                     var tableProcesses = document.getElementById("tableProcesses");
@@ -77,6 +83,22 @@ var TSOS;
                     newRow.appendChild(colState);
                     colState.innerHTML = pcb.state;
                 }
+            }
+        };
+        MemoryManager.prototype.executeProcess = function () {
+            var process = _MemoryManager.readyQueue.dequeue();
+            _CPU.PC = process.PC;
+            _CPU.Acc = process.Acc;
+            _CPU.Xreg = process.xReg;
+            _CPU.Yreg = process.yReg;
+            _CPU.Zflag = process.Zflag;
+            _CPU.isExecuting = true;
+            process.state = "Executing";
+            // Update CPU display
+        };
+        MemoryManager.prototype.checkReadyQueue = function () {
+            if (!this.readyQueue.isEmpty()) {
+                this.executeProcess();
             }
         };
         return MemoryManager;

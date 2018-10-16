@@ -41,11 +41,14 @@
 
             // Find the first empty partition -- First one served
             public getEmptyPartition(): number {
-                for (let i = 0; i < this.partitions.length; i++) {
-                    // When found, return the index and break from the loop
+                let found = false;
+                let i = 0;
+                while (found || i > 2) {
                     if (this.partitions[i].isEmpty) {
+                        found = true;
                         return i;
-                        break;
+                    } else {
+                        i++;
                     }
                 }
             }
@@ -58,6 +61,11 @@
                 }
                 // Set boolean to let the OS know that this partition is being used
                 this.partitions[partition].isEmpty = false;
+            }
+
+            // Get the correct process out of memory and into CPU
+            public getProcess(processId) {
+
             }
         }
     }

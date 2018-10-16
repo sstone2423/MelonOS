@@ -7,7 +7,9 @@
 
     export class MemoryManager {
         // Initialize variables
-        constructor(public processIncrementor: number = 0){
+        constructor(public processIncrementor: number = 0,
+                    public waitingQueue = new TSOS.Queue,
+                    public readyQueue = new TSOS.Queue){
         }
         
         // Create a process for the loaded program (called from shellLoad command)
@@ -28,6 +30,8 @@
                     pcb.init(partition);
                     // Load into memory
                     _Memory.loadIntoMemory(opCodes, pcb.partition);
+                    // Add pcb to waitingQueue
+                    this.waitingQueue.enqueue(pcb);
                     // Update the pcb info to the tableProcess
                     // Initialize table variable
                     let tableProcesses = document.getElementById("tableProcesses");
@@ -77,14 +81,26 @@
                     colState.innerHTML = pcb.state;
                 }
             }
+        }
+    
+        public executeProcess(): void {
+            let process = _MemoryManager.readyQueue.dequeue();
+            _CPU.PC = process.PC;
+            _CPU.Acc = process.Acc;
+            _CPU.Xreg = process.xReg;
+            _CPU.Yreg = process.yReg;
+            _CPU.Zflag = process.Zflag;
+            _CPU.isExecuting = true;
+            process.state = "Executing";
 
-            
+            // Update CPU display
         }
 
- 
-
-
-
+        public checkReadyQueue(): void {
+            if (!this.readyQueue.isEmpty()) {
+                this.executeProcess();
+            }
+        }
         
     }
 }

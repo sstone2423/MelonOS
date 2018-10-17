@@ -475,14 +475,32 @@ module TSOS {
             _Kernel.krnTrapError(oops);
         }
 
-        public shellRun(processId) {
-            // TODO: Ensure the processId exists
+        // Add the process to the ready queue - Arg will be the processId
+        public shellRun(args) {
+            let found = false;
+            let waitQueueLength = _MemoryManager.waitingQueue.getSize();
+            let counter = 0;
             // Check to see if CPU is already executing
             if (_CPU.isExecuting) {
                 _StdOut.putText("Process is already in execution");
             } else {
-                _MemoryManager.startProcess(processId);
-                _StdOut.putText("Executing Process #: " + processId);
+                // Find the correct processId by looping through the waiting queue
+                while (!found || counter > waitQueueLength) {
+                    let pcb = _MemoryManager.waitingQueue.dequeue();
+                    if (pcb.pId == args[0]) {
+                        // Put the pcb into the ready queue for execution
+                        _MemoryManager.readyQueue.enqueue(pcb);
+                        found = true;
+                    } else {
+                        // Put the pcb back into the queue if it doesn't match
+                        _MemoryManager.waitingQueue.enqueue(pcb);
+                        counter++;
+                    }
+                }
+
+                if (!found) {
+                    _StdOut.putText("Invalid process ID. It may not exist?");
+                }
             }
         }
     }

@@ -101,14 +101,6 @@ var TSOS;
                 this.executeProcess();
             }
         };
-        MemoryManager.prototype.writeMemory = function (address, value) {
-            // Check to see if leading 0 needs to be added
-            if (parseInt(value, 16) < 16) {
-                value = "0" + value;
-            }
-            // Save value to the memoryArray
-            _Memory.memoryArray[address] = value;
-        };
         return MemoryManager;
     }());
     TSOS.MemoryManager = MemoryManager;

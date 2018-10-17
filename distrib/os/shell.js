@@ -400,15 +400,33 @@ var TSOS;
             var oops = "Who dropped those?";
             _Kernel.krnTrapError(oops);
         };
-        Shell.prototype.shellRun = function (processId) {
-            // TODO: Ensure the processId exists
+        // Add the process to the ready queue - Arg will be the processId
+        Shell.prototype.shellRun = function (args) {
+            var found = false;
+            var waitQueueLength = _MemoryManager.waitingQueue.getSize();
+            var counter = 0;
             // Check to see if CPU is already executing
             if (_CPU.isExecuting) {
                 _StdOut.putText("Process is already in execution");
             }
             else {
-                _MemoryManager.startProcess(processId);
-                _StdOut.putText("Executing Process #: " + processId);
+                // Find the correct processId by looping through the waiting queue
+                while (!found || counter > waitQueueLength) {
+                    var pcb = _MemoryManager.waitingQueue.dequeue();
+                    if (pcb.pId == args[0]) {
+                        // Put the pcb into the ready queue for execution
+                        _MemoryManager.readyQueue.enqueue(pcb);
+                        found = true;
+                    }
+                    else {
+                        // Put the pcb back into the queue if it doesn't match
+                        _MemoryManager.waitingQueue.enqueue(pcb);
+                        counter++;
+                    }
+                }
+                if (!found) {
+                    _StdOut.putText("Invalid process ID. It may not exist?");
+                }
             }
         };
         return Shell;

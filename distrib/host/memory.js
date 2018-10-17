@@ -60,9 +60,18 @@ var TSOS;
             // Set boolean to let the OS know that this partition is being used
             this.partitions[partition].isEmpty = false;
         };
-        // Get the correct process out of memory and into CPU
+        // Get the opCode out of memory and into CPU
+        // TODO: Check partitions?
         Memory.prototype.readMemory = function (programCounter) {
             return _Memory.memoryArray[programCounter];
+        };
+        Memory.prototype.writeMemory = function (address, value) {
+            // Check to see if leading 0 needs to be added
+            if (parseInt(value, 16) < 16) {
+                value = "0" + value;
+            }
+            // Save value to the memoryArray
+            _Memory.memoryArray[address] = value;
         };
         return Memory;
     }());

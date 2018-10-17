@@ -1,4 +1,5 @@
 ///<reference path="../globals.ts" />
+///<reference path="../os/interrupt.ts" />
 
 /* ------------
      CPU.ts
@@ -142,7 +143,7 @@ module TSOS {
                     break;
 
                     case "00": // Break (system call)
-                    // TODO: Add an interrupt
+                    _KernelInterruptQueue.enqueue(new Interrupt(PROCESS_EXIT_IRQ, true));
                     break;
 
                     case "EC": /* Compare a byte in memory to the X reg: Sets the Z (zero) flag if equal
@@ -193,7 +194,7 @@ module TSOS {
                                 #$02 in X reg = print the 00-terminated string stored at the address
                                 in the Y register */
                         if (this.Xreg == 1) {
-                            // TODO: Add interrupt
+                            _KernelInterruptQueue.enqueue(new Interrupt(CONSOLE_WRITE_IRQ, this.Yreg));
                         } else if (this.Xreg == 2) {
                             address = this.Yreg;
                             // Initialize variables for while loop
@@ -208,17 +209,15 @@ module TSOS {
                                 printString += chr;
                                 address++;
                             }
-                            // TODO: Add interrupt
+                            _KernelInterruptQueue.enqueue(new Interrupt(CONSOLE_WRITE_IRQ, printString));
                         }
                         this.PC++;
                         break;
 
                     default: // If opCode is invalid, exit process
-                        // TODO: Add interrupt
+                        _KernelInterruptQueue.enqueue(new Interrupt(PROCESS_EXIT_IRQ, false));
                 }
             } else {
-                // Check the ready queue on each cycle if CPU is not executing
-                _MemoryManager.checkReadyQueue();
                 _Kernel.krnTrace("CPU cycle");
             }
         }

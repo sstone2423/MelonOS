@@ -98,6 +98,8 @@ module TSOS {
             } else {                      // If there are no interrupts and there is nothing being executed
                                           // then just be idle.
                 this.krnTrace("Idle");
+                // Check the ready queue on each cycle if CPU is not executing
+                _MemoryManager.checkReadyQueue();
             }
         }
 
@@ -128,12 +130,28 @@ module TSOS {
                 case TIMER_IRQ:
                     this.krnTimerISR();              // Kernel built-in routine for timers (not the clock).
                     break;
+
                 case KEYBOARD_IRQ:
                     _krnKeyboardDriver.isr(params);   // Kernel mode device driver
                     _StdIn.handleInput();
                     break;
+
+                case PROCESS_EXIT_IRQ:
+                    _MemoryManager.exitProcess(params);
+                    // TODO: Update display
+                    break;
+
+                case CONSOLE_WRITE_IRQ:
+                    _StdOut.putText(params);
+                    break;
+
+                case INVALID_OP_IRQ:
+                    _StdOut.putText("Invalid op code in process " + _MemoryManager.runningProcess.pId + ". Exiting the process.")
+                    break;
+
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
+                    this.melonDrop();
             }
         }
 
@@ -179,7 +197,9 @@ module TSOS {
         public krnTrapError(msg) {
             // Display error
             Control.hostLog("OS ERROR - TRAP: " + msg);
+        }
 
+        public melonDrop() {
             // Initialize Canvas and melon variables
             var ctx;
             var noOfMelons = 20;

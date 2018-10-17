@@ -9,7 +9,8 @@
         // Initialize variables
         constructor(public processIncrementor: number = 0,
                     public waitingQueue = new TSOS.Queue,
-                    public readyQueue = new TSOS.Queue){
+                    public readyQueue = new TSOS.Queue,
+                    public runningProcess){
         }
         
         // Create a process for the loaded program (called from shellLoad command)
@@ -84,14 +85,14 @@
         }
     
         public executeProcess(): void {
-            let process = _MemoryManager.readyQueue.dequeue();
-            _CPU.PC = process.PC;
-            _CPU.Acc = process.Acc;
-            _CPU.Xreg = process.xReg;
-            _CPU.Yreg = process.yReg;
-            _CPU.Zflag = process.Zflag;
+            this.runningProcess = _MemoryManager.readyQueue.dequeue();
+            _CPU.PC = this.runningProcess.PC;
+            _CPU.Acc = this.runningProcess.Acc;
+            _CPU.Xreg = this.runningProcess.xReg;
+            _CPU.Yreg = this.runningProcess.yReg;
+            _CPU.Zflag = this.runningProcess.Zflag;
             _CPU.isExecuting = true;
-            process.state = "Executing";
+            this.runningProcess.state = "Executing";
 
             // TODO: Update Memory, CPU, PCB displays
         }
@@ -100,6 +101,17 @@
             if (!this.readyQueue.isEmpty()) {
                 this.executeProcess();
             }
+        }
+        
+        // Exit a process from the CPU, reset CPU values, reset memory partition
+        public exitProcess(): void {
+            // Init the CPU to reset registers and isExecuting
+            _CPU.init();
+            // For iProject 2, init the memory to reset the values. Will change later
+            _Memory.init();
+            // TODO: Update displays
+            _StdOut.putText("Exiting process " + this.runningProcess.pId);
+            this.runningProcess = null;
         }
     }
 }

@@ -6,13 +6,14 @@ var TSOS;
 (function (TSOS) {
     var MemoryManager = /** @class */ (function () {
         // Initialize variables
-        function MemoryManager(processIncrementor, waitingQueue, readyQueue) {
+        function MemoryManager(processIncrementor, waitingQueue, readyQueue, runningProcess) {
             if (processIncrementor === void 0) { processIncrementor = 0; }
             if (waitingQueue === void 0) { waitingQueue = new TSOS.Queue; }
             if (readyQueue === void 0) { readyQueue = new TSOS.Queue; }
             this.processIncrementor = processIncrementor;
             this.waitingQueue = waitingQueue;
             this.readyQueue = readyQueue;
+            this.runningProcess = runningProcess;
         }
         // Create a process for the loaded program (called from shellLoad command)
         MemoryManager.prototype.createProcess = function (opCodes) {
@@ -86,20 +87,30 @@ var TSOS;
             }
         };
         MemoryManager.prototype.executeProcess = function () {
-            var process = _MemoryManager.readyQueue.dequeue();
-            _CPU.PC = process.PC;
-            _CPU.Acc = process.Acc;
-            _CPU.Xreg = process.xReg;
-            _CPU.Yreg = process.yReg;
-            _CPU.Zflag = process.Zflag;
+            this.runningProcess = _MemoryManager.readyQueue.dequeue();
+            _CPU.PC = this.runningProcess.PC;
+            _CPU.Acc = this.runningProcess.Acc;
+            _CPU.Xreg = this.runningProcess.xReg;
+            _CPU.Yreg = this.runningProcess.yReg;
+            _CPU.Zflag = this.runningProcess.Zflag;
             _CPU.isExecuting = true;
-            process.state = "Executing";
+            this.runningProcess.state = "Executing";
             // TODO: Update Memory, CPU, PCB displays
         };
         MemoryManager.prototype.checkReadyQueue = function () {
             if (!this.readyQueue.isEmpty()) {
                 this.executeProcess();
             }
+        };
+        // Exit a process from the CPU, reset CPU values, reset memory partition
+        MemoryManager.prototype.exitProcess = function () {
+            // Init the CPU to reset registers and isExecuting
+            _CPU.init();
+            // For iProject 2, init the memory to reset the values. Will change later
+            _Memory.init();
+            // TODO: Update displays
+            _StdOut.putText("Exiting process " + this.runningProcess.pId);
+            this.runningProcess = null;
         };
         return MemoryManager;
     }());

@@ -54,6 +54,7 @@ var _StdOut;
 // UI
 var _Console;
 var _OsShell;
+var _Control;
 // At least this OS is not trying to kill you. (Yet.)
 var _SarcasticMode = false;
 // Global Device Driver Objects - page 12

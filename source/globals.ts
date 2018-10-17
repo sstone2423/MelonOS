@@ -64,6 +64,7 @@ let _StdOut;
 // UI
 let _Console: TSOS.Console;
 let _OsShell: TSOS.Shell;
+let _Control: TSOS.Control;
 
 // At least this OS is not trying to kill you. (Yet.)
 let _SarcasticMode: boolean = false;

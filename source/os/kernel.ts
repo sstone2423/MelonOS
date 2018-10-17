@@ -46,10 +46,6 @@ module TSOS {
             const currentDateTime = new Date();
             htmlDateTime.innerHTML = currentDateTime + "";
 
-            // Initialize memory
-            _Memory = new Memory();
-            _Memory.init();
-
             // Initialize memory manager
             _MemoryManager = new MemoryManager();
 
@@ -151,7 +147,7 @@ module TSOS {
 
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
-                    this.melonDrop();
+                    _Control.melonDrop();
             }
         }
 
@@ -197,63 +193,6 @@ module TSOS {
         public krnTrapError(msg) {
             // Display error
             Control.hostLog("OS ERROR - TRAP: " + msg);
-        }
-
-        public melonDrop() {
-            // Initialize Canvas and melon variables
-            var ctx;
-            var noOfMelons = 20;
-            var melons = [];
-            var melon;
-            var melonImage = document.getElementById("melonFall");
-
-            // Set the context
-            ctx = _Canvas.getContext('2d');
-            // Change the background to blue for BSOD
-            _Canvas.style.backgroundColor = "blue";
-            // Change the canvas height
-            _Canvas.height = 500;
-            // Create the array of melons
-            for (var i = 0; i < noOfMelons; i++) {
-                melons.push({
-                    x: Math.random() * _Canvas.width,
-                    y: Math.random() * _Canvas.height,
-                    ys: Math.random() + 2,
-                    image: melonImage
-                });
-            }
-            
-            // Draw the melon on the canvas using the melonImage
-            function draw() {
-                // Clear the canvas first
-                ctx.clearRect(0, 0, _Canvas.width, _Canvas.height);
-                // Draw the melons
-                for(let i = 0; i < noOfMelons; i++) {
-                    melon = melons[i];
-                    ctx.drawImage(melon.image, melon.x, melon.y);
-                }
-                // Call the move function to redraw the images to make them seem in motion
-                move();
-            }
-            
-            // Move will continuously change the y coordinates to make them seem in motion
-            function move() {
-                // Loop through all of the melons
-                for (let i = 0; i < noOfMelons; i++) {
-                    melon = melons[i];
-                    // Change the y coordinate to make them "fall"
-                    melon.y += melon.ys;
-                    // If melons go past the canvas height, redraw them at the top
-                    if (melon.y > _Canvas.height) {
-                        melon.x = Math.random() * _Canvas.width;
-                        melon.y = -1 * 15;
-                    }
-                }
-            }
-            // Set the interval in which to draw the melons
-            setInterval(draw, 30);
-            // Shutdown the kernel
-            this.krnShutdown();
         }
     }
 }

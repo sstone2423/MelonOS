@@ -20,7 +20,7 @@
 
             // Initialize the memory with 768 bytes
             public init(): void {
-                this.memoryArray = new Array<String>(_TotalMemorySize);
+                this.memoryArray = new Array<string>(_TotalMemorySize);
                 // Initialize memory with 00's
                 for (let i = 0; i < this.memoryArray.length; i++) {
                     this.memoryArray[i] = "00";

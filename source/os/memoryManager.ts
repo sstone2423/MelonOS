@@ -7,10 +7,15 @@
 
     export class MemoryManager {
         // Initialize variables
-        constructor(public processIncrementor: number = 0,
-                    public waitingQueue = new TSOS.Queue,
-                    public readyQueue = new TSOS.Queue,
-                    public runningProcess){
+        public processIncrementor: number,
+        public waitingQueue: any;
+        public readyQueue: any;
+        public runningProcess: any;
+
+        constructor() {
+            this.processIncrementor = 0;
+            this.readyQueue = new TSOS.Queue;
+            this.waitingQueue = new TSOS.Queue;
         }
         
         // Create a process for the loaded program (called from shellLoad command)

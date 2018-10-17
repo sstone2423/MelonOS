@@ -5,16 +5,17 @@
 var TSOS;
 (function (TSOS) {
     var MemoryManager = /** @class */ (function () {
-        // Initialize variables
-        function MemoryManager(processIncrementor, waitingQueue, readyQueue, runningProcess) {
-            if (processIncrementor === void 0) { processIncrementor = 0; }
-            if (waitingQueue === void 0) { waitingQueue = new TSOS.Queue; }
-            if (readyQueue === void 0) { readyQueue = new TSOS.Queue; }
-            this.processIncrementor = processIncrementor;
-            this.waitingQueue = waitingQueue;
-            this.readyQueue = readyQueue;
-            this.runningProcess = runningProcess;
+        function MemoryManager() {
+            this.processIncrementor = 0;
+            this.readyQueue = new TSOS.Queue;
+            this.waitingQueue = new TSOS.Queue;
         }
+        MemoryManager.prototype.init = function () {
+            this.processIncrementor = 0;
+            this.waitingQueue = new TSOS.Queue;
+            this.readyQueue = new TSOS.Queue;
+            this.runningProcess = null;
+        };
         // Create a process for the loaded program (called from shellLoad command)
         MemoryManager.prototype.createProcess = function (opCodes) {
             // Check to see if the program is greater than the partition size

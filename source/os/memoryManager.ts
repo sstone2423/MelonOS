@@ -7,7 +7,7 @@
 
     export class MemoryManager {
         // Initialize variables
-        public processIncrementor: number,
+        public processIncrementor: number;
         public waitingQueue: any;
         public readyQueue: any;
         public runningProcess: any;

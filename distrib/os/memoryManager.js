@@ -10,12 +10,6 @@ var TSOS;
             this.readyQueue = new TSOS.Queue;
             this.waitingQueue = new TSOS.Queue;
         }
-        MemoryManager.prototype.init = function () {
-            this.processIncrementor = 0;
-            this.waitingQueue = new TSOS.Queue;
-            this.readyQueue = new TSOS.Queue;
-            this.runningProcess = null;
-        };
         // Create a process for the loaded program (called from shellLoad command)
         MemoryManager.prototype.createProcess = function (opCodes) {
             // Check to see if the program is greater than the partition size

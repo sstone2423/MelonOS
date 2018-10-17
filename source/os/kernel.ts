@@ -133,7 +133,7 @@ module TSOS {
                     break;
 
                 case PROCESS_EXIT_IRQ:
-                    _MemoryManager.exitProcess(params);
+                    _MemoryManager.exitProcess();
                     // TODO: Update display
                     break;
 
@@ -193,6 +193,8 @@ module TSOS {
         public krnTrapError(msg) {
             // Display error
             Control.hostLog("OS ERROR - TRAP: " + msg);
+            // Shutdown the kernel
+            this.krnShutdown();
         }
     }
 }

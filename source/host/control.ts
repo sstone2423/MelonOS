@@ -30,7 +30,7 @@ module TSOS {
             // Get a global reference to the drawing context.
             _DrawingContext = _Canvas.getContext("2d");
             // Enable the added-in canvas text functions (see canvastext.ts for provenance and details).
-            CanvasTextFunctions.enable(_DrawingContext);=
+            CanvasTextFunctions.enable(_DrawingContext);
             // Clear the log text box. Use the TypeScript cast to HTMLInputElement
             (document.getElementById("taHostLog") as HTMLInputElement).value = "";
             // Set focus on the start button.
@@ -139,7 +139,7 @@ module TSOS {
                     // Check to see if the hex needs a leading zero. Covert to decimal, then to hex, then add leading zero
                     let convert = parseInt(_Memory.memoryArray[memoryPC].toString(), 16);
                     if (convert < 16 && convert > 0){
-                        table.rows[i].cells.item(j).innerHTML = "0" + dec.toString(16).toUpperCase();
+                        table.rows[i].cells.item(j).innerHTML = "0" + convert.toString(16).toUpperCase();
                     }
                     memoryPC++;
                 }
@@ -274,8 +274,6 @@ module TSOS {
             }
             // Set the interval in which to draw the melons
             setInterval(draw, 30);
-            // Shutdown the kernel
-            this.krnShutdown();
         }
     }
 }

@@ -114,7 +114,7 @@ var TSOS;
                     _StdIn.handleInput();
                     break;
                 case PROCESS_EXIT_IRQ:
-                    _MemoryManager.exitProcess(params);
+                    _MemoryManager.exitProcess();
                     // TODO: Update display
                     break;
                 case CONSOLE_WRITE_IRQ:
@@ -168,6 +168,8 @@ var TSOS;
         Kernel.prototype.krnTrapError = function (msg) {
             // Display error
             TSOS.Control.hostLog("OS ERROR - TRAP: " + msg);
+            // Shutdown the kernel
+            this.krnShutdown();
         };
         return Kernel;
     }());

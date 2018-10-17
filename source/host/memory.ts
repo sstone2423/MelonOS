@@ -10,7 +10,7 @@
      module TSOS {
 
         export class Memory {
-            constructor(public memoryArray: Array<String> = [],
+            constructor(public memoryArray: Array<string> = [],
                         public partitions = [
                             {"base": 0, "limit": _PartitionSize, "isEmpty": true},
                             {"base": 256, "limit": _PartitionSize, "isEmpty": true},
@@ -64,8 +64,8 @@
             }
 
             // Get the correct process out of memory and into CPU
-            public getProcess(processId) {
-
+            public readMemory(programCounter): string {
+                return _Memory.memoryArray[programCounter];
             }
         }
     }

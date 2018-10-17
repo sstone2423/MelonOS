@@ -61,7 +61,8 @@ var TSOS;
             this.partitions[partition].isEmpty = false;
         };
         // Get the correct process out of memory and into CPU
-        Memory.prototype.getProcess = function (processId) {
+        Memory.prototype.readMemory = function (programCounter) {
+            return _Memory.memoryArray[programCounter];
         };
         return Memory;
     }());

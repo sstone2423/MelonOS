@@ -94,12 +94,20 @@ var TSOS;
             _CPU.Zflag = process.Zflag;
             _CPU.isExecuting = true;
             process.state = "Executing";
-            // Update CPU display
+            // TODO: Update Memory, CPU, PCB displays
         };
         MemoryManager.prototype.checkReadyQueue = function () {
             if (!this.readyQueue.isEmpty()) {
                 this.executeProcess();
             }
+        };
+        MemoryManager.prototype.writeMemory = function (address, value) {
+            // Check to see if leading 0 needs to be added
+            if (parseInt(value, 16) < 16) {
+                value = "0" + value;
+            }
+            // Save value to the memoryArray
+            _Memory.memoryArray[address] = value;
         };
         return MemoryManager;
     }());

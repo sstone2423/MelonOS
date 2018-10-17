@@ -93,7 +93,7 @@
             _CPU.isExecuting = true;
             process.state = "Executing";
 
-            // Update CPU display
+            // TODO: Update Memory, CPU, PCB displays
         }
 
         public checkReadyQueue(): void {
@@ -101,6 +101,14 @@
                 this.executeProcess();
             }
         }
-        
+
+        public writeMemory(address, value): void {
+            // Check to see if leading 0 needs to be added
+            if (parseInt(value, 16) < 16) {
+                value = "0" + value;
+            }
+            // Save value to the memoryArray
+            _Memory.memoryArray[address] = value;
+        }
     }
 }

@@ -132,7 +132,7 @@ var TSOS;
                     // Check to see if the hex needs a leading zero. Covert to decimal, then to hex, then add leading zero
                     var convert = parseInt(_Memory.memoryArray[memoryPC].toString(), 16);
                     if (convert < 16 && convert > 0) {
-                        table.rows[i].cells.item(j).innerHTML = "0" + dec.toString(16).toUpperCase();
+                        table.rows[i].cells.item(j).innerHTML = "0" + convert.toString(16).toUpperCase();
                     }
                     memoryPC++;
                 }
@@ -260,8 +260,6 @@ var TSOS;
             }
             // Set the interval in which to draw the melons
             setInterval(draw, 30);
-            // Shutdown the kernel
-            this.krnShutdown();
         };
         return Control;
     }());

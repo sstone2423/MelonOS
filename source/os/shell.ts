@@ -29,7 +29,6 @@ module TSOS {
         public init() {
             let sc;      
             // Load the command list.
-
             // v
             sc = new ShellCommand(this.shellVer,
                                   "v",
@@ -454,9 +453,9 @@ module TSOS {
 
         public shellLoad() {
             // Get value inside program input (the program)
-            const userInputProgram = document.getElementById("taProgramInput").value;
+            const userInputProgram = (<HTMLInputElement>document.getElementById("taProgramInput")).value;
             // Create regex pattern
-            const hexRegex = new RegExp("^[a-fA-F0-9\s]+$");
+            const hexRegex = new RegExp(/[0-9A-Fa-f]{2}/i);
             // Check for anything besides hex or spaces (A-Fa-f0-9)
             if (hexRegex.test(userInputProgram)) {
                 // Load program into memory (currently just outputs success)

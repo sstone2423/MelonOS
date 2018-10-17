@@ -382,7 +382,7 @@ var TSOS;
             // Get value inside program input (the program)
             var userInputProgram = document.getElementById("taProgramInput").value;
             // Create regex pattern
-            var hexRegex = new RegExp("^[a-fA-F0-9\s]+$");
+            var hexRegex = new RegExp(/[0-9A-Fa-f]{2}/i);
             // Check for anything besides hex or spaces (A-Fa-f0-9)
             if (hexRegex.test(userInputProgram)) {
                 // Load program into memory (currently just outputs success)

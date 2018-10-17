@@ -8,15 +8,12 @@
 var TSOS;
 (function (TSOS) {
     var Memory = /** @class */ (function () {
-        function Memory(memoryArray, partitions) {
-            if (memoryArray === void 0) { memoryArray = []; }
-            if (partitions === void 0) { partitions = [
+        function Memory() {
+            this.partitions = [
                 { "base": 0, "limit": _PartitionSize, "isEmpty": true },
                 { "base": 256, "limit": _PartitionSize, "isEmpty": true },
                 { "base": 512, "limit": _PartitionSize, "isEmpty": true }
-            ]; }
-            this.memoryArray = memoryArray;
-            this.partitions = partitions;
+            ];
         }
         // Initialize the memory with 768 bytes
         Memory.prototype.init = function () {
@@ -58,7 +55,7 @@ var TSOS;
                 _Memory.memoryArray[i] = opCodes[i];
             }
             // Set boolean to let the OS know that this partition is being used
-            this.partitions[partition].isEmpty = false;
+            //this.partitions[partition].isEmpty = false;
         };
         // Get the opCode out of memory and into CPU
         // TODO: Check partitions?

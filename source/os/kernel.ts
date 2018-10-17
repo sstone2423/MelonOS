@@ -91,11 +91,15 @@ module TSOS {
             } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is
                                            // anything being processed.
                 _CPU.cycle();
+                Control.hostCPU();
+                Control.hostMemory();
+                Control.hostProcesses();
             } else {                      // If there are no interrupts and there is nothing being executed
                                           // then just be idle.
                 this.krnTrace("Idle");
                 // Check the ready queue on each cycle if CPU is not executing
                 _MemoryManager.checkReadyQueue();
+
             }
         }
 
@@ -134,7 +138,9 @@ module TSOS {
 
                 case PROCESS_EXIT_IRQ:
                     _MemoryManager.exitProcess();
-                    // TODO: Update display
+                    // Update the CPU and Processes display
+                    Control.hostProcesses();
+                    Control.hostCPU();
                     break;
 
                 case CONSOLE_WRITE_IRQ:
@@ -143,6 +149,8 @@ module TSOS {
 
                 case INVALID_OP_IRQ:
                     _StdOut.putText("Invalid op code in process " + _MemoryManager.runningProcess.pId + ". Exiting the process.")
+                    _StdOut.advanceLine();
+                    _OsShell.putPrompt();
                     break;
 
                 default:

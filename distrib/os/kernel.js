@@ -78,6 +78,9 @@ var TSOS;
             else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is
                 // anything being processed.
                 _CPU.cycle();
+                TSOS.Control.hostCPU();
+                TSOS.Control.hostMemory();
+                TSOS.Control.hostProcesses();
             }
             else { // If there are no interrupts and there is nothing being executed
                 // then just be idle.
@@ -115,13 +118,17 @@ var TSOS;
                     break;
                 case PROCESS_EXIT_IRQ:
                     _MemoryManager.exitProcess();
-                    // TODO: Update display
+                    // Update the CPU and Processes display
+                    TSOS.Control.hostProcesses();
+                    TSOS.Control.hostCPU();
                     break;
                 case CONSOLE_WRITE_IRQ:
                     _StdOut.putText(params);
                     break;
                 case INVALID_OP_IRQ:
                     _StdOut.putText("Invalid op code in process " + _MemoryManager.runningProcess.pId + ". Exiting the process.");
+                    _StdOut.advanceLine();
+                    _OsShell.putPrompt();
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");

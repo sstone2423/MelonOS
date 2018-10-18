@@ -1,5 +1,6 @@
 ///<reference path="../globals.ts" />
 ///<reference path="queue.ts" />
+///<reference path="../host/memory.ts" />
 
 /* ------------
      Kernel.ts
@@ -45,8 +46,8 @@ module TSOS {
             const currentDateTime = new Date();
             htmlDateTime.innerHTML = currentDateTime + "";
 
-            // Initialize memory
-            _Memory.init();
+            // Initialize memory manager
+            _MemoryManager = new MemoryManager();
 
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
@@ -80,7 +81,11 @@ module TSOS {
                This is NOT the same as a TIMER, which causes an interrupt and is handled like other interrupts.
                This, on the other hand, is the clock pulse from the hardware / VM / host that tells the kernel
                that it has to look for interrupts and process them if it finds any.                           */
-
+            // Get the time
+            // TODO: Remove the time zones and DST
+            const htmlDateTime = document.getElementById("currentDate");
+            const currentDateTime = new Date();
+            htmlDateTime.innerHTML = currentDateTime + "";
             // Check for an interrupt, are any. Page 560
             if (_KernelInterruptQueue.getSize() > 0) {
                 // Process the first interrupt on the interrupt queue.
@@ -90,9 +95,15 @@ module TSOS {
             } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is
                                            // anything being processed.
                 _CPU.cycle();
+                Control.hostCPU();
+                Control.hostMemory();
+                Control.hostProcesses();
             } else {                      // If there are no interrupts and there is nothing being executed
                                           // then just be idle.
                 this.krnTrace("Idle");
+                // Check the ready queue on each cycle if CPU is not executing
+                _MemoryManager.checkReadyQueue();
+
             }
         }
 
@@ -123,12 +134,32 @@ module TSOS {
                 case TIMER_IRQ:
                     this.krnTimerISR();              // Kernel built-in routine for timers (not the clock).
                     break;
+
                 case KEYBOARD_IRQ:
                     _krnKeyboardDriver.isr(params);   // Kernel mode device driver
                     _StdIn.handleInput();
                     break;
+
+                case PROCESS_EXIT_IRQ:
+                    _MemoryManager.exitProcess();
+                    // Update the CPU and Processes display
+                    Control.hostProcesses();
+                    Control.hostCPU();
+                    break;
+
+                case CONSOLE_WRITE_IRQ:
+                    _StdOut.putText(params);
+                    break;
+
+                case INVALID_OP_IRQ:
+                    _StdOut.putText("Invalid op code in process " + _MemoryManager.runningProcess.pId + ". Exiting the process.")
+                    _StdOut.advanceLine();
+                    _OsShell.putPrompt();
+                    break;
+
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
+                    _Control.melonDrop();
             }
         }
 
@@ -174,59 +205,6 @@ module TSOS {
         public krnTrapError(msg) {
             // Display error
             Control.hostLog("OS ERROR - TRAP: " + msg);
-
-            // Initialize Canvas and melon variables
-            var ctx;
-            var noOfMelons = 20;
-            var melons = [];
-            var melon;
-            var melonImage = document.getElementById("melonFall");
-
-            // Set the context
-            ctx = _Canvas.getContext('2d');
-            // Change the background to blue for BSOD
-            _Canvas.style.backgroundColor = "blue";
-            // Change the canvas height
-            _Canvas.height = 500;
-            // Create the array of melons
-            for (var i = 0; i < noOfMelons; i++) {
-                melons.push({
-                    x: Math.random() * _Canvas.width,
-                    y: Math.random() * _Canvas.height,
-                    ys: Math.random() + 2,
-                    image: melonImage
-                });
-            }
-            
-            // Draw the melon on the canvas using the melonImage
-            function draw() {
-                // Clear the canvas first
-                ctx.clearRect(0, 0, _Canvas.width, _Canvas.height);
-                // Draw the melons
-                for(let i = 0; i < noOfMelons; i++) {
-                    melon = melons[i];
-                    ctx.drawImage(melon.image, melon.x, melon.y);
-                }
-                // Call the move function to redraw the images to make them seem in motion
-                move();
-            }
-            
-            // Move will continuously change the y coordinates to make them seem in motion
-            function move() {
-                // Loop through all of the melons
-                for (let i = 0; i < noOfMelons; i++) {
-                    melon = melons[i];
-                    // Change the y coordinate to make them "fall"
-                    melon.y += melon.ys;
-                    // If melons go past the canvas height, redraw them at the top
-                    if (melon.y > _Canvas.height) {
-                        melon.x = Math.random() * _Canvas.width;
-                        melon.y = -1 * 15;
-                    }
-                }
-            }
-            // Set the interval in which to draw the melons
-            setInterval(draw, 30);
             // Shutdown the kernel
             this.krnShutdown();
         }

@@ -16,6 +16,9 @@ const CPU_CLOCK_INTERVAL: number = 100;   // This is in ms (milliseconds) so 100
 const TIMER_IRQ: number = 0;  // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
                               // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 const KEYBOARD_IRQ: number = 1;
+const PROCESS_EXIT_IRQ: number = 2;
+const CONSOLE_WRITE_IRQ: number = 3;
+const INVALID_OP_IRQ: number = 4;
 
 // Global variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
@@ -27,8 +30,8 @@ let _Mode: number = 0;     // (currently unused)  0 = Kernel Mode, 1 = User Mode
 // Memory related global variables
 let _Memory: TSOS.Memory;
 let _MemoryManager: TSOS.MemoryManager;
-let _MemorySize = 768; // 786 bytes, 3 segments of 256 bytes
-let _SegementSize = 256;
+let _TotalMemorySize = 768; // 786 bytes, 3 segments of 256 bytes
+let _PartitionSize = 256;
 
 // Process related global variables
 let _PCB: TSOS.ProcessControlBlock;
@@ -61,6 +64,7 @@ let _StdOut;
 // UI
 let _Console: TSOS.Console;
 let _OsShell: TSOS.Shell;
+let _Control: TSOS.Control;
 
 // At least this OS is not trying to kill you. (Yet.)
 let _SarcasticMode: boolean = false;

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-        <meta name="author"             content="Alan G. Labouseur" />
+        <meta name="author"             content="Stephen Stone" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
    
         <!-- Enable bootstrap -->
@@ -19,8 +19,6 @@
         <script type="text/javascript" src="distrib/host/memory.js"></script>
         <!-- Virtual OS Routines: Make sure Kernel code is last, since it needs those above it. -->
         <script type="text/javascript" src="distrib/os/interrupt.js"></script>
-        <script type="text/javascript" src="distrib/os/memoryManager.js"></script>
-        <script type="text/javascript" src="distrib/os/processControlBlock.js"></script>
         <script type="text/javascript" src="distrib/os/canvastext.js"></script>
         <script type="text/javascript" src="distrib/os/console.js"></script>
         <script type="text/javascript" src="distrib/os/deviceDriver.js"></script>
@@ -29,6 +27,8 @@
         <script type="text/javascript" src="distrib/os/shell.js"></script>
         <script type="text/javascript" src="distrib/os/shellCommand.js"></script>
         <script type="text/javascript" src="distrib/os/userCommand.js"></script>
+        <script type="text/javascript" src="distrib/os/memoryManager.js"></script>
+        <script type="text/javascript" src="distrib/os/processControlBlock.js"></script>
         <script type="text/javascript" src="distrib/os/kernel.js"></script>
         <!-- Other Routines -->
         <script type="text/javascript" src="distrib/utils.js"></script>
@@ -81,72 +81,110 @@
                                 </li>
                         </ul>
                 </nav>
-                
-                <div id="divConsole">
-                        <canvas id="display" width="530px" height="5000px" tabindex="3"></canvas>
-                </div>
-
-                <div id="divLog">
-                        <label>
-                                Host Log
-                                <br>
-                                <textarea name="taHostLog"
-                                        id="taHostLog"
-                                        rows="26"
-                                        cols="48"
-                                ></textarea>
-                        </label>
-                </div>
-
-                <div id="divMemory">
-                        <label>
-                                Memory
-                                <br>
-                                <table id="tableMemory">
-                                        <tbody></tbody>
-                                </table>
-                        </label>
-                </div>
-
-                <div id="divCPU">
-                        <label>
-                                CPU
-                                <br>
-                                <table id="tableCPU">
-                                        <thead>
-                                                <tr>
-                                                        <td>PC</td>
-                                                        <td>IR</td>
-                                                        <td>Acc</td>
-                                                        <td>X</td>
-                                                        <td>Y</td>
-                                                        <td>ZF</td>
-                                                </tr>
-                                        </thead>
-                                        <tbody>
-                                                <tr>
-                                                        <td>0</td>
-                                                        <td>0</td>
-                                                        <td>0</td>
-                                                        <td>0</td>
-                                                        <td>0</td>
-                                                        <td>0</td>
-                                                </tr>
-                                        </tbody>
-                                </table>
-                        </label>
-                </div>
-
-                <div id="divUserProgramInput">
-                        <label>
-                                User Program Input
-                                <br>
-                                <textarea name="taProgramInput"
-                                        id  ="taProgramInput"
-                                        rows="8"
-                                        cols="48"
-                                ></textarea>
-                        </label>
+                <div class="container-fluid">
+                        <div class="row">
+                                <div class="col-sm">
+                                        <div id="divConsole">
+                                                <canvas id="display" width="530px" height="5000px" tabindex="3"></canvas>
+                                        </div>
+                                </div>
+                                <div class="col-sm">
+                                        <div id="divLog">
+                                                <label>
+                                                        Host Log
+                                                        <br>
+                                                        <textarea name="taHostLog"
+                                                                class="form-control"
+                                                                id="taHostLog"
+                                                                rows="20"
+                                                                cols="48"
+                                                        ></textarea>
+                                                </label>
+                                        </div>
+                                </div>
+                                <div class="col-sm">
+                                        <div id="divMemory">
+                                                <label>
+                                                        Memory
+                                                        <br>
+                                                        <table id="tableMemory" class="table table-striped">
+                                                                <tbody></tbody>
+                                                        </table>
+                                                </label>
+                                        </div>
+                                        
+                                </div>
+                        </div>
+                        <div class="row">
+                                <div class="col-sm">
+                                        <div id="divCPU">
+                                                <label>
+                                                        CPU
+                                                        <br>
+                                                        <table id="tableCPU" class="table table-striped">
+                                                                <thead>
+                                                                        <tr>
+                                                                                <td>PC</td>
+                                                                                <td>IR</td>
+                                                                                <td>Acc</td>
+                                                                                <td>X</td>
+                                                                                <td>Y</td>
+                                                                                <td>ZF</td>
+                                                                        </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                        <tr>
+                                                                                <td>-</td>
+                                                                                <td>-</td>
+                                                                                <td>-</td>
+                                                                                <td>-</td>
+                                                                                <td>-</td>
+                                                                                <td>-</td>
+                                                                        </tr>
+                                                                </tbody>
+                                                        </table>
+                                                </label>
+                                        </div>
+                                </div>
+                                <div class="col-sm">
+                                        <div id="divProcess">
+                                                <label>
+                                                        Processes
+                                                        <br>
+                                                        <table id="tableProcesses" class="table table-striped">
+                                                                <thead>
+                                                                        <tr>
+                                                                                <td>PID</td>
+                                                                                <td>PC</td>
+                                                                                <td>ACC</td>
+                                                                                <td>X</td>
+                                                                                <td>Y</td>
+                                                                                <td>Z</td>
+                                                                                <td>Priority</td>
+                                                                                <td>State</td>
+                                                                        </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                </tbody>
+                                                        </table>
+                                                </label>
+                                        </div>
+                                </div>
+                                <div class="col-sm">
+                                        <div id="divUserProgramInput">
+                                                <label>
+                                                        User Program Input
+                                                        <br>
+                                                        <textarea name="taProgramInput"
+                                                                class="form-control"
+                                                                id="taProgramInput"
+                                                                rows="5"
+                                                                cols="48"
+                                                        >A9 03 8D 41 00 A9 01 8D 40 00 AC 40 00 A2 01 FF EE 40 00 AE 40 00 EC 41 00 D0 EF A9 44 8D 42 00 A9 4F 8D 43 00 A9 4E 8D 44 00 A9 45 8D 45 00 A9 00 8D 46 00 A2 02 A0 42 FF 00</textarea>
+                                                </label>
+                                        </div>
+                                </div>
+                        </div>
                 </div>
         </div>
 

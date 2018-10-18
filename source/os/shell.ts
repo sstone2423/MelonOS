@@ -2,6 +2,7 @@
 ///<reference path="../utils.ts" />
 ///<reference path="shellCommand.ts" />
 ///<reference path="userCommand.ts" />
+///<reference path="memoryManager.ts" />
 
 /* ------------
    Shell.ts
@@ -28,7 +29,6 @@ module TSOS {
         public init() {
             let sc;      
             // Load the command list.
-
             // v
             sc = new ShellCommand(this.shellVer,
                                   "v",
@@ -453,9 +453,9 @@ module TSOS {
 
         public shellLoad() {
             // Get value inside program input (the program)
-            const userInputProgram = document.getElementById("taProgramInput").value;
+            const userInputProgram = (<HTMLInputElement>document.getElementById("taProgramInput")).value;
             // Create regex pattern
-            const hexRegex = new RegExp("^[a-fA-F0-9\s]+$");
+            const hexRegex = new RegExp(/[0-9A-Fa-f]{2}/i);
             // Check for anything besides hex or spaces (A-Fa-f0-9)
             if (hexRegex.test(userInputProgram)) {
                 // Load program into memory (currently just outputs success)
@@ -466,7 +466,7 @@ module TSOS {
             // Split the program into 2-bit hex
             let splitProgram = userInputProgram.split(" ");
             // Create a process using the process manager
-            _MemoryManager.uploadProgram(splitProgram);
+            _MemoryManager.createProcess(splitProgram);
         }
 
         public shellDropit() {
@@ -474,8 +474,33 @@ module TSOS {
             _Kernel.krnTrapError(oops);
         }
 
-        public shellRun() {
-            
+        // Add the process to the ready queue - Arg will be the processId
+        public shellRun(args) {
+            let found = false;
+            let waitQueueLength = _MemoryManager.waitingQueue.getSize();
+            let counter = 0;
+            // Check to see if CPU is already executing
+            if (_CPU.isExecuting) {
+                _StdOut.putText("Process is already in execution");
+            } else {
+                // Find the correct processId by looping through the waiting queue
+                while (!found || counter > waitQueueLength) {
+                    let pcb = _MemoryManager.waitingQueue.dequeue();
+                    if (pcb.pId == args[0]) {
+                        // Put the pcb into the ready queue for execution
+                        _MemoryManager.readyQueue.enqueue(pcb);
+                        found = true;
+                    } else {
+                        // Put the pcb back into the queue if it doesn't match
+                        _MemoryManager.waitingQueue.enqueue(pcb);
+                        counter++;
+                    }
+                }
+
+                if (!found) {
+                    _StdOut.putText("Invalid process ID. It may not exist?");
+                }
+            }
         }
     }
 }

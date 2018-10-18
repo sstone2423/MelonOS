@@ -14,6 +14,9 @@ var CPU_CLOCK_INTERVAL = 100; // This is in ms (milliseconds) so 1000 = 1 second
 var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 var KEYBOARD_IRQ = 1;
+var PROCESS_EXIT_IRQ = 2;
+var CONSOLE_WRITE_IRQ = 3;
+var INVALID_OP_IRQ = 4;
 // Global variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 var _CPU; // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
@@ -22,8 +25,8 @@ var _Mode = 0; // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 
 // Memory related global variables
 var _Memory;
 var _MemoryManager;
-var _MemorySize = 768; // 786 bytes, 3 segments of 256 bytes
-var _SegementSize = 256;
+var _TotalMemorySize = 768; // 786 bytes, 3 segments of 256 bytes
+var _PartitionSize = 256;
 // Process related global variables
 var _PCB;
 var _ProcessCount = 0;
@@ -51,6 +54,7 @@ var _StdOut;
 // UI
 var _Console;
 var _OsShell;
+var _Control;
 // At least this OS is not trying to kill you. (Yet.)
 var _SarcasticMode = false;
 // Global Device Driver Objects - page 12

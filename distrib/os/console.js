@@ -59,8 +59,6 @@ var TSOS;
               UPDATE: Even though we are now working in TypeScript, char and string remain undistinguished.
                      Consider fixing that. */
             if (text !== "") {
-                // Split all incoming text so that it can be checked for x position as it is handled
-                var textSplitArray = text.split(" ");
                 for (var i = 0; i < text.length; i++) {
                     // If the x position reaches 510, advance the line and continue drawing
                     if (this.currentXPosition > 510) {

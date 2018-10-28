@@ -221,7 +221,7 @@ module TSOS {
         }
 
         // BSOD effect
-        public melonDrop() {
+        public static melonDrop(): void {
             // Initialize Canvas and melon variables
             var ctx;
             var noOfMelons = 20;

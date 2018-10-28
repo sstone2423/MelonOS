@@ -103,7 +103,6 @@ module TSOS {
                 this.krnTrace("Idle");
                 // Check the ready queue on each cycle if CPU is not executing
                 _MemoryManager.checkReadyQueue();
-
             }
         }
 
@@ -161,7 +160,6 @@ module TSOS {
 
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
-                    _Control.melonDrop();
             }
         }
 
@@ -209,6 +207,8 @@ module TSOS {
             Control.hostLog("OS ERROR - TRAP: " + msg);
             // Shutdown the kernel
             this.krnShutdown();
+            // Issue melon drop
+            Control.melonDrop();
         }
     }
 }

@@ -139,7 +139,6 @@ var TSOS;
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
-                    _Control.melonDrop();
             }
         };
         Kernel.prototype.krnTimerISR = function () {
@@ -184,6 +183,8 @@ var TSOS;
             TSOS.Control.hostLog("OS ERROR - TRAP: " + msg);
             // Shutdown the kernel
             this.krnShutdown();
+            // Issue melon drop
+            TSOS.Control.melonDrop();
         };
         return Kernel;
     }());

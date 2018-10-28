@@ -210,7 +210,7 @@ var TSOS;
             }
         };
         // BSOD effect
-        Control.prototype.melonDrop = function () {
+        Control.melonDrop = function () {
             // Initialize Canvas and melon variables
             var ctx;
             var noOfMelons = 20;

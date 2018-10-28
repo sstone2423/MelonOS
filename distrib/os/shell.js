@@ -402,6 +402,7 @@ var TSOS;
         };
         // Add the process to the ready queue - Arg will be the processId
         Shell.prototype.shellRun = function (args) {
+            // Chec
             var found = false;
             var waitQueueLength = _MemoryManager.waitingQueue.getSize();
             var counter = 0;
@@ -411,7 +412,7 @@ var TSOS;
             }
             else {
                 // Find the correct processId by looping through the waiting queue
-                while (!found || counter > waitQueueLength) {
+                for (var i = 0; i < _MemoryManager.waitingQueue.getSize(); i++) {
                     var pcb = _MemoryManager.waitingQueue.dequeue();
                     if (pcb.pId == args[0]) {
                         // Put the pcb into the ready queue for execution
@@ -421,7 +422,6 @@ var TSOS;
                     else {
                         // Put the pcb back into the queue if it doesn't match
                         _MemoryManager.waitingQueue.enqueue(pcb);
-                        counter++;
                     }
                 }
                 if (!found) {

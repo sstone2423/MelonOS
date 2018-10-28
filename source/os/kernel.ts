@@ -145,6 +145,8 @@ module TSOS {
                     // Update the CPU and Processes display
                     Control.hostProcesses();
                     Control.hostCPU();
+                    _StdOut.advanceLine();
+                    _OsShell.putPrompt();
                     break;
 
                 case CONSOLE_WRITE_IRQ:

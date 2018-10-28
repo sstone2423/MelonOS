@@ -476,6 +476,7 @@ module TSOS {
 
         // Add the process to the ready queue - Arg will be the processId
         public shellRun(args) {
+            // Chec
             let found = false;
             let waitQueueLength = _MemoryManager.waitingQueue.getSize();
             let counter = 0;
@@ -484,7 +485,7 @@ module TSOS {
                 _StdOut.putText("Process is already in execution");
             } else {
                 // Find the correct processId by looping through the waiting queue
-                while (!found || counter > waitQueueLength) {
+                for (let i = 0; i < _MemoryManager.waitingQueue.getSize(); i++) {
                     let pcb = _MemoryManager.waitingQueue.dequeue();
                     if (pcb.pId == args[0]) {
                         // Put the pcb into the ready queue for execution
@@ -493,10 +494,8 @@ module TSOS {
                     } else {
                         // Put the pcb back into the queue if it doesn't match
                         _MemoryManager.waitingQueue.enqueue(pcb);
-                        counter++;
                     }
                 }
-
                 if (!found) {
                     _StdOut.putText("Invalid process ID. It may not exist?");
                 }

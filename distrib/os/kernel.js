@@ -126,6 +126,8 @@ var TSOS;
                     // Update the CPU and Processes display
                     TSOS.Control.hostProcesses();
                     TSOS.Control.hostCPU();
+                    _StdOut.advanceLine();
+                    _OsShell.putPrompt();
                     break;
                 case CONSOLE_WRITE_IRQ:
                     _StdOut.putText(params);

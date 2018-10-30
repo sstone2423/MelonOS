@@ -38,8 +38,11 @@
                     _Memory.loadIntoMemory(opCodes, pcb.partition);
                     // Add pcb to waitingQueue
                     this.waitingQueue.enqueue(pcb);
-                    // Update the pcb info to the tableProcess
+                    // Update the memory and processes displays
                     Control.hostMemory();
+                    Control.hostProcesses();
+                } else {
+                    _StdOut.putText("There are no free memory partitions.");
                 }
             }
         }
@@ -53,8 +56,6 @@
             _CPU.Zflag = this.runningProcess.Zflag;
             _CPU.isExecuting = true;
             this.runningProcess.state = "Executing";
-
-            // TODO: Update Memory, CPU, PCB displays
         }
 
         public checkReadyQueue(): void {

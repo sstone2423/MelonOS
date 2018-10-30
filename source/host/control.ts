@@ -64,6 +64,8 @@ module TSOS {
             // .. enable the Halt and Reset buttons ...
             (document.getElementById("btnHaltOS") as HTMLButtonElement).disabled = false;
             (document.getElementById("btnReset") as HTMLButtonElement).disabled = false;
+            (document.getElementById("btnSingleStep") as HTMLButtonElement).disabled = false;
+            (document.getElementById("btnSingleStep") as HTMLButtonElement).style.backgroundColor = "red";
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
             // ... Create and initialize the CPU (because it's part of the hardware)  ...
@@ -97,6 +99,25 @@ module TSOS {
             // That boolean parameter is the 'forceget' flag. When it is true it causes the page to always
             // be reloaded from the server. If it is false or not specified the browser may reload the
             // page from its cache, which is not what we want.
+        }
+
+        public static hostBtnSingleStep_click(btn): void {
+            if (!_SingleStep) {
+                // Enable the NextStep button
+                (document.getElementById("btnNextStep") as HTMLButtonElement).disabled = false;
+                _SingleStep = true;
+                (document.getElementById("btnSingleStep") as HTMLButtonElement).style.backgroundColor = "green";
+            } else {
+                // Disable the NextStep button
+                (document.getElementById("btnNextStep") as HTMLButtonElement).disabled = true;
+                _SingleStep = false;
+                (document.getElementById("btnSingleStep") as HTMLButtonElement).style.backgroundColor = "red";
+            }
+        }
+
+        public static hostBtnNextStep_click(btn): void {
+            // Set _NextStep = true
+            _NextStep = true;
         }
 
         // Update the CPU display table
@@ -149,12 +170,12 @@ module TSOS {
         // Update the Process in execution table
         public static hostProcesses(): void {
             let table = (<HTMLTableElement>document.getElementById('tableProcesses'));
-            // For each PCB in ready queue, print out a new row for it
+            // Initialize an array of PCBs
             let readyQueue: Array<ProcessControlBlock> = [];
-
-            for (let i = 0; i < _MemoryManager.readyQueue.getSize(); i++){
-                let pcb = _MemoryManager.readyQueue.dequeue();
-                _MemoryManager.readyQueue.enqueue(pcb);
+            // For each PCB in ready queue, print out a new row for it
+            for (let i = 0; i < _MemoryManager.waitingQueue.getSize(); i++){
+                let pcb = _MemoryManager.waitingQueue.dequeue();
+                _MemoryManager.waitingQueue.enqueue(pcb);
                 readyQueue.push(pcb);
             }
             if(_MemoryManager.runningProcess != null){
@@ -166,7 +187,7 @@ module TSOS {
             // Display all the other PCBs sitting in the ready queue
             // Convert numbers to HEX
             while(readyQueue.length > 0){
-                let displayPcb = readyQueue.pop();
+                let displayPcb = readyQueue.shift();
                 let row = table.insertRow(-1); // New row appended to table
                 // PID
                 let cell = row.insertCell();

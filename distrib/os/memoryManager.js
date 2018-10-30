@@ -31,8 +31,12 @@ var TSOS;
                     _Memory.loadIntoMemory(opCodes, pcb.partition);
                     // Add pcb to waitingQueue
                     this.waitingQueue.enqueue(pcb);
-                    // Update the pcb info to the tableProcess
+                    // Update the memory and processes displays
                     TSOS.Control.hostMemory();
+                    TSOS.Control.hostProcesses();
+                }
+                else {
+                    _StdOut.putText("There are no free memory partitions.");
                 }
             }
         };
@@ -45,7 +49,6 @@ var TSOS;
             _CPU.Zflag = this.runningProcess.Zflag;
             _CPU.isExecuting = true;
             this.runningProcess.state = "Executing";
-            // TODO: Update Memory, CPU, PCB displays
         };
         MemoryManager.prototype.checkReadyQueue = function () {
             if (!this.readyQueue.isEmpty()) {

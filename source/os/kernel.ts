@@ -86,7 +86,7 @@ module TSOS {
             const htmlDateTime = document.getElementById("currentDate");
             const currentDateTime = new Date();
             htmlDateTime.innerHTML = currentDateTime + "";
-            // Check for an interrupt, are any. Page 560
+            // Check for an interrupt Page 560
             if (_KernelInterruptQueue.getSize() > 0) {
                 // Process the first interrupt on the interrupt queue.
                 // TODO: Implement a priority queue based on the IRQ number/id to enforce interrupt priority.
@@ -94,12 +94,26 @@ module TSOS {
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is
                                            // anything being processed.
-                _CPU.cycle();
-                Control.hostCPU();
-                Control.hostMemory();
-                Control.hostProcesses();
+                // Check if _SingleStep is enabled, then wait for the next step click before executing the next instruction
+                if (_SingleStep) {
+                    if (_NextStep) {
+                        _CPU.cycle();
+                        // Update displays
+                        Control.hostCPU();
+                        Control.hostMemory();
+                        //Control.hostProcesses();
+                    }
+                // Otherwise, Execute normally
+                } else {
+                    _CPU.cycle();
+                    // Update displays
+                    Control.hostCPU();
+                    Control.hostMemory();
+                    //Control.hostProcesses();
+                }
             } else {                      // If there are no interrupts and there is nothing being executed
                                           // then just be idle.
+                _NextStep = false;  // Revert the boolean when the CPU is finished executing
                 this.krnTrace("Idle");
                 // Check the ready queue on each cycle if CPU is not executing
                 _MemoryManager.checkReadyQueue();

@@ -476,16 +476,14 @@ module TSOS {
 
         // Add the process to the ready queue - Arg will be the processId
         public shellRun(args) {
-            // Chec
             let found = false;
             let waitQueueLength = _MemoryManager.waitingQueue.getSize();
-            let counter = 0;
             // Check to see if CPU is already executing
             if (_CPU.isExecuting) {
                 _StdOut.putText("Process is already in execution");
             } else {
                 // Find the correct processId by looping through the waiting queue
-                for (let i = 0; i < _MemoryManager.waitingQueue.getSize(); i++) {
+                for (let i = 0; i < waitQueueLength; i++) {
                     let pcb = _MemoryManager.waitingQueue.dequeue();
                     if (pcb.pId == args[0]) {
                         // Put the pcb into the ready queue for execution

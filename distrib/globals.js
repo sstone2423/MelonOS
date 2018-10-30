@@ -48,6 +48,8 @@ var _KernelInputQueue = null; // Is this better? I don't like uninitialized leti
 // the type specifier 'any'
 var _KernelBuffers = null; // when clearly 'any' is not what we want. There is likely a better way, but what
 // is it?
+var _SingleStep = false; // Check if Single-step is enabled
+var _NextStep = false; // Check if NextStep is enabled
 // Standard input and output
 var _StdIn; // Same "to null or not to null" issue as above.
 var _StdOut;

@@ -56,6 +56,8 @@ let _KernelInputQueue: any = null;  // Is this better? I don't like uninitialize
                                     // the type specifier 'any'
 let _KernelBuffers: any[] = null;   // when clearly 'any' is not what we want. There is likely a better way, but what
                                     // is it?
+let _SingleStep: boolean = false;   // Check if Single-step is enabled
+let _NextStep: boolean = false;     // Check if NextStep is enabled
 
 // Standard input and output
 let _StdIn;    // Same "to null or not to null" issue as above.

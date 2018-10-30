@@ -120,6 +120,12 @@ module TSOS {
             _NextStep = true;
         }
 
+        public static hostDisableNextStep(): void {
+            // Disable the NextStep button
+            (document.getElementById("btnNextStep") as HTMLButtonElement).disabled = true;
+            _NextStep = false;
+        }
+
         // Update the CPU display table
         public static hostCPU(): void {
             var table = (<HTMLTableElement>document.getElementById('tableCPU'));
@@ -171,23 +177,23 @@ module TSOS {
         public static hostProcesses(): void {
             let table = (<HTMLTableElement>document.getElementById('tableProcesses'));
             // Initialize an array of PCBs
-            let readyQueue: Array<ProcessControlBlock> = [];
-            // For each PCB in ready queue, print out a new row for it
-            for (let i = 0; i < _MemoryManager.waitingQueue.getSize(); i++){
-                let pcb = _MemoryManager.waitingQueue.dequeue();
-                _MemoryManager.waitingQueue.enqueue(pcb);
-                readyQueue.push(pcb);
+            let displayQueue: Array<ProcessControlBlock> = [];
+            // For each PCB in resident queue, print out a new row for it
+            for (let i = 0; i < _MemoryManager.residentQueue.getSize(); i++){
+                let pcb = _MemoryManager.residentQueue.dequeue();
+                _MemoryManager.residentQueue.enqueue(pcb);
+                displayQueue.push(pcb);
             }
             if(_MemoryManager.runningProcess != null){
-                readyQueue.push(_MemoryManager.runningProcess);
+                displayQueue.push(_MemoryManager.runningProcess);
             }
             while(table.rows.length > 1){
                 table.deleteRow(1);
             }
-            // Display all the other PCBs sitting in the ready queue
+            // Display all the other PCBs sitting in the display queue
             // Convert numbers to HEX
-            while(readyQueue.length > 0){
-                let displayPcb = readyQueue.shift();
+            while(displayQueue.length > 0){
+                let displayPcb = displayQueue.shift();
                 let row = table.insertRow(-1); // New row appended to table
                 // PID
                 let cell = row.insertCell();
@@ -295,6 +301,13 @@ module TSOS {
             }
             // Set the interval in which to draw the melons
             setInterval(draw, 30);
+        }
+
+        public static hostTime(): void {
+            // TODO: Remove the time zones and DST
+            const htmlDateTime = document.getElementById("currentDate");
+            const currentDateTime = new Date();
+            htmlDateTime.innerHTML = currentDateTime + "";
         }
     }
 }

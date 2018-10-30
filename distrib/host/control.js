@@ -113,6 +113,11 @@ var TSOS;
             // Set _NextStep = true
             _NextStep = true;
         };
+        Control.hostDisableNextStep = function () {
+            // Disable the NextStep button
+            document.getElementById("btnNextStep").disabled = true;
+            _NextStep = false;
+        };
         // Update the CPU display table
         Control.hostCPU = function () {
             var table = document.getElementById('tableCPU');
@@ -162,23 +167,23 @@ var TSOS;
         Control.hostProcesses = function () {
             var table = document.getElementById('tableProcesses');
             // Initialize an array of PCBs
-            var readyQueue = [];
-            // For each PCB in ready queue, print out a new row for it
-            for (var i = 0; i < _MemoryManager.waitingQueue.getSize(); i++) {
-                var pcb = _MemoryManager.waitingQueue.dequeue();
-                _MemoryManager.waitingQueue.enqueue(pcb);
-                readyQueue.push(pcb);
+            var displayQueue = [];
+            // For each PCB in resident queue, print out a new row for it
+            for (var i = 0; i < _MemoryManager.residentQueue.getSize(); i++) {
+                var pcb = _MemoryManager.residentQueue.dequeue();
+                _MemoryManager.residentQueue.enqueue(pcb);
+                displayQueue.push(pcb);
             }
             if (_MemoryManager.runningProcess != null) {
-                readyQueue.push(_MemoryManager.runningProcess);
+                displayQueue.push(_MemoryManager.runningProcess);
             }
             while (table.rows.length > 1) {
                 table.deleteRow(1);
             }
-            // Display all the other PCBs sitting in the ready queue
+            // Display all the other PCBs sitting in the display queue
             // Convert numbers to HEX
-            while (readyQueue.length > 0) {
-                var displayPcb = readyQueue.shift();
+            while (displayQueue.length > 0) {
+                var displayPcb = displayQueue.shift();
                 var row = table.insertRow(-1); // New row appended to table
                 // PID
                 var cell = row.insertCell();
@@ -281,6 +286,12 @@ var TSOS;
             }
             // Set the interval in which to draw the melons
             setInterval(draw, 30);
+        };
+        Control.hostTime = function () {
+            // TODO: Remove the time zones and DST
+            var htmlDateTime = document.getElementById("currentDate");
+            var currentDateTime = new Date();
+            htmlDateTime.innerHTML = currentDateTime + "";
         };
         return Control;
     }());

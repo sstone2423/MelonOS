@@ -403,7 +403,7 @@ var TSOS;
         // Add the process to the ready queue - Arg will be the processId
         Shell.prototype.shellRun = function (args) {
             var found = false;
-            var waitQueueLength = _MemoryManager.waitingQueue.getSize();
+            var waitQueueLength = _MemoryManager.residentQueue.getSize();
             // Check to see if CPU is already executing
             if (_CPU.isExecuting) {
                 _StdOut.putText("Process is already in execution");
@@ -411,7 +411,7 @@ var TSOS;
             else {
                 // Find the correct processId by looping through the waiting queue
                 for (var i = 0; i < waitQueueLength; i++) {
-                    var pcb = _MemoryManager.waitingQueue.dequeue();
+                    var pcb = _MemoryManager.residentQueue.dequeue();
                     if (pcb.pId == args[0]) {
                         // Put the pcb into the ready queue for execution
                         _MemoryManager.readyQueue.enqueue(pcb);
@@ -419,7 +419,7 @@ var TSOS;
                     }
                     else {
                         // Put the pcb back into the queue if it doesn't match
-                        _MemoryManager.waitingQueue.enqueue(pcb);
+                        _MemoryManager.residentQueue.enqueue(pcb);
                     }
                 }
                 if (!found) {

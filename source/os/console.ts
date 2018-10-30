@@ -62,7 +62,6 @@ module TSOS {
                     // If the x position reaches 510, advance the line and continue drawing
                     if (this.currentXPosition > 510) {
                         _StdOut.advanceLine();
-
                         // Advance the position so that it is easier to see that you are still working within
                         // the same command line number
                         this.currentXPosition = 15;

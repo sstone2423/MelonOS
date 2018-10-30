@@ -81,5 +81,10 @@
                 // Save value to the memoryArray
                 _Memory.memoryArray[address] = value;
             }
+
+            // Loops address
+            public branchLoop(PC, branch) {
+                return (PC + branch + 2);
+            }
         }
     }

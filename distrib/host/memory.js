@@ -70,6 +70,10 @@ var TSOS;
             // Save value to the memoryArray
             _Memory.memoryArray[address] = value;
         };
+        // Loops address
+        Memory.prototype.branchLoop = function (PC, branch) {
+            return (PC + branch + 2);
+        };
         return Memory;
     }());
     TSOS.Memory = Memory;

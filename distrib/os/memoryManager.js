@@ -8,7 +8,7 @@ var TSOS;
         function MemoryManager() {
             this.processIncrementor = 0;
             this.readyQueue = new TSOS.Queue;
-            this.waitingQueue = new TSOS.Queue;
+            this.residentQueue = new TSOS.Queue;
         }
         // Create a process for the loaded program (called from shellLoad command)
         MemoryManager.prototype.createProcess = function (opCodes) {
@@ -29,8 +29,8 @@ var TSOS;
                     pcb.init(partition);
                     // Load into memory
                     _Memory.loadIntoMemory(opCodes, pcb.partition);
-                    // Add pcb to waitingQueue
-                    this.waitingQueue.enqueue(pcb);
+                    // Add pcb to residentQueue
+                    this.residentQueue.enqueue(pcb);
                     // Update the memory and processes displays
                     TSOS.Control.hostMemory();
                     TSOS.Control.hostProcesses();
@@ -43,10 +43,10 @@ var TSOS;
         MemoryManager.prototype.executeProcess = function () {
             this.runningProcess = _MemoryManager.readyQueue.dequeue();
             _CPU.PC = this.runningProcess.PC;
-            _CPU.Acc = this.runningProcess.Acc;
+            _CPU.Acc = this.runningProcess.acc;
             _CPU.Xreg = this.runningProcess.xReg;
             _CPU.Yreg = this.runningProcess.yReg;
-            _CPU.Zflag = this.runningProcess.Zflag;
+            _CPU.Zflag = this.runningProcess.zFlag;
             _CPU.isExecuting = true;
             this.runningProcess.state = "Executing";
         };

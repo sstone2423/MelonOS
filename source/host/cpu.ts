@@ -20,12 +20,12 @@ module TSOS {
 
     export class Cpu {
 
-        constructor(public PC: number = 0,
-                    public Acc: number = 0,
-                    public Xreg: number = 0,
-                    public Yreg: number = 0,
-                    public Zflag: number = 0,
-                    public isExecuting: boolean = false) {
+        constructor(public PC: number,
+                    public Acc: number,
+                    public Xreg: number,
+                    public Yreg: number,
+                    public Zflag: number,
+                    public isExecuting: boolean) {
         }
 
         public init(): void {
@@ -169,8 +169,11 @@ module TSOS {
                             // Get the number of bytes to branch
                             let branch = parseInt(_Memory.readMemory(this.PC + 1), 16);
                             // TODO: finish this logic
-
+                            this.PC = _Memory.branchLoop(this.PC, branch);
+                        } else {
+                            this.PC += 2;
                         }
+                        break;
 
                     case "EE": /* Increment the value of a byte
                         Get the hex memory address by looking at next 2 values in memory

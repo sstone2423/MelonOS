@@ -82,10 +82,8 @@ module TSOS {
                This, on the other hand, is the clock pulse from the hardware / VM / host that tells the kernel
                that it has to look for interrupts and process them if it finds any.                           */
             // Get the time
-            // TODO: Remove the time zones and DST
-            const htmlDateTime = document.getElementById("currentDate");
-            const currentDateTime = new Date();
-            htmlDateTime.innerHTML = currentDateTime + "";
+
+            Control.hostTime();
             // Check for an interrupt Page 560
             if (_KernelInterruptQueue.getSize() > 0) {
                 // Process the first interrupt on the interrupt queue.
@@ -96,20 +94,21 @@ module TSOS {
                                            // anything being processed.
                 // Check if _SingleStep is enabled, then wait for the next step click before executing the next instruction
                 if (_SingleStep) {
+                    // If user clicked next step, execute one step
                     if (_NextStep) {
                         _CPU.cycle();
                         // Update displays
                         Control.hostCPU();
                         Control.hostMemory();
-                        //Control.hostProcesses();
+                        _NextStep = false;
                     }
+                    this.krnTrace("Idle");
                 // Otherwise, Execute normally
                 } else {
                     _CPU.cycle();
                     // Update displays
                     Control.hostCPU();
                     Control.hostMemory();
-                    //Control.hostProcesses();
                 }
             } else {                      // If there are no interrupts and there is nothing being executed
                                           // then just be idle.

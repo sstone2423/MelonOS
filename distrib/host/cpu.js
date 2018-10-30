@@ -18,12 +18,6 @@ var TSOS;
 (function (TSOS) {
     var Cpu = /** @class */ (function () {
         function Cpu(PC, Acc, Xreg, Yreg, Zflag, isExecuting) {
-            if (PC === void 0) { PC = 0; }
-            if (Acc === void 0) { Acc = 0; }
-            if (Xreg === void 0) { Xreg = 0; }
-            if (Yreg === void 0) { Yreg = 0; }
-            if (Zflag === void 0) { Zflag = 0; }
-            if (isExecuting === void 0) { isExecuting = false; }
             this.PC = PC;
             this.Acc = Acc;
             this.Xreg = Xreg;
@@ -159,7 +153,12 @@ var TSOS;
                             // Get the number of bytes to branch
                             var branch = parseInt(_Memory.readMemory(this.PC + 1), 16);
                             // TODO: finish this logic
+                            this.PC = _Memory.branchLoop(this.PC, branch);
                         }
+                        else {
+                            this.PC += 2;
+                        }
+                        break;
                     case "EE": /* Increment the value of a byte
                         Get the hex memory address by looking at next 2 values in memory
                         and swapping because of little-endian */

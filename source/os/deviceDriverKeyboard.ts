@@ -3,9 +3,6 @@
 
 /* ----------------------------------
    DeviceDriverKeyboard.ts
-
-   Requires deviceDriver.ts
-
    The Kernel Keyboard Device Driver.
    ---------------------------------- */
 

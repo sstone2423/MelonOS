@@ -1,12 +1,5 @@
 ///<reference path="../globals.ts" />
 
-/* ------------
-     Memory.ts
-
-     Requires global.ts.
-
-     ------------ */
-
      module TSOS {
 
         export class Memory {
@@ -44,14 +37,9 @@
 
             // Find the first empty partition -- First one served
             public getEmptyPartition(): number {
-                let found = false;
-                let i = 0;
-                while (found || i > 2) {
+                for (let i = 0; i < this.partitions.length; i++) {
                     if (this.partitions[i].isEmpty) {
-                        found = true;
                         return i;
-                    } else {
-                        i++;
                     }
                 }
             }
@@ -60,10 +48,26 @@
             public loadIntoMemory(opCodes, partition): void {
                 // Copy the textsplit program to the memoryArray
                 for (let i = 0; i < opCodes.length; i++) {
-                    _Memory.memoryArray[i] = opCodes[i];
+                    // Check partition
+                    if (partition == 0) {
+                        // Copy into memoryArray
+                        _Memory.memoryArray[i] = opCodes[i];
+                        // Set partition to not empty
+                        this.partitions[0].isEmpty = false;
+                    // Check partition
+                    } else if (partition == 1) {
+                        // Copy into memoryArray + partition size
+                        _Memory.memoryArray[i + 256] = opCodes[i];
+                        // Set partition to not empty
+                        this.partitions[1].isEmpty = false;
+                    // Check partition
+                    } else {
+                        // Copy into memoryArray + partition size
+                        _Memory.memoryArray[i + 512] = opCodes[i];
+                        // Set partition to not empty
+                        this.partitions[2].isEmpty = false;
+                    }
                 }
-                // Set boolean to let the OS know that this partition is being used
-                //this.partitions[partition].isEmpty = false;
             }
 
             // Get the opCode out of memory and into CPU

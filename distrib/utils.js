@@ -1,8 +1,3 @@
-/* --------
-   Utils.ts
-
-   Utility functions.
-   -------- */
 var TSOS;
 (function (TSOS) {
     var Utils = /** @class */ (function () {

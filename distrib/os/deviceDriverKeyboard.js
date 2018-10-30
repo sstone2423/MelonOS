@@ -15,9 +15,6 @@ var __extends = (this && this.__extends) || (function () {
 })();
 /* ----------------------------------
    DeviceDriverKeyboard.ts
-
-   Requires deviceDriver.ts
-
    The Kernel Keyboard Device Driver.
    ---------------------------------- */
 var TSOS;

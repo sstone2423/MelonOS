@@ -3,7 +3,6 @@
 
    Global CONSTANTS and _letiables.
    (Global over both the OS and Hardware Simulation / Host.)
-
    This code references page numbers in the text book:
    Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 978-0-470-12872-5
    ------------ */
@@ -19,6 +18,7 @@ const KEYBOARD_IRQ: number = 1;
 const PROCESS_EXIT_IRQ: number = 2;
 const CONSOLE_WRITE_IRQ: number = 3;
 const INVALID_OP_IRQ: number = 4;
+const BOUNDS_ERROR_IRQ: number = 5;
 
 // Global variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.

@@ -10,11 +10,7 @@
  *  - fixed comma
  *  - added semi-colon
  *  - renamed "letter" object to "symbol"
- *
  * Port to TypeScript by Bob Nisco in 2014.
- *
- * Note: You could theoretically make up your own letters and symbols for your OS.
- *       That might be fun.
  * ----------------- */
 
 module TSOS {

@@ -3,7 +3,6 @@
 
    Global CONSTANTS and _letiables.
    (Global over both the OS and Hardware Simulation / Host.)
-
    This code references page numbers in the text book:
    Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 978-0-470-12872-5
    ------------ */
@@ -17,6 +16,7 @@ var KEYBOARD_IRQ = 1;
 var PROCESS_EXIT_IRQ = 2;
 var CONSOLE_WRITE_IRQ = 3;
 var INVALID_OP_IRQ = 4;
+var BOUNDS_ERROR_IRQ = 5;
 // Global variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 var _CPU; // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.

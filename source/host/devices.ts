@@ -9,12 +9,6 @@
      These are static because we are never going to instantiate them, because they represent the hardware.
      In this manner, it's A LITTLE BIT like a hypervisor, in that the Document environment inside a browser
      is the "bare metal" (so to speak) for which we write code that hosts our client OS.
-     But that analogy only goes so far, and the lines are blurred, because we are using TypeScript/JavaScript
-     in both the host and client environments.
-
-     This (and simulation scripts) is the only place that we should see "web" code, like
-     DOM manipulation and TypeScript/JavaScript event handling, and so on.  (Index.html is the only place for markup.)
-
      This code references page numbers in the text book:
      Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 978-0-470-12872-5
      ------------ */
@@ -23,8 +17,11 @@ module TSOS {
 
     export class Devices {
 
-        // Hardware/Host Clock Pulse
+        constructor() {
+            _hardwareClockID = -1;
+        }
 
+        // Hardware/Host Clock Pulse
         public static hostClockPulse(): void {
             // Increment the hardware (host) clock.
             _OSclock++;
@@ -33,7 +30,6 @@ module TSOS {
         }
 
         // Keyboard Interrupt, a HARDWARE Interrupt Request. (See pages 560-561 in our text book.)
-
         public static hostEnableKeyboardInterrupt(): void {
             // Listen for key press (keydown, actually) events in the Document
             // and call the simulation processor, which will in turn call the
@@ -55,10 +51,6 @@ module TSOS {
                 // Enqueue this interrupt on the kernel interrupt queue so that it gets to the Interrupt handler.
                 _KernelInterruptQueue.enqueue(new Interrupt(KEYBOARD_IRQ, params));
             }
-        }
-
-        constructor() {
-            _hardwareClockID = -1;
         }
     }
 }

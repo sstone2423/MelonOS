@@ -4,11 +4,7 @@
 /* ------------
      Kernel.ts
 
-     Requires globals.ts
-              queue.ts
-
      Routines for the Operating System, NOT the host.
-
      This code references page numbers in the text book:
      Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 978-0-470-12872-5
      ------------ */
@@ -147,6 +143,11 @@ var TSOS;
                     break;
                 case INVALID_OP_IRQ:
                     _StdOut.putText("Invalid op code in process " + _MemoryManager.runningProcess.pId + ". Exiting the process.");
+                    _StdOut.advanceLine();
+                    _OsShell.putPrompt();
+                    break;
+                case BOUNDS_ERROR_IRQ:
+                    _StdOut.putText("Out of bounds error in process " + _MemoryManager.runningProcess.pId + ". Exiting the process.");
                     _StdOut.advanceLine();
                     _OsShell.putPrompt();
                     break;

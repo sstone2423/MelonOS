@@ -81,8 +81,21 @@ var TSOS;
             // run
             sc = new TSOS.ShellCommand(this.shellRun, "run", "- Run the program currently loaded in memory.");
             this.commandList[this.commandList.length] = sc;
-            // ps  - list the running processes and their IDs
-            // kill <id> - kills the specified process id.
+            // clearmem
+            sc = new TSOS.ShellCommand(this.shellClearmem, "clearmem", "- Clears all memory partitions.");
+            this.commandList[this.commandList.length] = sc;
+            // runall
+            sc = new TSOS.ShellCommand(this.shellRunall, "runall", "- Run all programs currently loaded in memory.");
+            this.commandList[this.commandList.length] = sc;
+            // ps
+            sc = new TSOS.ShellCommand(this.shellPs, "ps", "- Display all processes and their IDs.");
+            this.commandList[this.commandList.length] = sc;
+            // kill <id>
+            sc = new TSOS.ShellCommand(this.shellKill, "kill", "- Kills the specified process ID.");
+            this.commandList[this.commandList.length] = sc;
+            // quantum <int>
+            sc = new TSOS.ShellCommand(this.shellQuantum, "quantum", "- Sets the round robin quantum to the specific integer.");
+            this.commandList[this.commandList.length] = sc;
             // Display the initial prompt.
             this.putPrompt();
         };
@@ -281,6 +294,21 @@ var TSOS;
                     case "run":
                         _StdOut.putText("Run will run the current process loaded in memory.");
                         break;
+                    case "clearmem":
+                        _StdOut.putText("Clearmem will *cough* init *cough* clear all memory partitions.");
+                        break;
+                    case "runall":
+                        _StdOut.putText("Runall will execute all programs in memory.");
+                        break;
+                    case "ps":
+                        _StdOut.putText("Ps will list all processes and their process IDs.");
+                        break;
+                    case "kill":
+                        _StdOut.putText("Kill <id> will terminate the corresponding process");
+                        break;
+                    case "quantum":
+                        _StdOut.putText("Quantum <int> will change the round round scheduling time.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -396,8 +424,10 @@ var TSOS;
             // Create a process using the process manager
             _MemoryManager.createProcess(splitProgram);
         };
+        // Display BSOD....
         Shell.prototype.shellDropit = function () {
             var oops = "Who dropped those?";
+            // Trigger the kernel trap error
             _Kernel.krnTrapError(oops);
         };
         // Add the process to the ready queue - Arg will be the processId
@@ -426,6 +456,21 @@ var TSOS;
                     _StdOut.putText("Invalid process ID. It may not exist?");
                 }
             }
+        };
+        // Clear all memory partitions
+        Shell.prototype.shellClearmem = function () {
+        };
+        // Run all processes in memory
+        Shell.prototype.ShellRunall = function () {
+        };
+        // List all processes and pIDs
+        Shell.prototype.ShellPs = function () {
+        };
+        // Kill process according to given <pid>
+        Shell.prototype.ShellKill = function (args) {
+        };
+        // Change the round robin scheduling according to given <int>
+        Shell.prototype.ShellQuantum = function (args) {
         };
         return Shell;
     }());

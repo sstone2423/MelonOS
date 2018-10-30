@@ -15,6 +15,8 @@ var TSOS;
             // Check to see if the program is greater than the partition size
             if (opCodes.length > _PartitionSize) {
                 _StdOut.putText("Program load failed. Program is over 256 bytes in length.");
+                _StdOut.advanceLine();
+                _StdOut.putPrompt();
             }
             else {
                 // Check if there is a partition available
@@ -37,6 +39,8 @@ var TSOS;
                 }
                 else {
                     _StdOut.putText("There are no free memory partitions.");
+                    _StdOut.advanceLine();
+                    _StdOut.putPrompt();
                 }
             }
         };
@@ -64,6 +68,18 @@ var TSOS;
             // TODO: Update displays
             _StdOut.putText("Exiting process " + this.runningProcess.pId);
             this.runningProcess = null;
+        };
+        // Checks to make sure the memory being accessed is within the range specified by the base/limit
+        MemoryManager.prototype.inBounds = function (address) {
+            var partition = this.runningProcess.partition;
+            if (address + _Memory.partitions[partition].base < _Memory.partitions[partition].base
+                + _Memory.partitions[partition].limit && address + _Memory.partitions[partition].base
+                >= _Memory.partitions[partition].base) {
+                return true;
+            }
+            else {
+                return false;
+            }
         };
         return MemoryManager;
     }());

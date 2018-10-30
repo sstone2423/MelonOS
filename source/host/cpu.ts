@@ -19,13 +19,13 @@
 module TSOS {
 
     export class Cpu {
-
-        constructor(public PC: number,
-                    public Acc: number,
-                    public Xreg: number,
-                    public Yreg: number,
-                    public Zflag: number,
-                    public isExecuting: boolean) {
+        public PC: number;
+        public Acc: number;
+        public Xreg: number;
+        public Yreg: number;
+        public Zflag: number;
+        public isExecuting: boolean;
+        constructor() {
         }
 
         public init(): void {

@@ -11,8 +11,8 @@ var TSOS;
         function Memory() {
             this.partitions = [
                 { "base": 0, "limit": _PartitionSize, "isEmpty": true },
-                { "base": 256, "limit": _PartitionSize, "isEmpty": true },
-                { "base": 512, "limit": _PartitionSize, "isEmpty": true }
+                { "base": 256, "limit": _PartitionSize + 256, "isEmpty": true },
+                { "base": 512, "limit": _PartitionSize + 256, "isEmpty": true }
             ];
         }
         // Initialize the memory with 768 bytes
@@ -29,7 +29,6 @@ var TSOS;
             for (var i = 0; i < this.partitions.length; i++) {
                 if (this.partitions[i].isEmpty) {
                     return true;
-                    break;
                 }
             }
             return false;

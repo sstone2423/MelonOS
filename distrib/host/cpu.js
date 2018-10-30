@@ -17,13 +17,7 @@
 var TSOS;
 (function (TSOS) {
     var Cpu = /** @class */ (function () {
-        function Cpu(PC, Acc, Xreg, Yreg, Zflag, isExecuting) {
-            this.PC = PC;
-            this.Acc = Acc;
-            this.Xreg = Xreg;
-            this.Yreg = Yreg;
-            this.Zflag = Zflag;
-            this.isExecuting = isExecuting;
+        function Cpu() {
         }
         Cpu.prototype.init = function () {
             this.PC = 0;

@@ -188,9 +188,6 @@ var TSOS;
                 // PID
                 var cell = row.insertCell();
                 cell.innerHTML = displayPcb.pId.toString(16).toUpperCase();
-                // State
-                cell = row.insertCell();
-                cell.innerHTML = displayPcb.state;
                 // PC
                 cell = row.insertCell();
                 cell.innerHTML = displayPcb.PC.toString(16).toUpperCase();
@@ -199,7 +196,7 @@ var TSOS;
                 cell.innerHTML = displayPcb.IR.toString();
                 // Acc
                 cell = row.insertCell();
-                cell.innerHTML = displayPcb.Acc.toString(16).toUpperCase();
+                cell.innerHTML = displayPcb.acc.toString(16).toUpperCase();
                 // Xreg
                 cell = row.insertCell();
                 cell.innerHTML = displayPcb.xReg.toString(16).toUpperCase();
@@ -209,6 +206,9 @@ var TSOS;
                 // Zflag
                 cell = row.insertCell();
                 cell.innerHTML = displayPcb.zFlag.toString(16).toUpperCase();
+                // State
+                cell = row.insertCell();
+                cell.innerHTML = displayPcb.state;
             }
         };
         // Initialize memory display

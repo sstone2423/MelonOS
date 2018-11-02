@@ -31,6 +31,7 @@ var _PartitionSize = 256;
 var _PCB;
 var _ProcessCount = 0;
 var _PCBList = [];
+var _Scheduler;
 // Canvas and font variables
 var _Canvas; // Initialized in Control.hostInit().
 var _DrawingContext; // = _Canvas.getContext("2d");  // Assigned here for type safety, but re-initialized in

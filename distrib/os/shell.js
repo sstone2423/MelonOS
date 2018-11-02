@@ -432,45 +432,60 @@ var TSOS;
         };
         // Add the process to the ready queue - Arg will be the processId
         Shell.prototype.shellRun = function (args) {
-            var found = false;
-            var waitQueueLength = _MemoryManager.residentQueue.getSize();
-            // Check to see if CPU is already executing
-            if (_CPU.isExecuting) {
-                _StdOut.putText("Process is already in execution");
+            if (args.length > 0 && Number.isInteger(parseInt(args[0]))) {
+                var found = false;
+                var waitQueueLength = _MemoryManager.residentQueue.getSize();
+                // Check to see if CPU is already executing
+                if (_CPU.isExecuting) {
+                    _StdOut.putText("Process is already in execution");
+                }
+                else {
+                    // Find the correct processId by looping through the waiting queue
+                    for (var i = 0; i < waitQueueLength; i++) {
+                        var pcb = _MemoryManager.residentQueue.dequeue();
+                        if (pcb.pId == args[0]) {
+                            // Put the pcb into the ready queue for execution
+                            _MemoryManager.readyQueue.enqueue(pcb);
+                            found = true;
+                        }
+                        else {
+                            // Put the pcb back into the queue if it doesn't match
+                            _MemoryManager.residentQueue.enqueue(pcb);
+                        }
+                    }
+                    if (!found) {
+                        _StdOut.putText("Invalid process ID. It may not exist?");
+                    }
+                }
             }
             else {
-                // Find the correct processId by looping through the waiting queue
-                for (var i = 0; i < waitQueueLength; i++) {
-                    var pcb = _MemoryManager.residentQueue.dequeue();
-                    if (pcb.pId == args[0]) {
-                        // Put the pcb into the ready queue for execution
-                        _MemoryManager.readyQueue.enqueue(pcb);
-                        found = true;
-                    }
-                    else {
-                        // Put the pcb back into the queue if it doesn't match
-                        _MemoryManager.residentQueue.enqueue(pcb);
-                    }
-                }
-                if (!found) {
-                    _StdOut.putText("Invalid process ID. It may not exist?");
-                }
+                _StdOut.putText("Usage: run <processID>  Please supply a processID.");
             }
         };
         // Clear all memory partitions
         Shell.prototype.shellClearmem = function () {
         };
         // Run all processes in memory
-        Shell.prototype.ShellRunall = function () {
+        Shell.prototype.shellRunall = function () {
         };
         // List all processes and pIDs
-        Shell.prototype.ShellPs = function () {
+        Shell.prototype.shellPs = function () {
         };
         // Kill process according to given <pid>
-        Shell.prototype.ShellKill = function (args) {
+        Shell.prototype.shellKill = function (args) {
         };
         // Change the round robin scheduling according to given <int>
-        Shell.prototype.ShellQuantum = function (args) {
+        Shell.prototype.shellQuantum = function (args) {
+            // Check if there is an argument and if the argument is an integer
+            if (args.length > 0 && Number.isInteger(parseInt(args[0]))) {
+                // Notify the user that the quantum has been changed
+                _StdOut.putText("Quantum has been changed from " + _Scheduler.quantum + " to " + args[0]);
+                // Change the quantum
+                _Scheduler.changeQuantum(args[0]);
+            }
+            else {
+                _StdOut.putText("Usage: quantum <int>  Please supply an integer.");
+            }
         };
         return Shell;
     }());

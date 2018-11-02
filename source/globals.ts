@@ -30,13 +30,14 @@ let _Mode: number = 0;     // (currently unused)  0 = Kernel Mode, 1 = User Mode
 // Memory related global variables
 let _Memory: TSOS.Memory;
 let _MemoryManager: TSOS.MemoryManager;
-let _TotalMemorySize = 768; // 786 bytes, 3 segments of 256 bytes
-let _PartitionSize = 256;
+const _TotalMemorySize = 768; // 786 bytes, 3 segments of 256 bytes
+const _PartitionSize = 256;
 
 // Process related global variables
 let _PCB: TSOS.ProcessControlBlock;
 let _ProcessCount = 0;
 let _PCBList = [];
+let _Scheduler: TSOS.Scheduler;
 
 // Canvas and font variables
 let _Canvas: HTMLCanvasElement;         // Initialized in Control.hostInit().

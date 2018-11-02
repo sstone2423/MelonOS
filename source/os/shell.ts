@@ -520,28 +520,33 @@ module TSOS {
 
         // Add the process to the ready queue - Arg will be the processId
         public shellRun(args) {
-            let found = false;
-            let waitQueueLength = _MemoryManager.residentQueue.getSize();
-            // Check to see if CPU is already executing
-            if (_CPU.isExecuting) {
-                _StdOut.putText("Process is already in execution");
-            } else {
-                // Find the correct processId by looping through the waiting queue
-                for (let i = 0; i < waitQueueLength; i++) {
-                    let pcb = _MemoryManager.residentQueue.dequeue();
-                    if (pcb.pId == args[0]) {
-                        // Put the pcb into the ready queue for execution
-                        _MemoryManager.readyQueue.enqueue(pcb);
-                        found = true;
-                    } else {
-                        // Put the pcb back into the queue if it doesn't match
-                        _MemoryManager.residentQueue.enqueue(pcb);
+            if (args.length > 0 && Number.isInteger(parseInt(args[0]))) {
+                let found = false;
+                let waitQueueLength = _MemoryManager.residentQueue.getSize();
+                // Check to see if CPU is already executing
+                if (_CPU.isExecuting) {
+                    _StdOut.putText("Process is already in execution");
+                } else {
+                    // Find the correct processId by looping through the waiting queue
+                    for (let i = 0; i < waitQueueLength; i++) {
+                        let pcb = _MemoryManager.residentQueue.dequeue();
+                        if (pcb.pId == args[0]) {
+                            // Put the pcb into the ready queue for execution
+                            _MemoryManager.readyQueue.enqueue(pcb);
+                            found = true;
+                        } else {
+                            // Put the pcb back into the queue if it doesn't match
+                            _MemoryManager.residentQueue.enqueue(pcb);
+                        }
+                    }
+                    if (!found) {
+                        _StdOut.putText("Invalid process ID. It may not exist?");
                     }
                 }
-                if (!found) {
-                    _StdOut.putText("Invalid process ID. It may not exist?");
-                }
+            } else {
+                _StdOut.putText("Usage: run <processID>  Please supply a processID.")
             }
+            
         }
 
         // Clear all memory partitions
@@ -550,23 +555,31 @@ module TSOS {
         }
 
         // Run all processes in memory
-        public ShellRunall() {
+        public shellRunall() {
 
         }
 
         // List all processes and pIDs
-        public ShellPs() {
+        public shellPs() {
 
         }
 
         // Kill process according to given <pid>
-        public ShellKill(args) {
+        public shellKill(args) {
 
         }
 
         // Change the round robin scheduling according to given <int>
-        public ShellQuantum(args) {
-            
+        public shellQuantum(args) {
+            // Check if there is an argument and if the argument is an integer
+            if (args.length > 0 && Number.isInteger(parseInt(args[0]))) {
+                // Notify the user that the quantum has been changed
+                _StdOut.putText("Quantum has been changed from " + _Scheduler.quantum + " to " + args[0]);
+                // Change the quantum
+                _Scheduler.changeQuantum(args[0]);
+            } else {
+                _StdOut.putText("Usage: quantum <int>  Please supply an integer.");
+            }
         }
     }
 }

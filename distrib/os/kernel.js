@@ -1,6 +1,7 @@
 ///<reference path="../globals.ts" />
 ///<reference path="queue.ts" />
 ///<reference path="../host/memory.ts" />
+///<reference path="scheduler.ts" />
 /* ------------
      Kernel.ts
 
@@ -26,17 +27,17 @@ var TSOS;
             // Initialize standard input and output to the _Console.
             _StdIn = _Console;
             _StdOut = _Console;
+            // Initialize memory manager
+            _MemoryManager = new TSOS.MemoryManager();
+            // Initialize the scheduler
+            _Scheduler = new TSOS.Scheduler();
             // Load the Keyboard Device Driver
             this.krnTrace("Loading the keyboard device driver.");
             _krnKeyboardDriver = new TSOS.DeviceDriverKeyboard(); // Construct it.
             _krnKeyboardDriver.driverEntry(); // Call the driverEntry() initialization routine.
             this.krnTrace(_krnKeyboardDriver.status);
             // Load current date/time
-            var htmlDateTime = document.getElementById("currentDate");
-            var currentDateTime = new Date();
-            htmlDateTime.innerHTML = currentDateTime + "";
-            // Initialize memory manager
-            _MemoryManager = new TSOS.MemoryManager();
+            TSOS.Control.hostTime();
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
             this.krnEnableInterrupts();

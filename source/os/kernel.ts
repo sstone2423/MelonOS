@@ -1,6 +1,7 @@
 ///<reference path="../globals.ts" />
 ///<reference path="queue.ts" />
 ///<reference path="../host/memory.ts" />
+///<reference path="scheduler.ts" />
 
 /* ------------
      Kernel.ts
@@ -14,7 +15,6 @@ module TSOS {
 
     export class Kernel {
         // OS Startup and Shutdown Routines
-
         public krnBootstrap() {      // Page 8. {
             Control.hostLog("bootstrap", "host");  // Use hostLog because we ALWAYS want this, even if _Trace is off.
 
@@ -22,14 +22,16 @@ module TSOS {
             _KernelInterruptQueue = new Queue();  // A (currently) non-priority queue for interrupt requests (IRQs).
             _KernelBuffers = new Array();         // Buffers... for the kernel.
             _KernelInputQueue = new Queue();      // Where device input lands before being processed out somewhere.
-
             // Initialize the console.
             _Console = new Console();          // The command line interface / console I/O device.
             _Console.init();
-
             // Initialize standard input and output to the _Console.
             _StdIn  = _Console;
             _StdOut = _Console;
+            // Initialize memory manager
+            _MemoryManager = new MemoryManager();
+            // Initialize the scheduler
+            _Scheduler = new Scheduler();
 
             // Load the Keyboard Device Driver
             this.krnTrace("Loading the keyboard device driver.");
@@ -38,12 +40,9 @@ module TSOS {
             this.krnTrace(_krnKeyboardDriver.status);
 
             // Load current date/time
-            const htmlDateTime = document.getElementById("currentDate");
-            const currentDateTime = new Date();
-            htmlDateTime.innerHTML = currentDateTime + "";
+            Control.hostTime();
 
-            // Initialize memory manager
-            _MemoryManager = new MemoryManager();
+            
 
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");

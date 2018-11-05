@@ -465,6 +465,18 @@ var TSOS;
         };
         // Run all processes in memory
         Shell.prototype.shellRunall = function () {
+            // Check if there is any programs loaded
+            if (_MemoryManager.residentQueue.getSize() > 0) {
+                var waitQueueLength = _MemoryManager.residentQueue.getSize();
+                // Add all resident pcbs to the ready queue
+                for (var i = 0; i < waitQueueLength; i++) {
+                    var pcb = _MemoryManager.residentQueue.dequeue();
+                    _MemoryManager.readyQueue.enqueue(pcb);
+                }
+            }
+            else {
+                _StdOut.putText("There are no programs loaded. Please load a process to be executed.");
+            }
         };
         // List all processes and pIDs
         Shell.prototype.shellPs = function () {

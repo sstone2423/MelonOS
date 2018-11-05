@@ -9,8 +9,8 @@
             constructor() {
                 this.partitions = [
                     {"base": 0, "limit": _PartitionSize, "isEmpty": true},
-                    {"base": 256, "limit": _PartitionSize + 256, "isEmpty": true},
-                    {"base": 512, "limit": _PartitionSize + 256, "isEmpty": true}
+                    {"base": 256, "limit": _PartitionSize, "isEmpty": true},
+                    {"base": 512, "limit": _PartitionSize, "isEmpty": true}
                 ];
             }
 
@@ -71,18 +71,25 @@
             }
 
             // Get the opCode out of memory and into CPU
-            // TODO: Check partitions?
             public readMemory(programCounter): string {
-                return _Memory.memoryArray[programCounter];
+                // Ensure to add the current partitions base to the PC
+                return _Memory.memoryArray[_Memory.partitions[_MemoryManager.runningProcess.partition].base + programCounter].toString();
             }
 
             public writeMemory(address, value): void {
-                // Check to see if leading 0 needs to be added
-                if (parseInt(value, 16) < 16) {
-                    value = "0" + value;
+                // Check if this is in bounds
+                if (_MemoryManager.inBounds(address)) {
+                    // Check to see if leading 0 needs to be added
+                    if (parseInt(value, 16) < 16) {
+                        value = "0" + value;
+                    }
+                    // Save value to the memoryArray[partition].base + address
+                    _Memory.memoryArray[_Memory.partitions[_MemoryManager.runningProcess.partition].base + address] = value;
+                } else {
+                    _KernelInterruptQueue.enqueue(new Interrupt(BOUNDS_ERROR_IRQ, 0));
+                    _KernelInterruptQueue.enqueue(new Interrupt(PROCESS_EXIT_IRQ, false));
                 }
-                // Save value to the memoryArray
-                _Memory.memoryArray[address] = value;
+                
             }
 
             // Loops address

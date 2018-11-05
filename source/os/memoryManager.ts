@@ -71,11 +71,17 @@
         public exitProcess(): void {
             // Init the CPU to reset registers and isExecuting
             _CPU.init();
-            // For iProject 2, init the memory to reset the values. Will change later
-            _Memory.init();
-            // TODO: Update displays
+            // Reset the partition to empty
+            _Memory.partitions[this.runningProcess.partition].isEmpty = true;
+            // Reset the memoryArray within the partition to 00's
+            // set counter = base, counter < runningPartition.limit
+            for (let i = _Memory.partitions[this.runningProcess.partition].base; i < _Memory.partitions[this.runningProcess.partition].limit; i++) {
+                _Memory.memoryArray[i] = "00";
+            }
+            // Notify the user the process has been exited
             _StdOut.putText("Exiting process " + this.runningProcess.pId);
             _StdOut.advanceLine();
+            // Reset the runningProcess to null
             this.runningProcess = null;
         }
 

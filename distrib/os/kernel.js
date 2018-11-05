@@ -83,6 +83,8 @@ var TSOS;
                         // Update displays
                         TSOS.Control.hostCPU();
                         TSOS.Control.hostMemory();
+                        TSOS.Control.hostProcesses();
+                        TSOS.Control.hostReady();
                         _NextStep = false;
                     }
                     this.krnTrace("Idle");
@@ -93,6 +95,8 @@ var TSOS;
                     // Update displays
                     TSOS.Control.hostCPU();
                     TSOS.Control.hostMemory();
+                    TSOS.Control.hostProcesses();
+                    TSOS.Control.hostReady();
                 }
             }
             else { // If there are no interrupts and there is nothing being executed
@@ -101,6 +105,11 @@ var TSOS;
                 this.krnTrace("Idle");
                 // Check the ready queue on each cycle if CPU is not executing
                 _MemoryManager.checkReadyQueue();
+                // Update displays
+                TSOS.Control.hostCPU();
+                TSOS.Control.hostMemory();
+                TSOS.Control.hostProcesses();
+                TSOS.Control.hostReady();
             }
         };
         // Interrupt Handling

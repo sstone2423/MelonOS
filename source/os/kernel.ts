@@ -92,6 +92,8 @@ module TSOS {
                         // Update displays
                         Control.hostCPU();
                         Control.hostMemory();
+                        Control.hostProcesses();
+                        Control.hostReady();
                         _NextStep = false;
                     }
                     this.krnTrace("Idle");
@@ -101,6 +103,8 @@ module TSOS {
                     // Update displays
                     Control.hostCPU();
                     Control.hostMemory();
+                    Control.hostProcesses();
+                    Control.hostReady();
                 }
             } else {                      // If there are no interrupts and there is nothing being executed
                                           // then just be idle.
@@ -108,6 +112,11 @@ module TSOS {
                 this.krnTrace("Idle");
                 // Check the ready queue on each cycle if CPU is not executing
                 _MemoryManager.checkReadyQueue();
+                // Update displays
+                Control.hostCPU();
+                Control.hostMemory();
+                Control.hostProcesses();
+                Control.hostReady();
             }
         }
 

@@ -5,8 +5,8 @@ var TSOS;
         function Memory() {
             this.partitions = [
                 { "base": 0, "limit": _PartitionSize, "isEmpty": true },
-                { "base": 256, "limit": _PartitionSize + 256, "isEmpty": true },
-                { "base": 512, "limit": _PartitionSize + 256, "isEmpty": true }
+                { "base": 256, "limit": _PartitionSize, "isEmpty": true },
+                { "base": 512, "limit": _PartitionSize, "isEmpty": true }
             ];
         }
         // Initialize the memory with 768 bytes
@@ -63,17 +63,24 @@ var TSOS;
             }
         };
         // Get the opCode out of memory and into CPU
-        // TODO: Check partitions?
         Memory.prototype.readMemory = function (programCounter) {
-            return _Memory.memoryArray[programCounter];
+            // Ensure to add the current partitions base to the PC
+            return _Memory.memoryArray[_Memory.partitions[_MemoryManager.runningProcess.partition].base + programCounter].toString();
         };
         Memory.prototype.writeMemory = function (address, value) {
-            // Check to see if leading 0 needs to be added
-            if (parseInt(value, 16) < 16) {
-                value = "0" + value;
+            // Check if this is in bounds
+            if (_MemoryManager.inBounds(address)) {
+                // Check to see if leading 0 needs to be added
+                if (parseInt(value, 16) < 16) {
+                    value = "0" + value;
+                }
+                // Save value to the memoryArray[partition].base + address
+                _Memory.memoryArray[_Memory.partitions[_MemoryManager.runningProcess.partition].base + address] = value;
             }
-            // Save value to the memoryArray
-            _Memory.memoryArray[address] = value;
+            else {
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(BOUNDS_ERROR_IRQ, 0));
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_EXIT_IRQ, false));
+            }
         };
         // Loops address
         Memory.prototype.branchLoop = function (PC, branch, partition) {

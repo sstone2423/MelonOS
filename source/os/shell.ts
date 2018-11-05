@@ -554,7 +554,17 @@ module TSOS {
 
         // Run all processes in memory
         public shellRunall() {
-
+            // Check if there is any programs loaded
+            if (_MemoryManager.residentQueue.getSize() > 0) {
+                let waitQueueLength = _MemoryManager.residentQueue.getSize();
+                // Add all resident pcbs to the ready queue
+                for (let i = 0; i < waitQueueLength; i++) {
+                    let pcb = _MemoryManager.residentQueue.dequeue();
+                    _MemoryManager.readyQueue.enqueue(pcb);
+                }
+            } else {
+                _StdOut.putText("There are no programs loaded. Please load a process to be executed.");
+            }
         }
 
         // List all processes and pIDs

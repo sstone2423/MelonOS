@@ -413,16 +413,14 @@ var TSOS;
             var hexRegex = new RegExp(/[0-9A-Fa-f]{2}/i);
             // Check for anything besides hex or spaces (A-Fa-f0-9)
             if (hexRegex.test(userInputProgram)) {
-                // Load program into memory (currently just outputs success)
-                _StdOut.putText("Success");
+                // Split the program into 2-bit hex
+                var splitProgram = userInputProgram.split(" ");
+                // Create a process using the process manager
+                _MemoryManager.createProcess(splitProgram);
             }
             else {
                 _StdOut.putText("Program must only contain hexadecimal values (A-F, a-f, 0-9) or spaces.");
             }
-            // Split the program into 2-bit hex
-            var splitProgram = userInputProgram.split(" ");
-            // Create a process using the process manager
-            _MemoryManager.createProcess(splitProgram);
         };
         // Display BSOD....
         Shell.prototype.shellDropit = function () {

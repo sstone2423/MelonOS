@@ -65,9 +65,8 @@ var TSOS;
                This is NOT the same as a TIMER, which causes an interrupt and is handled like other interrupts.
                This, on the other hand, is the clock pulse from the hardware / VM / host that tells the kernel
                that it has to look for interrupts and process them if it finds any.                           */
-            // Get the time
             TSOS.Control.hostTime();
-            // Check for an interrupt Page 560
+            // Check for an interrtsupt Page 560
             if (_KernelInterruptQueue.getSize() > 0) {
                 // Process the first interrupt on the interrupt queue.
                 // TODO: Implement a priority queue based on the IRQ number/id to enforce interrupt priority.
@@ -140,7 +139,7 @@ var TSOS;
                     _OsShell.putPrompt();
                     break;
                 case CONSOLE_WRITE_IRQ:
-                    _StdOut.putText(params);
+                    _StdOut.putText(params.toString());
                     break;
                 case INVALID_OP_IRQ:
                     _StdOut.putText("Invalid op code in process " + _MemoryManager.runningProcess.pId + ". Exiting the process.");

@@ -86,8 +86,8 @@
             }
 
             // Loops address
-            public branchLoop(PC, branch) {
-                return (PC + branch + 2);
+            public branchLoop(PC, branch, partition) {
+                return (PC + branch + 2) % this.partitions[partition].limit;
             }
         }
     }

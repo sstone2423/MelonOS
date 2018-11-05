@@ -23,6 +23,8 @@ var TSOS;
             this.isExecuting = false;
         };
         Cpu.prototype.cycle = function () {
+            console.log("Cycle PC " + this.PC);
+            console.log("toString16 " + this.PC.toString(16));
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Check if the current opcode/pc is out of memory bounds based on partition base/limit
             if (!_MemoryManager.inBounds(this.PC)) {
@@ -146,8 +148,7 @@ var TSOS;
                             if (this.Zflag == 0) {
                                 // Get the number of bytes to branch
                                 var branch = parseInt(_Memory.readMemory(this.PC + 1), 16);
-                                // TODO: finish this logic
-                                this.PC = _Memory.branchLoop(this.PC, branch);
+                                this.PC = _Memory.branchLoop(this.PC, branch, _MemoryManager.runningProcess.partition);
                             }
                             else {
                                 this.PC += 2;
@@ -173,10 +174,11 @@ var TSOS;
                                     #$01 in X reg = print the integer stored in the Y register
                                     #$02 in X reg = print the 00-terminated string stored at the address
                                     in the Y register */
-                            if (this.Xreg == 1) {
+                            if (this.Xreg === 1) {
+                                console.log("Y reg = " + this.Yreg);
                                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CONSOLE_WRITE_IRQ, this.Yreg));
                             }
-                            else if (this.Xreg == 2) {
+                            else if (this.Xreg === 2) {
                                 address = this.Yreg;
                                 // Initialize variables for while loop
                                 var printString = "";
@@ -187,9 +189,15 @@ var TSOS;
                                 // Get the character from the value
                                 var chr = String.fromCharCode(hex);
                                 while (original != "00") {
+                                    var ascii = _Memory.readMemory(address);
+                                    // Convert hex to decimal
+                                    var dec = parseInt(ascii.toString(), 16);
+                                    chr = String.fromCharCode(dec);
                                     printString += chr;
                                     address++;
+                                    original = _Memory.readMemory(address);
                                 }
+                                console.log("Y reg = " + printString);
                                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CONSOLE_WRITE_IRQ, printString));
                             }
                             this.PC++;

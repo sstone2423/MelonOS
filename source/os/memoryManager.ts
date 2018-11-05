@@ -24,7 +24,6 @@
             if (opCodes.length > _PartitionSize) {
                 _StdOut.putText("Program load failed. Program is over 256 bytes in length.");
                 _StdOut.advanceLine();
-                _StdOut.putPrompt();
             } else {
                 // Check if there is a partition available
                 if (_Memory.checkMemorySpace()) {
@@ -40,13 +39,13 @@
                     _Memory.loadIntoMemory(opCodes, pcb.partition);
                     // Add pcb to residentQueue
                     this.residentQueue.enqueue(pcb);
-                    // Update the memory and processes displays
+                    // Update the memory,processes, and host log displays
+                    _StdOut.putText("Process " + pcb.pId + " loaded successfully.");
                     Control.hostMemory();
                     Control.hostProcesses();
                 } else {
                     _StdOut.putText("There are no free memory partitions.");
                     _StdOut.advanceLine();
-                    _StdOut.putPrompt();
                 }
             }
         }
@@ -76,6 +75,7 @@
             _Memory.init();
             // TODO: Update displays
             _StdOut.putText("Exiting process " + this.runningProcess.pId);
+            _StdOut.advanceLine();
             this.runningProcess = null;
         }
 

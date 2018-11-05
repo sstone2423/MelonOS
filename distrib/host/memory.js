@@ -76,8 +76,8 @@ var TSOS;
             _Memory.memoryArray[address] = value;
         };
         // Loops address
-        Memory.prototype.branchLoop = function (PC, branch) {
-            return (PC + branch + 2);
+        Memory.prototype.branchLoop = function (PC, branch, partition) {
+            return (PC + branch + 2) % this.partitions[partition].limit;
         };
         return Memory;
     }());

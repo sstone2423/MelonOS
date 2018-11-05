@@ -31,15 +31,13 @@ var TSOS;
                 // Check to see if it's "special" (enter or ctrl-c) or "normal"
                 // (anything else that the keyboard device driver gave us).
                 if (chr === String.fromCharCode(13)) { //     Enter key
-                    // The enter key marks the end of a console command, so ...
-                    // ... tell the shell ...
+                    // The enter key marks the end of a console command, so tell the shell
                     _OsShell.handleInput(this.buffer);
                     // ... and reset our buffer.
                     this.buffer = "";
                 }
                 else {
-                    // This is a "normal" character, so ...
-                    // ... draw it on the screen...
+                    // This is a "normal" character, so draw it on the screen
                     this.putText(chr);
                     // ... and add it to our buffer.
                     this.buffer += chr;

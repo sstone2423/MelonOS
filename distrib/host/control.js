@@ -157,7 +157,7 @@ var TSOS;
                 }
             }
         };
-        // Update the Process in execution table
+        // Update the resident queue table
         Control.hostProcesses = function () {
             var table = document.getElementById('tableProcesses');
             // Initialize an array of PCBs
@@ -168,14 +168,59 @@ var TSOS;
                 _MemoryManager.residentQueue.enqueue(pcb);
                 displayQueue.push(pcb);
             }
+            while (table.rows.length > 1) {
+                table.deleteRow(1);
+            }
+            // Display all the other PCBs sitting in the Resident queue
+            // Convert numbers to hex
+            while (displayQueue.length > 0) {
+                var displayPcb = displayQueue.shift();
+                var row = table.insertRow(-1); // New row appended to table
+                // PID
+                var cell = row.insertCell();
+                cell.innerHTML = displayPcb.pId.toString(16).toUpperCase();
+                // PC
+                cell = row.insertCell();
+                cell.innerHTML = displayPcb.PC.toString(16).toUpperCase();
+                // IR
+                cell = row.insertCell();
+                cell.innerHTML = displayPcb.IR.toString();
+                // Acc
+                cell = row.insertCell();
+                cell.innerHTML = displayPcb.acc.toString(16).toUpperCase();
+                // Xreg
+                cell = row.insertCell();
+                cell.innerHTML = displayPcb.xReg.toString(16).toUpperCase();
+                // Yreg
+                cell = row.insertCell();
+                cell.innerHTML = displayPcb.yReg.toString(16).toUpperCase();
+                // Zflag
+                cell = row.insertCell();
+                cell.innerHTML = displayPcb.zFlag.toString(16).toUpperCase();
+                // State
+                cell = row.insertCell();
+                cell.innerHTML = displayPcb.state;
+            }
+        };
+        // Update the ready queue table
+        Control.hostReady = function () {
+            var table = document.getElementById('tableReady');
+            // Initialize an array of PCBs
+            var displayQueue = [];
+            // For each PCB in ready queue, print out a new row for it
+            for (var i = 0; i < _MemoryManager.readyQueue.getSize(); i++) {
+                var pcb = _MemoryManager.readyQueue.dequeue();
+                _MemoryManager.readyQueue.enqueue(pcb);
+                displayQueue.push(pcb);
+            }
             if (_MemoryManager.runningProcess != null) {
                 displayQueue.push(_MemoryManager.runningProcess);
             }
             while (table.rows.length > 1) {
                 table.deleteRow(1);
             }
-            // Display all the other PCBs sitting in the display queue
-            // Convert numbers to HEX
+            // Display all the other PCBs sitting in the Resident queue
+            // Convert numbers to hex
             while (displayQueue.length > 0) {
                 var displayPcb = displayQueue.shift();
                 var row = table.insertRow(-1); // New row appended to table

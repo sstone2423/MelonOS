@@ -549,7 +549,33 @@ module TSOS {
 
         // Clear all memory partitions
         public shellClearmem() {
-
+            // Check if CPU is executing
+            if (!_CPU.isExecuting) {
+                let readyQueueLength = _MemoryManager.readyQueue.getSize();
+                // Check ready queue first since these will be executing shortly
+                if (readyQueueLength > 0) {
+                    for (let i = 0; i < readyQueueLength; i++) {
+                        // Kill the process
+                        let pcb = _MemoryManager.readyQueue.dequeue();
+                        // Clear the memory partition
+                        _Memory.clearPartition(pcb.partition);
+                        _StdOut.putText("Clearing Process ID: " + pcb.pId + " from partition: " + pcb.partition);
+                        _StdOut.advanceLine();
+                    }
+                }
+                // Check wait queue second
+                let waitQueueLength = _MemoryManager.residentQueue.getSize();
+                if (waitQueueLength > 0) {
+                    for (let i = 0; i < waitQueueLength; i++) {
+                        // Kill the process
+                        let pcb = _MemoryManager.residentQueue.dequeue();
+                        // Clear the memory partition
+                        _Memory.clearPartition(pcb.partition);
+                        _StdOut.putText("Clearing Process ID: " + pcb.pId + " from partition: " + pcb.partition);
+                        _StdOut.advanceLine();
+                    }
+                }
+            }
         }
 
         // Run all processes in memory
@@ -580,7 +606,8 @@ module TSOS {
                 }
             }
             let readyQueueLength = _MemoryManager.readyQueue.getSize();
-            // Check if any programs are in ready queue
+            /* Check if any programs are in ready queue.. although its not very practical to 
+            call this command while programs are executing with this weird CLI */
             if (readyQueueLength > 0) {
                 for (let i = 0; i < readyQueueLength; i++) {
                     let pcb = _MemoryManager.readyQueue.dequeue();
@@ -593,7 +620,7 @@ module TSOS {
 
         // Kill process according to given <pid>
         public shellKill(args) {
-
+            // Check if any proc
         }
 
         // Change the round robin scheduling according to given <int>

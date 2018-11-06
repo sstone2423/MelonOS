@@ -17,6 +17,13 @@ var TSOS;
                 this.memoryArray[i] = "00";
             }
         };
+        // Clear memory partition
+        Memory.prototype.clearPartition = function (partition) {
+            // Clear from the memoryArray[base] to memoryArray[limit]
+            for (var i = this.partitions[partition].base; i < this.partitions[partition].base + this.partitions[partition].limit; i++) {
+                this.memoryArray[i] = "00";
+            }
+        };
         // Check the isEmpty booleans to see if there is any open partitions
         Memory.prototype.checkMemorySpace = function () {
             // Loop through each partition to find an empty partition.
@@ -42,21 +49,21 @@ var TSOS;
                 // Check partition
                 if (partition == 0) {
                     // Copy into memoryArray
-                    _Memory.memoryArray[i] = opCodes[i];
+                    this.memoryArray[i] = opCodes[i];
                     // Set partition to not empty
                     this.partitions[0].isEmpty = false;
                     // Check partition
                 }
                 else if (partition == 1) {
                     // Copy into memoryArray + partition size
-                    _Memory.memoryArray[i + 256] = opCodes[i];
+                    this.memoryArray[i + 256] = opCodes[i];
                     // Set partition to not empty
                     this.partitions[1].isEmpty = false;
                     // Check partition
                 }
                 else {
                     // Copy into memoryArray + partition size
-                    _Memory.memoryArray[i + 512] = opCodes[i];
+                    this.memoryArray[i + 512] = opCodes[i];
                     // Set partition to not empty
                     this.partitions[2].isEmpty = false;
                 }
@@ -65,7 +72,7 @@ var TSOS;
         // Get the opCode out of memory and into CPU
         Memory.prototype.readMemory = function (programCounter) {
             // Ensure to add the current partitions base to the PC
-            return _Memory.memoryArray[_Memory.partitions[_MemoryManager.runningProcess.partition].base + programCounter].toString();
+            return this.memoryArray[this.partitions[_MemoryManager.runningProcess.partition].base + programCounter].toString();
         };
         Memory.prototype.writeMemory = function (address, value) {
             // Check if this is in bounds
@@ -75,7 +82,7 @@ var TSOS;
                     value = "0" + value;
                 }
                 // Save value to the memoryArray[partition].base + address
-                _Memory.memoryArray[_Memory.partitions[_MemoryManager.runningProcess.partition].base + address] = value;
+                this.memoryArray[this.partitions[_MemoryManager.runningProcess.partition].base + address] = value;
             }
             else {
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(BOUNDS_ERROR_IRQ, 0));

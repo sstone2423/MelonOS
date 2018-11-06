@@ -21,7 +21,14 @@
                 for (let i = 0; i < this.memoryArray.length; i++) {
                     this.memoryArray[i] = "00";
                 }
-                
+            }
+
+            // Clear memory partition
+            public clearPartition(partition): void {
+                // Clear from the memoryArray[base] to memoryArray[limit]
+                for (let i = this.partitions[partition].base; i < this.partitions[partition].base + this.partitions[partition].limit; i++) {
+                    this.memoryArray[i] = "00";
+                }
             }
 
             // Check the isEmpty booleans to see if there is any open partitions
@@ -51,19 +58,19 @@
                     // Check partition
                     if (partition == 0) {
                         // Copy into memoryArray
-                        _Memory.memoryArray[i] = opCodes[i];
+                        this.memoryArray[i] = opCodes[i];
                         // Set partition to not empty
                         this.partitions[0].isEmpty = false;
                     // Check partition
                     } else if (partition == 1) {
                         // Copy into memoryArray + partition size
-                        _Memory.memoryArray[i + 256] = opCodes[i];
+                        this.memoryArray[i + 256] = opCodes[i];
                         // Set partition to not empty
                         this.partitions[1].isEmpty = false;
                     // Check partition
                     } else {
                         // Copy into memoryArray + partition size
-                        _Memory.memoryArray[i + 512] = opCodes[i];
+                        this.memoryArray[i + 512] = opCodes[i];
                         // Set partition to not empty
                         this.partitions[2].isEmpty = false;
                     }
@@ -73,7 +80,7 @@
             // Get the opCode out of memory and into CPU
             public readMemory(programCounter): string {
                 // Ensure to add the current partitions base to the PC
-                return _Memory.memoryArray[_Memory.partitions[_MemoryManager.runningProcess.partition].base + programCounter].toString();
+                return this.memoryArray[this.partitions[_MemoryManager.runningProcess.partition].base + programCounter].toString();
             }
 
             public writeMemory(address, value): void {
@@ -84,7 +91,7 @@
                         value = "0" + value;
                     }
                     // Save value to the memoryArray[partition].base + address
-                    _Memory.memoryArray[_Memory.partitions[_MemoryManager.runningProcess.partition].base + address] = value;
+                    this.memoryArray[this.partitions[_MemoryManager.runningProcess.partition].base + address] = value;
                 } else {
                     _KernelInterruptQueue.enqueue(new Interrupt(BOUNDS_ERROR_IRQ, 0));
                     _KernelInterruptQueue.enqueue(new Interrupt(PROCESS_EXIT_IRQ, false));

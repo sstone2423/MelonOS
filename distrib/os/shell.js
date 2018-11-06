@@ -462,6 +462,33 @@ var TSOS;
         };
         // Clear all memory partitions
         Shell.prototype.shellClearmem = function () {
+            // Check if CPU is executing
+            if (!_CPU.isExecuting) {
+                var readyQueueLength = _MemoryManager.readyQueue.getSize();
+                // Check ready queue first since these will be executing shortly
+                if (readyQueueLength > 0) {
+                    for (var i = 0; i < readyQueueLength; i++) {
+                        // Kill the process
+                        var pcb = _MemoryManager.readyQueue.dequeue();
+                        // Clear the memory partition
+                        _Memory.clearPartition(pcb.partition);
+                        _StdOut.putText("Clearing Process ID: " + pcb.pId + " from partition: " + pcb.partition);
+                        _StdOut.advanceLine();
+                    }
+                }
+                // Check wait queue second
+                var waitQueueLength = _MemoryManager.residentQueue.getSize();
+                if (waitQueueLength > 0) {
+                    for (var i = 0; i < waitQueueLength; i++) {
+                        // Kill the process
+                        var pcb = _MemoryManager.residentQueue.dequeue();
+                        // Clear the memory partition
+                        _Memory.clearPartition(pcb.partition);
+                        _StdOut.putText("Clearing Process ID: " + pcb.pId + " from partition: " + pcb.partition);
+                        _StdOut.advanceLine();
+                    }
+                }
+            }
         };
         // Run all processes in memory
         Shell.prototype.shellRunall = function () {
@@ -491,7 +518,8 @@ var TSOS;
                 }
             }
             var readyQueueLength = _MemoryManager.readyQueue.getSize();
-            // Check if any programs are in ready queue
+            /* Check if any programs are in ready queue.. although its not very practical to
+            call this command while programs are executing with this weird CLI */
             if (readyQueueLength > 0) {
                 for (var i = 0; i < readyQueueLength; i++) {
                     var pcb = _MemoryManager.readyQueue.dequeue();
@@ -503,6 +531,7 @@ var TSOS;
         };
         // Kill process according to given <pid>
         Shell.prototype.shellKill = function (args) {
+            // Check if any proc
         };
         // Change the round robin scheduling according to given <int>
         Shell.prototype.shellQuantum = function (args) {

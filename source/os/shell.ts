@@ -544,7 +544,6 @@ module TSOS {
             } else {
                 _StdOut.putText("Usage: run <processID>  Please supply a processID.")
             }
-            
         }
 
         // Clear all memory partitions
@@ -604,6 +603,8 @@ module TSOS {
                     _StdOut.advanceLine();
                     _MemoryManager.residentQueue.enqueue(pcb);
                 }
+            } else {
+                _StdOut.putText("No processes in resident queue.");
             }
             let readyQueueLength = _MemoryManager.readyQueue.getSize();
             /* Check if any programs are in ready queue.. although its not very practical to 
@@ -615,12 +616,19 @@ module TSOS {
                     _StdOut.advanceLine();
                     _MemoryManager.readyQueue.enqueue(pcb);
                 }
+            } else {
+                _StdOut.putText("No processes in ready queue.");
             }
         }
 
         // Kill process according to given <pid>
         public shellKill(args) {
-            // Check if any proc
+            // Check if there is an arg and its an integer
+            if (args.length > 0 && Number.isInteger(parseInt(args[0]))) {
+                _MemoryManager.killProcess(args[0]);
+            } else {
+                _StdOut.putText("Usage: kill <pid> Please supply a process ID.");
+            }
         }
 
         // Change the round robin scheduling according to given <int>

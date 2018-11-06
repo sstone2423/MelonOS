@@ -19,6 +19,7 @@ const PROCESS_EXIT_IRQ: number = 2;
 const CONSOLE_WRITE_IRQ: number = 3;
 const INVALID_OP_IRQ: number = 4;
 const BOUNDS_ERROR_IRQ: number = 5;
+const CONTEXT_SWITCH_IRQ: number = 6;
 
 // Global variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.

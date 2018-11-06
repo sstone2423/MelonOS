@@ -178,6 +178,12 @@ module TSOS {
                     _OsShell.putPrompt();
                     break;
 
+                case CONTEXT_SWITCH_IRQ:
+                    _StdOut.putText("Switching process " + _MemoryManager.runningProcess.pId);
+                    _StdOut.advanceLine();
+                    _OsShell.putPrompt();
+                    break;
+
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }
@@ -188,7 +194,7 @@ module TSOS {
             a device driver).
             Check multiprogramming parameters and enforce quanta here. Call the scheduler / context
             switch here if necessary. */
-            this.quantumCounter++;
+            _Scheduler.quantumTimer++;
         }
 
         /* System Calls... that generate software interrupts via tha Application Programming Interface library routines.

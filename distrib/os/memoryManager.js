@@ -9,6 +9,7 @@ var TSOS;
             this.processIncrementor = 0;
             this.readyQueue = new TSOS.Queue;
             this.residentQueue = new TSOS.Queue;
+            this.runningProcess = null;
         }
         // Create a process for the loaded program (called from shellLoad command)
         MemoryManager.prototype.createProcess = function (opCodes) {
@@ -74,6 +75,57 @@ var TSOS;
             _StdOut.advanceLine();
             // Reset the runningProcess to null
             this.runningProcess = null;
+        };
+        // Kill a specific process specified by processID
+        // TODO: make this more efficient?
+        MemoryManager.prototype.killProcess = function (processID) {
+            var found = false;
+            // Check if running process is null
+            if (this.runningProcess !== null) {
+                // Check if the process is executing
+                if (this.runningProcess.pId == processID) {
+                    this.exitProcess();
+                    found = true;
+                }
+            }
+            // Check if its in the ready queue
+            var readyQueueLength = this.readyQueue.getSize();
+            console.log(readyQueueLength + found);
+            if (readyQueueLength > 0 && !found) {
+                console.log("ready");
+                for (var i = 0; i < readyQueueLength; i++) {
+                    var pcb = this.readyQueue.dequeue();
+                    // If it matches, clear the partitionIf it doesnt match, put it back in the queue
+                    if (pcb.pId == processID) {
+                        _Memory.clearPartition(pcb.partition);
+                        _StdOut.putText("Exiting process " + processID);
+                        found = true;
+                    }
+                    else { // if not, put it back in the queue
+                        this.readyQueue.enqueue(pcb);
+                    }
+                }
+            }
+            // Check if its in the resident queue
+            var residentQueueLength = this.residentQueue.getSize();
+            if (residentQueueLength > 0 && !found) {
+                for (var i = 0; i < residentQueueLength; i++) {
+                    var pcb = this.residentQueue.dequeue();
+                    // If it matches, clear the partition
+                    if (pcb.pId == processID) {
+                        _Memory.clearPartition(pcb.partition);
+                        _StdOut.putText("Exiting process " + processID);
+                        found = true;
+                    }
+                    else { // if not, put it back in the queue
+                        this.residentQueue.enqueue(pcb);
+                    }
+                }
+            }
+            // If not found, let the user know
+            if (!found) {
+                _StdOut.putText("Process " + processID + " does not exist..");
+            }
         };
         // Checks to make sure the memory being accessed is within the range specified by the base/limit
         MemoryManager.prototype.inBounds = function (address) {

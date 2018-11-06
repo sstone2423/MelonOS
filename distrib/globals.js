@@ -17,6 +17,7 @@ var PROCESS_EXIT_IRQ = 2;
 var CONSOLE_WRITE_IRQ = 3;
 var INVALID_OP_IRQ = 4;
 var BOUNDS_ERROR_IRQ = 5;
+var CONTEXT_SWITCH_IRQ = 6;
 // Global variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 var _CPU; // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.

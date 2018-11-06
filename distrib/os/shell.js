@@ -517,6 +517,9 @@ var TSOS;
                     _MemoryManager.residentQueue.enqueue(pcb);
                 }
             }
+            else {
+                _StdOut.putText("No processes in resident queue.");
+            }
             var readyQueueLength = _MemoryManager.readyQueue.getSize();
             /* Check if any programs are in ready queue.. although its not very practical to
             call this command while programs are executing with this weird CLI */
@@ -528,10 +531,19 @@ var TSOS;
                     _MemoryManager.readyQueue.enqueue(pcb);
                 }
             }
+            else {
+                _StdOut.putText("No processes in ready queue.");
+            }
         };
         // Kill process according to given <pid>
         Shell.prototype.shellKill = function (args) {
-            // Check if any proc
+            // Check if there is an arg and its an integer
+            if (args.length > 0 && Number.isInteger(parseInt(args[0]))) {
+                _MemoryManager.killProcess(args[0]);
+            }
+            else {
+                _StdOut.putText("Usage: kill <pid> Please supply a process ID.");
+            }
         };
         // Change the round robin scheduling according to given <int>
         Shell.prototype.shellQuantum = function (args) {

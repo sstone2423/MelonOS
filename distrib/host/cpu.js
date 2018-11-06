@@ -23,9 +23,6 @@ var TSOS;
             this.isExecuting = false;
         };
         Cpu.prototype.cycle = function () {
-            console.log(this.PC);
-            console.log(this.PC.toString());
-            console.log(this.PC.toString(16));
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Check if the current opcode/pc is out of memory bounds based on partition base/limit
             if (!_MemoryManager.inBounds(this.PC)) {

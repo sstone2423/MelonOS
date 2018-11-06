@@ -169,6 +169,7 @@ var TSOS;
             a device driver).
             Check multiprogramming parameters and enforce quanta here. Call the scheduler / context
             switch here if necessary. */
+            this.quantumCounter++;
         };
         /* System Calls... that generate software interrupts via tha Application Programming Interface library routines.
 

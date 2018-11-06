@@ -465,9 +465,9 @@ var TSOS;
         };
         // Run all processes in memory
         Shell.prototype.shellRunall = function () {
+            var waitQueueLength = _MemoryManager.residentQueue.getSize();
             // Check if there is any programs loaded
-            if (_MemoryManager.residentQueue.getSize() > 0) {
-                var waitQueueLength = _MemoryManager.residentQueue.getSize();
+            if (waitQueueLength > 0) {
                 // Add all resident pcbs to the ready queue
                 for (var i = 0; i < waitQueueLength; i++) {
                     var pcb = _MemoryManager.residentQueue.dequeue();
@@ -480,6 +480,26 @@ var TSOS;
         };
         // List all processes and pIDs
         Shell.prototype.shellPs = function () {
+            var waitQueueLength = _MemoryManager.residentQueue.getSize();
+            // Check if any programs are loaded
+            if (waitQueueLength > 0) {
+                for (var i = 0; i < waitQueueLength; i++) {
+                    var pcb = _MemoryManager.residentQueue.dequeue();
+                    _StdOut.putText("Process ID: " + pcb.pId);
+                    _StdOut.advanceLine();
+                    _MemoryManager.residentQueue.enqueue(pcb);
+                }
+            }
+            var readyQueueLength = _MemoryManager.readyQueue.getSize();
+            // Check if any programs are in ready queue
+            if (readyQueueLength > 0) {
+                for (var i = 0; i < readyQueueLength; i++) {
+                    var pcb = _MemoryManager.readyQueue.dequeue();
+                    _StdOut.putText("Process ID: " + pcb.pId);
+                    _StdOut.advanceLine();
+                    _MemoryManager.readyQueue.enqueue(pcb);
+                }
+            }
         };
         // Kill process according to given <pid>
         Shell.prototype.shellKill = function (args) {

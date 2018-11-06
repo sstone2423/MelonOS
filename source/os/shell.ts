@@ -554,9 +554,9 @@ module TSOS {
 
         // Run all processes in memory
         public shellRunall() {
+            let waitQueueLength = _MemoryManager.residentQueue.getSize();
             // Check if there is any programs loaded
-            if (_MemoryManager.residentQueue.getSize() > 0) {
-                let waitQueueLength = _MemoryManager.residentQueue.getSize();
+            if (waitQueueLength > 0) {
                 // Add all resident pcbs to the ready queue
                 for (let i = 0; i < waitQueueLength; i++) {
                     let pcb = _MemoryManager.residentQueue.dequeue();
@@ -569,7 +569,26 @@ module TSOS {
 
         // List all processes and pIDs
         public shellPs() {
-
+            let waitQueueLength = _MemoryManager.residentQueue.getSize();
+            // Check if any programs are loaded
+            if (waitQueueLength > 0) {
+                for (let i = 0; i < waitQueueLength; i++) {
+                    let pcb = _MemoryManager.residentQueue.dequeue();
+                    _StdOut.putText("Process ID: " + pcb.pId);
+                    _StdOut.advanceLine();
+                    _MemoryManager.residentQueue.enqueue(pcb);
+                }
+            }
+            let readyQueueLength = _MemoryManager.readyQueue.getSize();
+            // Check if any programs are in ready queue
+            if (readyQueueLength > 0) {
+                for (let i = 0; i < readyQueueLength; i++) {
+                    let pcb = _MemoryManager.readyQueue.dequeue();
+                    _StdOut.putText("Process ID: " + pcb.pId);
+                    _StdOut.advanceLine();
+                    _MemoryManager.readyQueue.enqueue(pcb);
+                }
+            }
         }
 
         // Kill process according to given <pid>

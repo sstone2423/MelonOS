@@ -549,10 +549,16 @@ var TSOS;
         Shell.prototype.shellQuantum = function (args) {
             // Check if there is an argument and if the argument is an integer
             if (args.length > 0 && Number.isInteger(parseInt(args[0]))) {
-                // Notify the user that the quantum has been changed
-                _StdOut.putText("Quantum has been changed from " + _Scheduler.quantum + " to " + args[0]);
-                // Change the quantum
-                _Scheduler.changeQuantum(args[0]);
+                // Make sure the number is above 0. 0 will make melons enter the black hole
+                if (args[0] > 0) {
+                    // Notify the user that the quantum has been changed
+                    _StdOut.putText("Quantum has been changed from " + _Scheduler.quantum + " to " + args[0]);
+                    // Change the quantum
+                    _Scheduler.changeQuantum(args[0]);
+                }
+                else {
+                    _StdOut.putText("Usage: quantum <int> must be greater than 0.");
+                }
             }
             else {
                 _StdOut.putText("Usage: quantum <int>  Please supply an integer.");

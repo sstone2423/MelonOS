@@ -45,10 +45,9 @@ module TSOS {
             // Check to see if we even want to deal with the key that was pressed.
             if (((keyCode >= 65) && (keyCode <= 90)) ||   // A..Z
                 ((keyCode >= 97) && (keyCode <= 123))) {  // a..z {
-                // Determine the character we want to display.
-                // Assume it's lowercase...
+                // Determine the character we want to display. Assume its lowercase
                 chr = String.fromCharCode(keyCode + 32);
-                // ... then check the shift key and re-adjust if necessary.
+                // then check the shift key and re-adjust if necessary.
                 if (isShifted) {
                     chr = String.fromCharCode(keyCode);
                 }
@@ -58,7 +57,6 @@ module TSOS {
             } else if (((keyCode >= 48) && (keyCode <= 57) && !isShifted) || // digits
                         (keyCode === 32)                                  || // space
                         (keyCode === 13)                                  || // enter
-                        ((keyCode === 61) && !isShifted)                  || // =
                         ((keyCode === 59) && !isShifted)) {                  // ;
                 if (keyCode === 13) {
                     this.isScrollingCommands = false;
@@ -93,8 +91,7 @@ module TSOS {
                 this.basicKeyPress((keyCode - 96));
             } else if (isShifted && (keyCode === 173)) {        // _
                 this.basicKeyPress((keyCode - 78));
-            } else if ((keyCode === 173)                    ||  // -
-                      (keyCode === 219)                     ||  // [
+            } else if ((keyCode === 219)                    ||  // [
                       (keyCode === 221)                     ||  // ]
                       (keyCode === 220)                     ||  // \
                       (isShifted && (keyCode === 188))      ||  // <
@@ -111,8 +108,11 @@ module TSOS {
                 this.basicKeyPress((keyCode - 183));
             } else if ((keyCode === 188)                    ||  // ,
                       (keyCode === 190)                     ||  // .
+                      (keyCode === 189)                     ||  // -
                       (keyCode === 191)) {                      // /
                 this.basicKeyPress((keyCode - 144));
+            } else if (keyCode === 187) {                       // =
+                this.basicKeyPress((keyCode - 126));
             } else if (keyCode == 8) { // backspace
                 if (this.characterArray.length > 0) {
                     // Initialize the previous character

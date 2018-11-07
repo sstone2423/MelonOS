@@ -193,7 +193,6 @@ module TSOS {
                                     #$02 in X reg = print the 00-terminated string stored at the address
                                     in the Y register */
                             if (this.Xreg === 1) {
-                                console.log("Y reg = " + this.Yreg);
                                 _KernelInterruptQueue.enqueue(new Interrupt(CONSOLE_WRITE_IRQ, this.Yreg));
                             } else if (this.Xreg === 2) {
                                 address = this.Yreg;
@@ -214,7 +213,6 @@ module TSOS {
                                     address++;
                                     original = _Memory.readMemory(address);
                                 }
-                                console.log("Y reg = " + printString);
                                 _KernelInterruptQueue.enqueue(new Interrupt(CONSOLE_WRITE_IRQ, printString));
                             }
                             this.PC++;

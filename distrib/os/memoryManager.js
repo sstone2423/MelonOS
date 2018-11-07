@@ -71,6 +71,7 @@ var TSOS;
                 _Memory.memoryArray[i] = "00";
             }
             // Notify the user the process has been exited
+            _StdOut.advanceLine();
             _StdOut.putText("Exiting process " + this.runningProcess.pId);
             _StdOut.advanceLine();
             // Reset the runningProcess to null

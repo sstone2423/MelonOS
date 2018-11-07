@@ -14,6 +14,7 @@
 module TSOS {
 
     export class Kernel {
+        public timer: number = 0;
         // OS Startup and Shutdown Routines
         public krnBootstrap() {      // Page 8. {
             Control.hostLog("bootstrap", "host");  // Use hostLog because we ALWAYS want this, even if _Trace is off.
@@ -74,7 +75,18 @@ module TSOS {
                This is NOT the same as a TIMER, which causes an interrupt and is handled like other interrupts.
                This, on the other hand, is the clock pulse from the hardware / VM / host that tells the kernel
                that it has to look for interrupts and process them if it finds any.                           */
-
+            // If executing, Increment the timer
+            // Check if timer has reached the quantum
+            if (this.timer > _Scheduler.quantum && _MemoryManager.readyQueue.getSize() > 0 && _CPU.isExecuting) {
+                // Throw the TIMER_IRQ
+                _KernelInterruptQueue.enqueue(new Interrupt(TIMER_IRQ, false));
+                // Reset the timer
+                this.timer = 0;
+            }
+            if (_CPU.isExecuting) {
+                this.timer++;
+            }
+            // Update the time
             Control.hostTime();
             // Check for an interrtsupt Page 560
             if (_KernelInterruptQueue.getSize() > 0) {
@@ -146,6 +158,8 @@ module TSOS {
             switch (irq) {
                 case TIMER_IRQ:
                     this.krnTimerISR();              // Kernel built-in routine for timers (not the clock).
+                    _StdOut.putText("Time's up!");
+                    _StdOut.advanceLine();
                     break;
 
                 case KEYBOARD_IRQ:
@@ -178,12 +192,6 @@ module TSOS {
                     _OsShell.putPrompt();
                     break;
 
-                case CONTEXT_SWITCH_IRQ:
-                    _StdOut.putText("Switching process " + _MemoryManager.runningProcess.pId);
-                    _StdOut.advanceLine();
-                    _OsShell.putPrompt();
-                    break;
-
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }
@@ -194,7 +202,7 @@ module TSOS {
             a device driver).
             Check multiprogramming parameters and enforce quanta here. Call the scheduler / context
             switch here if necessary. */
-            _Scheduler.quantumTimer++;
+            _Scheduler.contextSwitch();
         }
 
         /* System Calls... that generate software interrupts via tha Application Programming Interface library routines.

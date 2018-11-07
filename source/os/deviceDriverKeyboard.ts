@@ -56,8 +56,7 @@ module TSOS {
                 this.characterArray.push(chr);
             } else if (((keyCode >= 48) && (keyCode <= 57) && !isShifted) || // digits
                         (keyCode === 32)                                  || // space
-                        (keyCode === 13)                                  || // enter
-                        ((keyCode === 59) && !isShifted)) {                  // ;
+                        (keyCode === 13)) {                                  // enter
                 if (keyCode === 13) {
                     this.isScrollingCommands = false;
                     chr = String.fromCharCode(keyCode);
@@ -89,30 +88,29 @@ module TSOS {
                       (isShifted && (keyCode === 221))      ||  // }
                       (isShifted && (keyCode === 220))) {       // |
                 this.basicKeyPress((keyCode - 96));
-            } else if (isShifted && (keyCode === 173)) {        // _
-                this.basicKeyPress((keyCode - 78));
+            } else if (isShifted && (keyCode === 189)) {        // _
+                this.basicKeyPress((keyCode - 94));
             } else if ((keyCode === 219)                    ||  // [
                       (keyCode === 221)                     ||  // ]
                       (keyCode === 220)                     ||  // \
                       (isShifted && (keyCode === 188))      ||  // <
                       (isShifted && (keyCode === 190))      ||  // >
+                      (isShifted && (keyCode === 186))      ||  // :
                       (isShifted && (keyCode === 191))) {       // ?
                 this.basicKeyPress((keyCode - 128));
-            } else if (isShifted && (keyCode === 61)) {         // +
-                this.basicKeyPress((keyCode - 18));
-            } else if (isShifted && (keyCode === 59)) {         // :
-                this.basicKeyPress((keyCode - 1));
             } else if (isShifted && (keyCode === 222)) {        // "
                 this.basicKeyPress((keyCode - 188));
             } else if (keyCode === 222) {                       // '
                 this.basicKeyPress((keyCode - 183));
             } else if ((keyCode === 188)                    ||  // ,
                       (keyCode === 190)                     ||  // .
-                      (keyCode === 189)                     ||  // -
+                      (isShifted && (keyCode === 187))      ||  // +
                       (keyCode === 191)) {                      // /
-                this.basicKeyPress((keyCode - 144));
+                this.basicKeyPress(keyCode - 144);
             } else if (keyCode === 187) {                       // =
                 this.basicKeyPress((keyCode - 126));
+            } else if (keyCode === 186) {                       // -
+                this.basicKeyPress((keyCode - 127));
             } else if (keyCode == 8) { // backspace
                 if (this.characterArray.length > 0) {
                     // Initialize the previous character

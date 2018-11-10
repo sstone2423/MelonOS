@@ -1,15 +1,12 @@
 ///<reference path="../globals.ts" />
 ///<reference path="queue.ts" />
 ///<reference path="../host/memory.ts" />
+///<reference path="scheduler.ts" />
 
 /* ------------
      Kernel.ts
 
-     Requires globals.ts
-              queue.ts
-
      Routines for the Operating System, NOT the host.
-
      This code references page numbers in the text book:
      Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 978-0-470-12872-5
      ------------ */
@@ -17,8 +14,8 @@
 module TSOS {
 
     export class Kernel {
+        public timer: number = 0;
         // OS Startup and Shutdown Routines
-
         public krnBootstrap() {      // Page 8. {
             Control.hostLog("bootstrap", "host");  // Use hostLog because we ALWAYS want this, even if _Trace is off.
 
@@ -26,14 +23,16 @@ module TSOS {
             _KernelInterruptQueue = new Queue();  // A (currently) non-priority queue for interrupt requests (IRQs).
             _KernelBuffers = new Array();         // Buffers... for the kernel.
             _KernelInputQueue = new Queue();      // Where device input lands before being processed out somewhere.
-
             // Initialize the console.
             _Console = new Console();          // The command line interface / console I/O device.
             _Console.init();
-
             // Initialize standard input and output to the _Console.
             _StdIn  = _Console;
             _StdOut = _Console;
+            // Initialize memory manager
+            _MemoryManager = new MemoryManager();
+            // Initialize the scheduler
+            _Scheduler = new Scheduler();
 
             // Load the Keyboard Device Driver
             this.krnTrace("Loading the keyboard device driver.");
@@ -42,12 +41,7 @@ module TSOS {
             this.krnTrace(_krnKeyboardDriver.status);
 
             // Load current date/time
-            const htmlDateTime = document.getElementById("currentDate");
-            const currentDateTime = new Date();
-            htmlDateTime.innerHTML = currentDateTime + "";
-
-            // Initialize memory manager
-            _MemoryManager = new MemoryManager();
+            Control.hostTime();
 
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
@@ -81,12 +75,20 @@ module TSOS {
                This is NOT the same as a TIMER, which causes an interrupt and is handled like other interrupts.
                This, on the other hand, is the clock pulse from the hardware / VM / host that tells the kernel
                that it has to look for interrupts and process them if it finds any.                           */
-            // Get the time
-            // TODO: Remove the time zones and DST
-            const htmlDateTime = document.getElementById("currentDate");
-            const currentDateTime = new Date();
-            htmlDateTime.innerHTML = currentDateTime + "";
-            // Check for an interrupt, are any. Page 560
+            // If executing, Increment the timer
+            // Check if timer has reached the quantum
+            if (this.timer > _Scheduler.quantum && _MemoryManager.readyQueue.getSize() > 0 && _CPU.isExecuting) {
+                // Throw the TIMER_IRQ
+                _KernelInterruptQueue.enqueue(new Interrupt(TIMER_IRQ, false));
+                // Reset the timer
+                this.timer = 0;
+            }
+            if (_CPU.isExecuting) {
+                this.timer++;
+            }
+            // Update the time
+            Control.hostTime();
+            // Check for an interrtsupt Page 560
             if (_KernelInterruptQueue.getSize() > 0) {
                 // Process the first interrupt on the interrupt queue.
                 // TODO: Implement a priority queue based on the IRQ number/id to enforce interrupt priority.
@@ -94,16 +96,39 @@ module TSOS {
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is
                                            // anything being processed.
-                _CPU.cycle();
-                Control.hostCPU();
-                Control.hostMemory();
-                Control.hostProcesses();
+                // Check if _SingleStep is enabled, then wait for the next step click before executing the next instruction
+                if (_SingleStep) {
+                    // If user clicked next step, execute one step
+                    if (_NextStep) {
+                        _CPU.cycle();
+                        // Update displays
+                        Control.hostCPU();
+                        Control.hostMemory();
+                        Control.hostProcesses();
+                        Control.hostReady();
+                        _NextStep = false;
+                    }
+                    this.krnTrace("Idle");
+                // Otherwise, Execute normally
+                } else {
+                    _CPU.cycle();
+                    // Update displays
+                    Control.hostCPU();
+                    Control.hostMemory();
+                    Control.hostProcesses();
+                    Control.hostReady();
+                }
             } else {                      // If there are no interrupts and there is nothing being executed
                                           // then just be idle.
+                _NextStep = false;  // Revert the boolean when the CPU is finished executing
                 this.krnTrace("Idle");
                 // Check the ready queue on each cycle if CPU is not executing
                 _MemoryManager.checkReadyQueue();
-
+                // Update displays
+                Control.hostCPU();
+                Control.hostMemory();
+                Control.hostProcesses();
+                Control.hostReady();
             }
         }
 
@@ -133,6 +158,8 @@ module TSOS {
             switch (irq) {
                 case TIMER_IRQ:
                     this.krnTimerISR();              // Kernel built-in routine for timers (not the clock).
+                    _StdOut.putText("Time's up!");
+                    _StdOut.advanceLine();
                     break;
 
                 case KEYBOARD_IRQ:
@@ -145,10 +172,12 @@ module TSOS {
                     // Update the CPU and Processes display
                     Control.hostProcesses();
                     Control.hostCPU();
+                    _StdOut.advanceLine();
+                    _OsShell.putPrompt();
                     break;
 
                 case CONSOLE_WRITE_IRQ:
-                    _StdOut.putText(params);
+                    _StdOut.putText(params.toString());
                     break;
 
                 case INVALID_OP_IRQ:
@@ -157,9 +186,14 @@ module TSOS {
                     _OsShell.putPrompt();
                     break;
 
+                case BOUNDS_ERROR_IRQ:
+                    _StdOut.putText("Out of bounds error in process " + _MemoryManager.runningProcess.pId + ". Exiting the process.");
+                    _StdOut.advanceLine();
+                    _OsShell.putPrompt();
+                    break;
+
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
-                    _Control.melonDrop();
             }
         }
 
@@ -168,6 +202,7 @@ module TSOS {
             a device driver).
             Check multiprogramming parameters and enforce quanta here. Call the scheduler / context
             switch here if necessary. */
+            _Scheduler.contextSwitch();
         }
 
         /* System Calls... that generate software interrupts via tha Application Programming Interface library routines.
@@ -207,6 +242,8 @@ module TSOS {
             Control.hostLog("OS ERROR - TRAP: " + msg);
             // Shutdown the kernel
             this.krnShutdown();
+            // Issue melon drop
+            Control.melonDrop();
         }
     }
 }

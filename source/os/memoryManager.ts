@@ -8,21 +8,23 @@
     export class MemoryManager {
         // Initialize variables
         public processIncrementor: number;
-        public waitingQueue: any;
+        public residentQueue: any;
         public readyQueue: any;
         public runningProcess: any;
 
         constructor() {
             this.processIncrementor = 0;
             this.readyQueue = new TSOS.Queue;
-            this.waitingQueue = new TSOS.Queue;
+            this.residentQueue = new TSOS.Queue;
+            this.runningProcess = null;
         }
         
         // Create a process for the loaded program (called from shellLoad command)
         public createProcess(opCodes): void {
             // Check to see if the program is greater than the partition size
             if (opCodes.length > _PartitionSize) {
-                _StdOut.putText("Program load failed. Program is over 256 bytes in length.")
+                _StdOut.putText("Program load failed. Program is over 256 bytes in length.");
+                _StdOut.advanceLine();
             } else {
                 // Check if there is a partition available
                 if (_Memory.checkMemorySpace()) {
@@ -36,55 +38,15 @@
                     pcb.init(partition);
                     // Load into memory
                     _Memory.loadIntoMemory(opCodes, pcb.partition);
-                    // Add pcb to waitingQueue
-                    this.waitingQueue.enqueue(pcb);
-                    // Update the pcb info to the tableProcess
-                    // Initialize table variable
-                    let tableProcesses = document.getElementById("tableProcesses");
-                    // Create a new row for the new process
-                    let newRow = document.createElement("TR");
-                    newRow.setAttribute("id", "processTR");
-                    tableProcesses.appendChild(newRow);
-                    // Create a column for PID
-                    let colPID = document.createElement("TD");
-                    colPID.setAttribute("id", "colPID");
-                    newRow.appendChild(colPID);
-                    colPID.innerHTML = pcb.pId.toString();
-                    // Create a column for PC
-                    let colPC = document.createElement("TD");
-                    colPC.setAttribute("id", "colPC");
-                    newRow.appendChild(colPC);
-                    colPC.innerHTML = pcb.PC.toString();
-                    // Create a column for ACC
-                    let colACC = document.createElement("TD");
-                    colACC.setAttribute("id", "colACC");
-                    newRow.appendChild(colACC);
-                    colACC.innerHTML = pcb.Acc.toString();
-                    // Create a column for X
-                    let colX = document.createElement("TD");
-                    colX.setAttribute("id", "colX");
-                    newRow.appendChild(colX);
-                    colX.innerHTML = pcb.xReg.toString();
-                    // Create a column for Y
-                    let colY = document.createElement("TD");
-                    colY.setAttribute("id", "colY");
-                    newRow.appendChild(colY);
-                    colY.innerHTML = pcb.yReg.toString();
-                    // Create a column for Z flag
-                    let colZ = document.createElement("TD");
-                    colZ.setAttribute("id", "colZ");
-                    newRow.appendChild(colZ);
-                    colZ.innerHTML = pcb.zFlag.toString();
-                    // Create a column for Priority
-                    let colPriority = document.createElement("TD");
-                    colPriority.setAttribute("id", "colPriority");
-                    newRow.appendChild(colPriority);
-                    colPriority.innerHTML = pcb.priority.toString();
-                    // Create a column for State
-                    let colState = document.createElement("TD");
-                    colState.setAttribute("id", "colState");
-                    newRow.appendChild(colState);
-                    colState.innerHTML = pcb.state;
+                    // Add pcb to residentQueue
+                    this.residentQueue.enqueue(pcb);
+                    // Update the memory,processes, and host log displays
+                    _StdOut.putText("Process " + pcb.pId + " loaded successfully.");
+                    Control.hostMemory();
+                    Control.hostProcesses();
+                } else {
+                    _StdOut.putText("There are no free memory partitions.");
+                    _StdOut.advanceLine();
                 }
             }
         }
@@ -92,14 +54,12 @@
         public executeProcess(): void {
             this.runningProcess = _MemoryManager.readyQueue.dequeue();
             _CPU.PC = this.runningProcess.PC;
-            _CPU.Acc = this.runningProcess.Acc;
+            _CPU.Acc = this.runningProcess.acc;
             _CPU.Xreg = this.runningProcess.xReg;
             _CPU.Yreg = this.runningProcess.yReg;
-            _CPU.Zflag = this.runningProcess.Zflag;
+            _CPU.Zflag = this.runningProcess.zFlag;
             _CPU.isExecuting = true;
             this.runningProcess.state = "Executing";
-
-            // TODO: Update Memory, CPU, PCB displays
         }
 
         public checkReadyQueue(): void {
@@ -112,11 +72,83 @@
         public exitProcess(): void {
             // Init the CPU to reset registers and isExecuting
             _CPU.init();
-            // For iProject 2, init the memory to reset the values. Will change later
-            _Memory.init();
-            // TODO: Update displays
+            // Reset the partition to empty
+            _Memory.partitions[this.runningProcess.partition].isEmpty = true;
+            // Reset the memoryArray within the partition to 00's
+            // set counter = base, counter < runningPartition.limit
+            for (let i = _Memory.partitions[this.runningProcess.partition].base; i < _Memory.partitions[this.runningProcess.partition].limit; i++) {
+                _Memory.memoryArray[i] = "00";
+            }
+            // Notify the user the process has been exited
+            _StdOut.advanceLine();
             _StdOut.putText("Exiting process " + this.runningProcess.pId);
+            _StdOut.advanceLine();
+            // Reset the runningProcess to null
             this.runningProcess = null;
         }
+
+        // Kill a specific process specified by processID
+        // TODO: make this more efficient?
+        public killProcess(processID): void {
+            let found = false;
+            // Check if running process is null
+            if (this.runningProcess !== null) {
+                // Check if the process is executing
+                if (this.runningProcess.pId == processID) {
+                    this.exitProcess();
+                    found = true;
+                } 
+            }
+            // Check if its in the ready queue
+            let readyQueueLength = this.readyQueue.getSize();
+            console.log(readyQueueLength + found);
+            if (readyQueueLength > 0 && !found) {
+                console.log("ready");
+                for (let i = 0; i < readyQueueLength; i++) {
+                    let pcb = this.readyQueue.dequeue();
+                    // If it matches, clear the partitionIf it doesnt match, put it back in the queue
+                    if (pcb.pId == processID) {
+                        _Memory.clearPartition(pcb.partition);
+                        _StdOut.putText("Exiting process " + processID);
+                        found = true;
+                    } else { // if not, put it back in the queue
+                        this.readyQueue.enqueue(pcb);
+                    }
+                }
+            }
+            // Check if its in the resident queue
+            let residentQueueLength = this.residentQueue.getSize();
+            if (residentQueueLength > 0 && !found) {
+                for (let i = 0; i < residentQueueLength; i++) {
+                    let pcb = this.residentQueue.dequeue();
+                    // If it matches, clear the partition
+                    if (pcb.pId == processID) {
+                        _Memory.clearPartition(pcb.partition);
+                        _StdOut.putText("Exiting process " + processID);
+                        found = true;
+                    } else {  // if not, put it back in the queue
+                        this.residentQueue.enqueue(pcb);
+                    }
+                }
+            }
+            // If not found, let the user know
+            if (!found) {
+                _StdOut.putText("Process " + processID + " does not exist..");
+            }
+        }
+
+        // Checks to make sure the memory being accessed is within the range specified by the base/limit
+        public inBounds(address): boolean {
+            let partition = this.runningProcess.partition;
+            if(address + _Memory.partitions[partition].base < _Memory.partitions[partition].base
+                + _Memory.partitions[partition].limit && address + _Memory.partitions[partition].base
+                >= _Memory.partitions[partition].base) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
     }
 }

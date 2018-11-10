@@ -7,7 +7,7 @@ module TSOS {
         public PC: number; // 4 bytes in length
         public IR: string; //
         public priority: number;
-        public Acc: number; 
+        public acc: number; 
         public xReg: number;
         public yReg: number;
         public zFlag: number;
@@ -21,7 +21,7 @@ module TSOS {
             this.state = "Ready";
             this.PC = 0;
             this.IR = "00";
-            this.Acc = 0;
+            this.acc = 0;
             this.xReg = 0;
             this.yReg = 0;
             this.zFlag = 0;

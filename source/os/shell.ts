@@ -133,8 +133,35 @@ module TSOS {
                                   "- Run the program currently loaded in memory.");
             this.commandList[this.commandList.length] = sc;
 
-            // ps  - list the running processes and their IDs
-            // kill <id> - kills the specified process id.
+            // clearmem
+            sc = new ShellCommand(this.shellClearmem,
+                                  "clearmem",
+                                  "- Clears all memory partitions.");
+            this.commandList[this.commandList.length] = sc;
+
+            // runall
+            sc = new ShellCommand(this.shellRunall,
+                                  "runall",
+                                  "- Run all programs currently loaded in memory.");
+            this.commandList[this.commandList.length] = sc;
+
+            // ps
+            sc = new ShellCommand(this.shellPs,
+                                  "ps",
+                                  "- Display all processes and their IDs.");
+            this.commandList[this.commandList.length] = sc;
+
+            // kill <id>
+            sc = new ShellCommand(this.shellKill,
+                                  "kill",
+                                  "- Kills the specified process ID.");
+            this.commandList[this.commandList.length] = sc;
+
+            // quantum <int>
+            sc = new ShellCommand(this.shellQuantum,
+                                  "quantum",
+                                  "- Sets the round robin quantum to the specific integer.");
+            this.commandList[this.commandList.length] = sc;
 
             // Display the initial prompt.
             this.putPrompt();
@@ -351,6 +378,21 @@ module TSOS {
                     case "run":
                         _StdOut.putText("Run will run the current process loaded in memory.");
                         break;
+                    case "clearmem":
+                        _StdOut.putText("Clearmem will *cough* init *cough* clear all memory partitions.");
+                        break;
+                    case "runall":
+                        _StdOut.putText("Runall will execute all programs in memory.");
+                        break;
+                    case "ps":
+                        _StdOut.putText("Ps will list all processes and their process IDs.");
+                        break;
+                    case "kill":
+                        _StdOut.putText("Kill <id> will terminate the corresponding process");
+                        break;
+                    case "quantum":
+                        _StdOut.putText("Quantum <int> will change the round round scheduling time.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -458,48 +500,152 @@ module TSOS {
             const hexRegex = new RegExp(/[0-9A-Fa-f]{2}/i);
             // Check for anything besides hex or spaces (A-Fa-f0-9)
             if (hexRegex.test(userInputProgram)) {
-                // Load program into memory (currently just outputs success)
-                _StdOut.putText("Success");
+                // Split the program into 2-bit hex
+                let splitProgram = userInputProgram.split(" ");
+                // Create a process using the process manager
+                _MemoryManager.createProcess(splitProgram);
             } else {
                 _StdOut.putText("Program must only contain hexadecimal values (A-F, a-f, 0-9) or spaces.");
             }
-            // Split the program into 2-bit hex
-            let splitProgram = userInputProgram.split(" ");
-            // Create a process using the process manager
-            _MemoryManager.createProcess(splitProgram);
         }
-
+        
+        // Display BSOD....
         public shellDropit() {
             const oops = "Who dropped those?";
+            // Trigger the kernel trap error
             _Kernel.krnTrapError(oops);
         }
 
         // Add the process to the ready queue - Arg will be the processId
         public shellRun(args) {
-            let found = false;
-            let waitQueueLength = _MemoryManager.waitingQueue.getSize();
-            let counter = 0;
-            // Check to see if CPU is already executing
-            if (_CPU.isExecuting) {
-                _StdOut.putText("Process is already in execution");
-            } else {
-                // Find the correct processId by looping through the waiting queue
-                while (!found || counter > waitQueueLength) {
-                    let pcb = _MemoryManager.waitingQueue.dequeue();
-                    if (pcb.pId == args[0]) {
-                        // Put the pcb into the ready queue for execution
-                        _MemoryManager.readyQueue.enqueue(pcb);
-                        found = true;
-                    } else {
-                        // Put the pcb back into the queue if it doesn't match
-                        _MemoryManager.waitingQueue.enqueue(pcb);
-                        counter++;
+            if (args.length > 0 && Number.isInteger(parseInt(args[0]))) {
+                let found = false;
+                let waitQueueLength = _MemoryManager.residentQueue.getSize();
+                // Check to see if CPU is already executing
+                if (_CPU.isExecuting) {
+                    _StdOut.putText("Process is already in execution");
+                } else {
+                    // Find the correct processId by looping through the waiting queue
+                    for (let i = 0; i < waitQueueLength; i++) {
+                        let pcb = _MemoryManager.residentQueue.dequeue();
+                        if (pcb.pId == args[0]) {
+                            // Put the pcb into the ready queue for execution
+                            _MemoryManager.readyQueue.enqueue(pcb);
+                            found = true;
+                        } else {
+                            // Put the pcb back into the queue if it doesn't match
+                            _MemoryManager.residentQueue.enqueue(pcb);
+                        }
+                    }
+                    if (!found) {
+                        _StdOut.putText("Invalid process ID. It may not exist?");
                     }
                 }
+            } else {
+                _StdOut.putText("Usage: run <processID>  Please supply a processID.")
+            }
+        }
 
-                if (!found) {
-                    _StdOut.putText("Invalid process ID. It may not exist?");
+        // Clear all memory partitions
+        public shellClearmem() {
+            // Check if CPU is executing
+            if (!_CPU.isExecuting) {
+                let readyQueueLength = _MemoryManager.readyQueue.getSize();
+                // Check ready queue first since these will be executing shortly
+                if (readyQueueLength > 0) {
+                    for (let i = 0; i < readyQueueLength; i++) {
+                        // Kill the process
+                        let pcb = _MemoryManager.readyQueue.dequeue();
+                        // Clear the memory partition
+                        _Memory.clearPartition(pcb.partition);
+                        _StdOut.putText("Clearing Process ID: " + pcb.pId + " from partition: " + pcb.partition);
+                        _StdOut.advanceLine();
+                    }
                 }
+                // Check wait queue second
+                let waitQueueLength = _MemoryManager.residentQueue.getSize();
+                if (waitQueueLength > 0) {
+                    for (let i = 0; i < waitQueueLength; i++) {
+                        // Kill the process
+                        let pcb = _MemoryManager.residentQueue.dequeue();
+                        // Clear the memory partition
+                        _Memory.clearPartition(pcb.partition);
+                        _StdOut.putText("Clearing Process ID: " + pcb.pId + " from partition: " + pcb.partition);
+                        _StdOut.advanceLine();
+                    }
+                }
+            }
+        }
+
+        // Run all processes in memory
+        public shellRunall() {
+            let waitQueueLength = _MemoryManager.residentQueue.getSize();
+            // Check if there is any programs loaded
+            if (waitQueueLength > 0) {
+                // Add all resident pcbs to the ready queue
+                for (let i = 0; i < waitQueueLength; i++) {
+                    let pcb = _MemoryManager.residentQueue.dequeue();
+                    _MemoryManager.readyQueue.enqueue(pcb);
+                }
+            } else {
+                _StdOut.putText("There are no programs loaded. Please load a process to be executed.");
+            }
+        }
+
+        // List all processes and pIDs
+        public shellPs() {
+            let waitQueueLength = _MemoryManager.residentQueue.getSize();
+            // Check if any programs are loaded
+            if (waitQueueLength > 0) {
+                for (let i = 0; i < waitQueueLength; i++) {
+                    let pcb = _MemoryManager.residentQueue.dequeue();
+                    _StdOut.putText("Process ID: " + pcb.pId);
+                    _StdOut.advanceLine();
+                    _MemoryManager.residentQueue.enqueue(pcb);
+                }
+            } else {
+                _StdOut.putText("No processes in resident queue.");
+            }
+            let readyQueueLength = _MemoryManager.readyQueue.getSize();
+            /* Check if any programs are in ready queue.. although its not very practical to 
+            call this command while programs are executing with this weird CLI */
+            if (readyQueueLength > 0) {
+                for (let i = 0; i < readyQueueLength; i++) {
+                    let pcb = _MemoryManager.readyQueue.dequeue();
+                    _StdOut.putText("Process ID: " + pcb.pId);
+                    _StdOut.advanceLine();
+                    _MemoryManager.readyQueue.enqueue(pcb);
+                }
+            } else {
+                _StdOut.putText("No processes in ready queue.");
+            }
+        }
+
+        // Kill process according to given <pid>
+        public shellKill(args) {
+            // Check if there is an arg and its an integer
+            if (args.length > 0 && Number.isInteger(parseInt(args[0]))) {
+                _MemoryManager.killProcess(args[0]);
+            } else {
+                _StdOut.putText("Usage: kill <pid> Please supply a process ID.");
+            }
+        }
+
+        // Change the round robin scheduling according to given <int>
+        public shellQuantum(args) {
+            // Check if there is an argument and if the argument is an integer
+            if (args.length > 0 && Number.isInteger(parseInt(args[0]))) {
+                // Make sure the number is above 0. 0 will make melons enter the black hole
+                if (args[0] > 0) {
+                    // Notify the user that the quantum has been changed
+                    _StdOut.putText("Quantum has been changed from " + _Scheduler.quantum + " to " + args[0]);
+                    // Change the quantum
+                    _Scheduler.changeQuantum(args[0]);
+                } else {
+                    _StdOut.putText("Usage: quantum <int> must be greater than 0.")
+                }
+            } else {
+                _StdOut.putText("Usage: quantum <int>  Please supply an integer.");
             }
         }
     }

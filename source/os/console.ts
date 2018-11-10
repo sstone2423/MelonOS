@@ -3,8 +3,6 @@
 /* ------------
      Console.ts
 
-     Requires globals.ts
-
      The OS Console - stdIn and stdOut by default.
      Note: This is not the Shell. The Shell is the "command line interface" (CLI) or interpreter for this console.
      ------------ */
@@ -32,14 +30,12 @@ module TSOS {
                 // Check to see if it's "special" (enter or ctrl-c) or "normal"
                 // (anything else that the keyboard device driver gave us).
                 if (chr === String.fromCharCode(13)) { //     Enter key
-                    // The enter key marks the end of a console command, so ...
-                    // ... tell the shell ...
+                    // The enter key marks the end of a console command, so tell the shell
                     _OsShell.handleInput(this.buffer);
                     // ... and reset our buffer.
                     this.buffer = "";
                 } else {
-                    // This is a "normal" character, so ...
-                    // ... draw it on the screen...
+                    // This is a "normal" character, so draw it on the screen
                     this.putText(chr);
                     // ... and add it to our buffer.
                     this.buffer += chr;
@@ -62,7 +58,6 @@ module TSOS {
                     // If the x position reaches 510, advance the line and continue drawing
                     if (this.currentXPosition > 510) {
                         _StdOut.advanceLine();
-
                         // Advance the position so that it is easier to see that you are still working within
                         // the same command line number
                         this.currentXPosition = 15;

@@ -1,0 +1,9 @@
+{
+    "defaultSeverity": "error",
+    "exclude": [
+        "./node_modules"
+    ],
+    "jsRules": {},
+    "rules": {},
+    "rulesDirectory": []
+}

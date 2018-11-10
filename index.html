@@ -8,6 +8,7 @@
         <!-- Enable bootstrap -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" />
         <link rel="stylesheet" href="tsos.css" type="text/css" media="screen" />
+        <link rel="shortcut icon" href="favicon.ico" /> 
         <title>MelonOS - a browser-based virtual Operating System in TypeScript</title>
 
         <!-- Globals CONSTANTS and _Variables. Must included be first. -->
@@ -24,6 +25,7 @@
         <script type="text/javascript" src="distrib/os/deviceDriver.js"></script>
         <script type="text/javascript" src="distrib/os/deviceDriverKeyboard.js"></script>
         <script type="text/javascript" src="distrib/os/queue.js"></script>
+        <script type="text/javascript" src="distrib/os/scheduler.js"></script>
         <script type="text/javascript" src="distrib/os/shell.js"></script>
         <script type="text/javascript" src="distrib/os/shellCommand.js"></script>
         <script type="text/javascript" src="distrib/os/userCommand.js"></script>
@@ -67,6 +69,26 @@
                                                 value="Reset"
                                                 tabindex="2"
                                                 onclick="TSOS.Control.hostBtnReset_click(this);">
+                                </li>
+                                <li class="nav-item">
+                                        <input type="button"
+                                                id = "btnSingleStep"
+                                                name="brnSingleStep"
+                                                class="normal_button"
+                                                disabled="disabled"
+                                                value="Single-Step"
+                                                tabindex="2"
+                                                onclick="TSOS.Control.hostBtnSingleStep_click(this);">
+                                </li>
+                                <li class="nav-item">
+                                        <input type="button"
+                                                id = "btnNextStep"
+                                                name="brnReset"
+                                                class="normal_button"
+                                                disabled="disabled"
+                                                value="NextStep"
+                                                tabindex="2"
+                                                onclick="TSOS.Control.hostBtnNextStep_click(this);">
                                 </li>
                         </ul>
                         <div class="mx-auto">
@@ -149,22 +171,66 @@
                                 <div class="col-sm">
                                         <div id="divProcess">
                                                 <label>
-                                                        Processes
+                                                        Resident Queue
                                                         <br>
                                                         <table id="tableProcesses" class="table table-striped">
                                                                 <thead>
                                                                         <tr>
                                                                                 <td>PID</td>
                                                                                 <td>PC</td>
+                                                                                <td>IR</td>
                                                                                 <td>ACC</td>
                                                                                 <td>X</td>
                                                                                 <td>Y</td>
                                                                                 <td>Z</td>
-                                                                                <td>Priority</td>
                                                                                 <td>State</td>
                                                                         </tr>
                                                                 </thead>
                                                                 <tbody>
+                                                                        <tr>
+                                                                                <td>-</td>
+                                                                                <td>-</td>
+                                                                                <td>-</td>
+                                                                                <td>-</td>
+                                                                                <td>-</td>
+                                                                                <td>-</td>
+                                                                                <td>-</td>
+                                                                                <td>-</td>
+                                                                        </tr>
+                                                                </tbody>
+                                                        </table>
+                                                </label>
+                                        </div>
+                                </div>
+                                <div class="col-sm">
+                                        <div id="divReady">
+                                                <label>
+                                                        Ready Queue
+                                                        <br>
+                                                        <table id="tableReady" class="table table-striped">
+                                                                <thead>
+                                                                        <tr>
+                                                                                <td>PID</td>
+                                                                                <td>PC</td>
+                                                                                <td>IR</td>
+                                                                                <td>ACC</td>
+                                                                                <td>X</td>
+                                                                                <td>Y</td>
+                                                                                <td>Z</td>
+                                                                                <td>State</td>
+                                                                        </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                        <tr>
+                                                                                <td>-</td>
+                                                                                <td>-</td>
+                                                                                <td>-</td>
+                                                                                <td>-</td>
+                                                                                <td>-</td>
+                                                                                <td>-</td>
+                                                                                <td>-</td>
+                                                                                <td>-</td>
+                                                                        </tr>
                                                                 </tbody>
                                                         </table>
                                                 </label>
@@ -191,11 +257,11 @@
         <img id ="melonFall" src="melon.png" alt="MelonOS" height="15" width="15"/>
 
         <footer class="footerText">
-        <br>
-        Copyright &copy; 2008 - 2016 No Rights Reserved.
-        <br>
-        Reproduction is inhibited without the express written consent of
-        Ted Codd, Stevie Ray Vaughan, and Ian Fleming.
+                <br>
+                Copyright &copy; 2008 - 2016 No Rights Reserved.
+                <br>
+                Reproduction is inhibited without the express written consent of
+                Ted Codd, Stevie Ray Vaughan, and Ian Fleming.
         </footer>
 
 <!-- Enable bootstrap -->

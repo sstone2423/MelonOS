@@ -3,19 +3,13 @@
 /* ------------
      Control.ts
 
-     Requires globals.ts.
-
      Routines for the hardware simulation, NOT for our client OS itself.
      These are static because we are never going to instantiate them, because they represent the hardware.
      In this manner, it's A LITTLE BIT like a hypervisor, in that the Document environment inside a browser
      is the "bare metal" (so to speak) for which we write code that hosts our client OS.
-     But that analogy only goes so far, and the lines are blurred, because we are using TypeScript/JavaScript
-     in both the host and client environments.
-
      This code references page numbers in the text book:
      Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 978-0-470-12872-5
      ------------ */
-// Control Services
 var TSOS;
 (function (TSOS) {
     var Control = /** @class */ (function () {
@@ -61,6 +55,8 @@ var TSOS;
             // .. enable the Halt and Reset buttons ...
             document.getElementById("btnHaltOS").disabled = false;
             document.getElementById("btnReset").disabled = false;
+            document.getElementById("btnSingleStep").disabled = false;
+            document.getElementById("btnSingleStep").style.backgroundColor = "red";
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
             // ... Create and initialize the CPU (because it's part of the hardware)  ...
@@ -92,6 +88,29 @@ var TSOS;
             // That boolean parameter is the 'forceget' flag. When it is true it causes the page to always
             // be reloaded from the server. If it is false or not specified the browser may reload the
             // page from its cache, which is not what we want.
+        };
+        Control.hostBtnSingleStep_click = function (btn) {
+            if (!_SingleStep) {
+                // Enable the NextStep button
+                document.getElementById("btnNextStep").disabled = false;
+                _SingleStep = true;
+                document.getElementById("btnSingleStep").style.backgroundColor = "green";
+            }
+            else {
+                // Disable the NextStep button
+                document.getElementById("btnNextStep").disabled = true;
+                _SingleStep = false;
+                document.getElementById("btnSingleStep").style.backgroundColor = "red";
+            }
+        };
+        Control.hostBtnNextStep_click = function (btn) {
+            // Set _NextStep = true
+            _NextStep = true;
+        };
+        Control.hostDisableNextStep = function () {
+            // Disable the NextStep button
+            document.getElementById("btnNextStep").disabled = true;
+            _NextStep = false;
         };
         // Update the CPU display table
         Control.hostCPU = function () {
@@ -138,33 +157,28 @@ var TSOS;
                 }
             }
         };
-        // Update the Process in execution table
+        // Update the resident queue table
         Control.hostProcesses = function () {
             var table = document.getElementById('tableProcesses');
-            // For each PCB in ready queue, print out a new row for it
-            var readyQueue = [];
-            for (var i = 0; i < _MemoryManager.readyQueue.getSize(); i++) {
-                var pcb = _MemoryManager.readyQueue.dequeue();
-                _MemoryManager.readyQueue.enqueue(pcb);
-                readyQueue.push(pcb);
-            }
-            if (_MemoryManager.runningProcess != null) {
-                readyQueue.push(_MemoryManager.runningProcess);
+            // Initialize an array of PCBs
+            var displayQueue = [];
+            // For each PCB in resident queue, print out a new row for it
+            for (var i = 0; i < _MemoryManager.residentQueue.getSize(); i++) {
+                var pcb = _MemoryManager.residentQueue.dequeue();
+                _MemoryManager.residentQueue.enqueue(pcb);
+                displayQueue.push(pcb);
             }
             while (table.rows.length > 1) {
                 table.deleteRow(1);
             }
-            // Display all the other PCBs sitting in the ready queue
-            // Convert numbers to HEX
-            while (readyQueue.length > 0) {
-                var displayPcb = readyQueue.pop();
+            // Display all the other PCBs sitting in the Resident queue
+            // Convert numbers to hex
+            while (displayQueue.length > 0) {
+                var displayPcb = displayQueue.shift();
                 var row = table.insertRow(-1); // New row appended to table
                 // PID
                 var cell = row.insertCell();
                 cell.innerHTML = displayPcb.pId.toString(16).toUpperCase();
-                // State
-                cell = row.insertCell();
-                cell.innerHTML = displayPcb.state;
                 // PC
                 cell = row.insertCell();
                 cell.innerHTML = displayPcb.PC.toString(16).toUpperCase();
@@ -173,7 +187,7 @@ var TSOS;
                 cell.innerHTML = displayPcb.IR.toString();
                 // Acc
                 cell = row.insertCell();
-                cell.innerHTML = displayPcb.Acc.toString(16).toUpperCase();
+                cell.innerHTML = displayPcb.acc.toString(16).toUpperCase();
                 // Xreg
                 cell = row.insertCell();
                 cell.innerHTML = displayPcb.xReg.toString(16).toUpperCase();
@@ -183,6 +197,57 @@ var TSOS;
                 // Zflag
                 cell = row.insertCell();
                 cell.innerHTML = displayPcb.zFlag.toString(16).toUpperCase();
+                // State
+                cell = row.insertCell();
+                cell.innerHTML = displayPcb.state;
+            }
+        };
+        // Update the ready queue table
+        Control.hostReady = function () {
+            var table = document.getElementById('tableReady');
+            // Initialize an array of PCBs
+            var displayQueue = [];
+            // For each PCB in ready queue, print out a new row for it
+            for (var i = 0; i < _MemoryManager.readyQueue.getSize(); i++) {
+                var pcb = _MemoryManager.readyQueue.dequeue();
+                _MemoryManager.readyQueue.enqueue(pcb);
+                displayQueue.push(pcb);
+            }
+            if (_MemoryManager.runningProcess != null) {
+                displayQueue.push(_MemoryManager.runningProcess);
+            }
+            while (table.rows.length > 1) {
+                table.deleteRow(1);
+            }
+            // Display all the other PCBs sitting in the Resident queue
+            // Convert numbers to hex
+            while (displayQueue.length > 0) {
+                var displayPcb = displayQueue.shift();
+                var row = table.insertRow(-1); // New row appended to table
+                // PID
+                var cell = row.insertCell();
+                cell.innerHTML = displayPcb.pId.toString(16).toUpperCase();
+                // PC
+                cell = row.insertCell();
+                cell.innerHTML = displayPcb.PC.toString(16).toUpperCase();
+                // IR
+                cell = row.insertCell();
+                cell.innerHTML = displayPcb.IR.toString();
+                // Acc
+                cell = row.insertCell();
+                cell.innerHTML = displayPcb.acc.toString(16).toUpperCase();
+                // Xreg
+                cell = row.insertCell();
+                cell.innerHTML = displayPcb.xReg.toString(16).toUpperCase();
+                // Yreg
+                cell = row.insertCell();
+                cell.innerHTML = displayPcb.yReg.toString(16).toUpperCase();
+                // Zflag
+                cell = row.insertCell();
+                cell.innerHTML = displayPcb.zFlag.toString(16).toUpperCase();
+                // State
+                cell = row.insertCell();
+                cell.innerHTML = displayPcb.state;
             }
         };
         // Initialize memory display
@@ -210,7 +275,7 @@ var TSOS;
             }
         };
         // BSOD effect
-        Control.prototype.melonDrop = function () {
+        Control.melonDrop = function () {
             // Initialize Canvas and melon variables
             var ctx;
             var noOfMelons = 20;
@@ -260,6 +325,12 @@ var TSOS;
             }
             // Set the interval in which to draw the melons
             setInterval(draw, 30);
+        };
+        Control.hostTime = function () {
+            // TODO: Remove the time zones and DST
+            var htmlDateTime = document.getElementById("currentDate");
+            var currentDateTime = new Date();
+            htmlDateTime.innerHTML = currentDateTime + "";
         };
         return Control;
     }());

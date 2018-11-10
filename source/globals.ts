@@ -3,7 +3,6 @@
 
    Global CONSTANTS and _letiables.
    (Global over both the OS and Hardware Simulation / Host.)
-
    This code references page numbers in the text book:
    Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 978-0-470-12872-5
    ------------ */
@@ -19,6 +18,8 @@ const KEYBOARD_IRQ: number = 1;
 const PROCESS_EXIT_IRQ: number = 2;
 const CONSOLE_WRITE_IRQ: number = 3;
 const INVALID_OP_IRQ: number = 4;
+const BOUNDS_ERROR_IRQ: number = 5;
+const CONTEXT_SWITCH_IRQ: number = 6;
 
 // Global variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
@@ -30,13 +31,14 @@ let _Mode: number = 0;     // (currently unused)  0 = Kernel Mode, 1 = User Mode
 // Memory related global variables
 let _Memory: TSOS.Memory;
 let _MemoryManager: TSOS.MemoryManager;
-let _TotalMemorySize = 768; // 786 bytes, 3 segments of 256 bytes
-let _PartitionSize = 256;
+const _TotalMemorySize = 768; // 786 bytes, 3 segments of 256 bytes
+const _PartitionSize = 256;
 
 // Process related global variables
 let _PCB: TSOS.ProcessControlBlock;
 let _ProcessCount = 0;
 let _PCBList = [];
+let _Scheduler: TSOS.Scheduler;
 
 // Canvas and font variables
 let _Canvas: HTMLCanvasElement;         // Initialized in Control.hostInit().
@@ -56,6 +58,8 @@ let _KernelInputQueue: any = null;  // Is this better? I don't like uninitialize
                                     // the type specifier 'any'
 let _KernelBuffers: any[] = null;   // when clearly 'any' is not what we want. There is likely a better way, but what
                                     // is it?
+let _SingleStep: boolean = false;   // Check if Single-step is enabled
+let _NextStep: boolean = false;     // Check if NextStep is enabled
 
 // Standard input and output
 let _StdIn;    // Same "to null or not to null" issue as above.

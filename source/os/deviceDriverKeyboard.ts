@@ -3,9 +3,6 @@
 
 /* ----------------------------------
    DeviceDriverKeyboard.ts
-
-   Requires deviceDriver.ts
-
    The Kernel Keyboard Device Driver.
    ---------------------------------- */
 
@@ -48,22 +45,18 @@ module TSOS {
             // Check to see if we even want to deal with the key that was pressed.
             if (((keyCode >= 65) && (keyCode <= 90)) ||   // A..Z
                 ((keyCode >= 97) && (keyCode <= 123))) {  // a..z {
-                // Determine the character we want to display.
-                // Assume it's lowercase...
+                // Determine the character we want to display. Assume its lowercase
                 chr = String.fromCharCode(keyCode + 32);
-                // ... then check the shift key and re-adjust if necessary.
+                // then check the shift key and re-adjust if necessary.
                 if (isShifted) {
                     chr = String.fromCharCode(keyCode);
                 }
                 // TODO: Check for caps-lock and handle as shifted if so.
                 _KernelInputQueue.enqueue(chr);
                 this.characterArray.push(chr);
-                console.log(this.characterArray);
             } else if (((keyCode >= 48) && (keyCode <= 57) && !isShifted) || // digits
                         (keyCode === 32)                                  || // space
-                        (keyCode === 13)                                  || // enter
-                        ((keyCode === 61) && !isShifted)                  || // =
-                        ((keyCode === 59) && !isShifted)) {                  // ;
+                        (keyCode === 13)) {                                  // enter
                 if (keyCode === 13) {
                     this.isScrollingCommands = false;
                     chr = String.fromCharCode(keyCode);
@@ -95,28 +88,29 @@ module TSOS {
                       (isShifted && (keyCode === 221))      ||  // }
                       (isShifted && (keyCode === 220))) {       // |
                 this.basicKeyPress((keyCode - 96));
-            } else if (isShifted && (keyCode === 173)) {        // _
-                this.basicKeyPress((keyCode - 78));
-            } else if ((keyCode === 173)                    ||  // -
-                      (keyCode === 219)                     ||  // [
+            } else if (isShifted && (keyCode === 189)) {        // _
+                this.basicKeyPress((keyCode - 94));
+            } else if ((keyCode === 219)                    ||  // [
                       (keyCode === 221)                     ||  // ]
                       (keyCode === 220)                     ||  // \
                       (isShifted && (keyCode === 188))      ||  // <
                       (isShifted && (keyCode === 190))      ||  // >
+                      (isShifted && (keyCode === 186))      ||  // :
                       (isShifted && (keyCode === 191))) {       // ?
                 this.basicKeyPress((keyCode - 128));
-            } else if (isShifted && (keyCode === 61)) {         // +
-                this.basicKeyPress((keyCode - 18));
-            } else if (isShifted && (keyCode === 59)) {         // :
-                this.basicKeyPress((keyCode - 1));
             } else if (isShifted && (keyCode === 222)) {        // "
                 this.basicKeyPress((keyCode - 188));
             } else if (keyCode === 222) {                       // '
                 this.basicKeyPress((keyCode - 183));
             } else if ((keyCode === 188)                    ||  // ,
                       (keyCode === 190)                     ||  // .
+                      (isShifted && (keyCode === 187))      ||  // +
                       (keyCode === 191)) {                      // /
-                this.basicKeyPress((keyCode - 144));
+                this.basicKeyPress(keyCode - 144);
+            } else if (keyCode === 187) {                       // =
+                this.basicKeyPress((keyCode - 126));
+            } else if (keyCode === 186) {                       // -
+                this.basicKeyPress((keyCode - 127));
             } else if (keyCode == 8) { // backspace
                 if (this.characterArray.length > 0) {
                     // Initialize the previous character
@@ -129,15 +123,12 @@ module TSOS {
                 }
             } else if (keyCode === 9) {           // tab
                 if (_Console.buffer.length != 0) {
-                    console.log("buffer length: " + _Console.buffer.length);
-                    console.log("buffer: " + _Console.buffer);
                     // Instantiate the tabIndex and match boolean
                     let tabIndex = 0;
                     let match = false;
                     
                     // Find first match
                     while (!match) {
-                        console.log("enter while loop");
                         // If the substring of a command == to the buffer, grab it
                         if (_OsShell.commandList[tabIndex].command.substring(0, _Console.buffer.length).toLowerCase()
                             == _Console.buffer.toLowerCase()) {
@@ -150,15 +141,12 @@ module TSOS {
                             _KernelInputQueue.enqueue(chr);
                             // Set the boolean to true to escape the loop
                             match = true;
-                            console.log("enter first if");
                         // If the entire list has been searched, escape the loop
                         } else if (tabIndex == _OsShell.commandList.length) {
                             match = true;
-                            console.log("tabIndex == commandList length");
                         // Otherwise, add 1 to the index and continue the search
                         } else {
                             tabIndex++;
-                            console.log("tab index: " + tabIndex);
                         }
                     }
                 }
@@ -226,10 +214,8 @@ module TSOS {
         // then pushes the character into the characterArray
         public basicKeyPress(keyCode): void {
             let chr = String.fromCharCode(keyCode);
-            console.log(chr);
             _KernelInputQueue.enqueue(chr);
             this.characterArray.push(chr);
-            console.log(this.characterArray);
         }
     }
 }

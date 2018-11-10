@@ -1,9 +1,3 @@
-/* --------
-   Utils.ts
-
-   Utility functions.
-   -------- */
-
 module TSOS {
     export class Utils {
         public static trim(str): string {

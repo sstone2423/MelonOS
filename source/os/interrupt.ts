@@ -1,6 +1,6 @@
 module TSOS {
     export class Interrupt {
-        constructor(public irq, public params) {
-        }
+        constructor(public irq, 
+                    public params) { }
     }
 }

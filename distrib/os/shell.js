@@ -12,8 +12,7 @@
           center activities, serious injuries may occur when trying to
           write your own Operating System.
    ------------ */
-// TODO: Write a base class / prototype for system services and let
-// Shell inherit from it.
+// TODO: Write a base class / prototype for system services and let Shell inherit from it.
 var TSOS;
 (function (TSOS) {
     var Shell = /** @class */ (function () {
@@ -629,6 +628,7 @@ var TSOS;
         };
         // Get the current scheduling algorithm
         Shell.prototype.shellGetSchedule = function () {
+            _StdOut.putText("Current CPU scheduling algorithm is " + _Scheduler.algorithm);
         };
         // Set the scheduling algorithm to rr, fcfs, priority
         Shell.prototype.shellSetSchedule = function (args) {

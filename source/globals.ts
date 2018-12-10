@@ -22,11 +22,11 @@ const BOUNDS_ERROR_IRQ: number = 5;
 const CONTEXT_SWITCH_IRQ: number = 6;
 
 // Global variables
-// TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 
 let _CPU: TSOS.Cpu;  // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
 let _OSclock: number = 0;  // Page 23.
 let _Mode: number = 0;     // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
+let _Disk: TSOS.Disk;
 
 // Memory related global variables
 let _Memory: TSOS.Memory;
@@ -41,28 +41,25 @@ let _PCBList = [];
 let _Scheduler: TSOS.Scheduler;
 
 // Canvas and font variables
-let _Canvas: HTMLCanvasElement;         // Initialized in Control.hostInit().
-let _DrawingContext: any; // = _Canvas.getContext("2d");  // Assigned here for type safety, but re-initialized in
-                          // Control.hostInit() for OCD and logic.
-let _DefaultFontFamily: string = "sans";        // Ignored, I think. The was just a place-holder in 2008, but the HTML
-                                                // canvas may have use for it.
+let _Canvas: HTMLCanvasElement;             // Initialized in Control.hostInit().
+let _DrawingContext: any;                   // = _Canvas.getContext("2d");  // Assigned here for type safety, but re-initialized in
+                                            // Control.hostInit() for OCD and logic.
+let _DefaultFontFamily: string = "sans";    // Ignored, I think. The was just a place-holder in 2008, but the HTML
+                                            // canvas may have use for it.
 let _DefaultFontSize: number = 13;
-let _FontHeightMargin: number = 4;              // Additional space added to font size when advancing a line.
+let _FontHeightMargin: number = 4;          // Additional space added to font size when advancing a line.
 
 // The OS Kernel and its queues.
-let _Trace: boolean = true;  // Default the OS trace to be on.
+let _Trace: boolean = true;         // Default the OS trace to be on.
 let _Kernel: TSOS.Kernel;
-let _KernelInterruptQueue;          // Initializing this to null (which I would normally do) would then require us to
-                                    // specify the 'any' type, as below.
-let _KernelInputQueue: any = null;  // Is this better? I don't like uninitialized letiables. But I also don't like using
-                                    // the type specifier 'any'
-let _KernelBuffers: any[] = null;   // when clearly 'any' is not what we want. There is likely a better way, but what
-                                    // is it?
+let _KernelInterruptQueue;
+let _KernelInputQueue: any = null;
+let _KernelBuffers: any[] = null;
 let _SingleStep: boolean = false;   // Check if Single-step is enabled
 let _NextStep: boolean = false;     // Check if NextStep is enabled
 
 // Standard input and output
-let _StdIn;    // Same "to null or not to null" issue as above.
+let _StdIn;
 let _StdOut;
 
 // UI
@@ -74,7 +71,7 @@ let _Control: TSOS.Control;
 let _SarcasticMode: boolean = false;
 
 // Global Device Driver Objects - page 12
-let _krnKeyboardDriver; //  = null;
+let _krnKeyboardDriver;
 let _hardwareClockID: number = null;
 
 // For testing (and enrichment)...

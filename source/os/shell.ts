@@ -14,8 +14,7 @@
           write your own Operating System.
    ------------ */
 
-// TODO: Write a base class / prototype for system services and let
-// Shell inherit from it.
+// TODO: Write a base class / prototype for system services and let Shell inherit from it.
 
 module TSOS {
     export class Shell {
@@ -26,7 +25,7 @@ module TSOS {
         public apologies = "[sorry]";
         public commandsUsedList = [];
 
-        public init() {
+        public init(): void {
             let sc;      
             // Load the command list.
             // v
@@ -209,11 +208,11 @@ module TSOS {
             this.putPrompt();
         }
 
-        public putPrompt() {
+        public putPrompt(): void {
             _StdOut.putText(this.promptStr);
         }
 
-        public handleInput(buffer) {
+        public handleInput(buffer): void {
             _Kernel.krnTrace("Shell Command~" + buffer);
 
             // Parse the input...
@@ -260,7 +259,7 @@ module TSOS {
         }
 
         // Note: args is an option parameter, ergo the ? which allows TypeScript to understand that.
-        public execute(fn, args?) {
+        public execute(fn, args?): void {
             // We just got a command, so advance the line...
             _StdOut.advanceLine();
             // ... call the command function passing in the args with some über-cool functional programming ...
@@ -305,7 +304,7 @@ module TSOS {
         // Shell Command Functions.  Kinda not part of Shell() class exactly, but
         // called from here, so kept here to avoid violating the law of least astonishment.
 
-        public shellInvalidCommand() {
+        public shellInvalidCommand(): void {
             _StdOut.putText("Invalid Command. ");
             if (_SarcasticMode) {
                 _StdOut.putText("Unbelievable. You, [subject name here],");
@@ -316,14 +315,14 @@ module TSOS {
             }
         }
 
-        public shellCurse() {
+        public shellCurse(): void {
             _StdOut.putText("Oh, so that's how it's going to be, eh? Fine.");
             _StdOut.advanceLine();
             _StdOut.putText("Bitch.");
             _SarcasticMode = true;
         }
 
-        public shellApology() {
+        public shellApology(): void {
            if (_SarcasticMode) {
               _StdOut.putText("I think we can put our differences behind us.");
               _StdOut.advanceLine();
@@ -334,11 +333,11 @@ module TSOS {
            }
         }
 
-        public shellVer(args) {
+        public shellVer(args): void {
             _StdOut.putText(APP_NAME + " version " + APP_VERSION);
         }
 
-        public shellHelp(args) {
+        public shellHelp(args): void {
             _StdOut.putText("Commands:");
             for (const i in _OsShell.commandList) {
                 _StdOut.advanceLine();
@@ -346,19 +345,19 @@ module TSOS {
             }
         }
 
-        public shellShutdown(args) {
+        public shellShutdown(args): void {
             _StdOut.putText("Shutting down...");
             // Call Kernel shutdown routine.
             _Kernel.krnShutdown();
             // TODO: Stop the final prompt from being displayed.  If possible.  Not a high priority.  (Damn OCD!)
         }
 
-        public shellCls(args) {
+        public shellCls(args): void {
             _StdOut.clearScreen();
             _StdOut.resetXY();
         }
 
-        public shellMan(args) {
+        public shellMan(args): void {
             if (args.length > 0) {
                 const topic = args[0];
                 switch (topic) {
@@ -466,7 +465,7 @@ module TSOS {
             }
         }
 
-        public shellTrace(args) {
+        public shellTrace(args): void {
             if (args.length > 0) {
                 const setting = args[0];
                 switch (setting) {
@@ -490,7 +489,7 @@ module TSOS {
             }
         }
 
-        public shellRot13(args) {
+        public shellRot13(args): void {
             if (args.length > 0) {
                 // Requires Utils.ts for rot13() function.
                 _StdOut.putText(args.join(" ") + " = '" + Utils.rot13(args.join(" ")) + "'");
@@ -499,7 +498,7 @@ module TSOS {
             }
         }
 
-        public shellPrompt(args) {
+        public shellPrompt(args): void {
             if (args.length > 0) {
                 _OsShell.promptStr = args[0];
             } else {
@@ -507,16 +506,16 @@ module TSOS {
             }
         }
 
-        public shellDate() {
+        public shellDate(): void {
             const currentDate = new Date();
             _StdOut.putText("Current date is " + currentDate);
         }
 
-        public shellWhereami() {
+        public shellWhereami(): void {
             _StdOut.putText("Current location is Melon Country");
         }
 
-        public shellMelon() {
+        public shellMelon(): void {
             // Get a random number between 1 and 8
             const randomPun = Math.floor(Math.random() * 8) + 1;
 
@@ -549,7 +548,7 @@ module TSOS {
             }
         }
 
-        public shellStatus(args) {
+        public shellStatus(args): void {
             if (args.length > 0) {
                 const htmlStatus = document.getElementById("status");
                 htmlStatus.innerHTML = "Status: " + args;
@@ -558,7 +557,7 @@ module TSOS {
             }
         }
 
-        public shellLoad() {
+        public shellLoad(): void {
             // Get value inside program input (the program)
             const userInputProgram = (<HTMLInputElement>document.getElementById("taProgramInput")).value;
             // Create regex pattern
@@ -575,14 +574,14 @@ module TSOS {
         }
         
         // Display BSOD....
-        public shellDropit() {
+        public shellDropit(): void {
             const oops = "Who dropped those?";
             // Trigger the kernel trap error
             _Kernel.krnTrapError(oops);
         }
 
         // Add the process to the ready queue - Arg will be the processId
-        public shellRun(args) {
+        public shellRun(args): void {
             if (args.length > 0 && Number.isInteger(parseInt(args[0]))) {
                 let found = false;
                 let waitQueueLength = _MemoryManager.residentQueue.getSize();
@@ -612,7 +611,7 @@ module TSOS {
         }
 
         // Clear all memory partitions
-        public shellClearmem() {
+        public shellClearmem(): void {
             // Check if CPU is executing
             if (!_CPU.isExecuting) {
                 let readyQueueLength = _MemoryManager.readyQueue.getSize();
@@ -643,7 +642,7 @@ module TSOS {
         }
 
         // Run all processes in memory
-        public shellRunall() {
+        public shellRunall(): void {
             let waitQueueLength = _MemoryManager.residentQueue.getSize();
             // Check if there is any programs loaded
             if (waitQueueLength > 0) {
@@ -658,7 +657,7 @@ module TSOS {
         }
 
         // List all processes and pIDs
-        public shellPs() {
+        public shellPs(): void {
             let waitQueueLength = _MemoryManager.residentQueue.getSize();
             // Check if any programs are loaded
             if (waitQueueLength > 0) {
@@ -687,7 +686,7 @@ module TSOS {
         }
 
         // Kill process according to given <pid>
-        public shellKill(args) {
+        public shellKill(args): void {
             // Check if there is an arg and its an integer
             if (args.length > 0 && Number.isInteger(parseInt(args[0]))) {
                 _MemoryManager.killProcess(args[0]);
@@ -697,7 +696,7 @@ module TSOS {
         }
 
         // Change the round robin scheduling according to given <int>
-        public shellQuantum(args) {
+        public shellQuantum(args): void {
             // Check if there is an argument and if the argument is an integer
             if (args.length > 0 && Number.isInteger(parseInt(args[0]))) {
                 // Make sure the number is above 0. 0 will make melons enter the black hole
@@ -746,7 +745,7 @@ module TSOS {
 
         // Get the current scheduling algorithm
         public shellGetSchedule(): void {
-
+            _StdOut.putText("Current CPU scheduling algorithm is " + _Scheduler.algorithm);
         }
 
         // Set the scheduling algorithm to rr, fcfs, priority

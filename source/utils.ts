@@ -28,7 +28,7 @@ module TSOS {
                                                             // it's called rot13.
                     retVal = retVal + String.fromCharCode(code);
                 } else if ("nopqrstuvwxyzNOPQRSTUVWXYZ".indexOf(ch) >= 0) {
-                    code = str.charCodeAt(Number(i)) - 13;  // It's okay to use 13.  See above.
+                    code = str.charCodeAt(Number(i)) - 13;
                     retVal = retVal + String.fromCharCode(code);
                 } else {
                     retVal = retVal + ch;

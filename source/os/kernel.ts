@@ -16,7 +16,7 @@ module TSOS {
     export class Kernel {
         public timer: number = 0;
         // OS Startup and Shutdown Routines
-        public krnBootstrap() {      // Page 8. {
+        public krnBootstrap(): void {      // Page 8. {
             Control.hostLog("bootstrap", "host");  // Use hostLog because we ALWAYS want this, even if _Trace is off.
 
             // Initialize our global queues.
@@ -58,7 +58,7 @@ module TSOS {
             }
         }
 
-        public krnShutdown() {
+        public krnShutdown(): void {
             this.krnTrace("begin shutdown OS");
             // TODO: Check for running processes.  If there are some, alert and stop. Else...
             // ... Disable the Interrupts.
@@ -70,7 +70,7 @@ module TSOS {
             this.krnTrace("end shutdown OS");
         }
 
-        public krnOnCPUClockPulse() {
+        public krnOnCPUClockPulse(): void {
             /* This gets called from the host hardware simulation every time there is a hardware clock pulse.
                This is NOT the same as a TIMER, which causes an interrupt and is handled like other interrupts.
                This, on the other hand, is the clock pulse from the hardware / VM / host that tells the kernel
@@ -134,19 +134,19 @@ module TSOS {
 
         // Interrupt Handling
 
-        public krnEnableInterrupts() {
+        public krnEnableInterrupts(): void {
             // Keyboard
             Devices.hostEnableKeyboardInterrupt();
             // Put more here.
         }
 
-        public krnDisableInterrupts() {
+        public krnDisableInterrupts(): void {
             // Keyboard
             Devices.hostDisableKeyboardInterrupt();
             // Put more here.
         }
 
-        public krnInterruptHandler(irq, params) {
+        public krnInterruptHandler(irq, params): void {
             // This is the Interrupt Handler Routine.  See pages 8 and 560.
             // Trace our entrance here so we can compute Interrupt Latency by analyzing the log file later on. Page 766.
             this.krnTrace("Handling IRQ~" + irq);
@@ -197,7 +197,7 @@ module TSOS {
             }
         }
 
-        public krnTimerISR() {
+        public krnTimerISR(): void {
             /* The built-in TIMER (not clock) Interrupt Service Routine (as opposed to an ISR coming from
             a device driver).
             Check multiprogramming parameters and enforce quanta here. Call the scheduler / context
@@ -221,7 +221,7 @@ module TSOS {
 
         // OS Utility Routines */
 
-        public krnTrace(msg: string) {
+        public krnTrace(msg: string): void {
              // Check globals to see if trace is set ON.  If so, then (maybe) log the message.
              if (_Trace) {
                 if (msg === "Idle") {
@@ -237,7 +237,7 @@ module TSOS {
              }
         }
 
-        public krnTrapError(msg) {
+        public krnTrapError(msg): void {
             // Display error
             Control.hostLog("OS ERROR - TRAP: " + msg);
             // Shutdown the kernel

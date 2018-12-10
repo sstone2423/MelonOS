@@ -63,10 +63,14 @@ var TSOS;
             _CPU = new TSOS.Cpu(); // Note: We could simulate multi-core systems by instantiating more than
             // one instance of the CPU here.
             _CPU.init();
-            // Initialize memory and memory manager
+            // Initialize memory
             _Memory = new TSOS.Memory();
             _Memory.init();
             this.initMemoryDisplay();
+            // Initialize the Disk
+            _Disk = new TSOS.Disk();
+            _Disk.init();
+            this.initDiskDisplay();
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(TSOS.Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
             // .. and call the OS Kernel Bootstrap routine.
@@ -74,8 +78,8 @@ var TSOS;
             _Kernel.krnBootstrap(); // _GLaDOS.afterStartup() will get called in there, if configured.
         };
         Control.hostBtnHaltOS_click = function (btn) {
-            Control.hostLog("Emergency halt", "host");
-            Control.hostLog("Attempting Kernel shutdown.", "host");
+            this.hostLog("Emergency halt", "host");
+            this.hostLog("Attempting Kernel shutdown.", "host");
             // Call the OS shutdown routine.
             _Kernel.krnShutdown();
             // Stop the interval that's simulating our clock pulse.
@@ -331,6 +335,46 @@ var TSOS;
             var htmlDateTime = document.getElementById("currentDate");
             var currentDateTime = new Date();
             htmlDateTime.innerHTML = currentDateTime + "";
+        };
+        // This will update the disk display with contents of session storage
+        Control.hostDisk = function () {
+            var table = document.getElementById('tableDisk');
+            // Remove all rows
+            var rows = table.rows.length;
+            for (var i = 0; i < rows; i++) {
+                table.deleteRow(0);
+            }
+            var rowNum = 0;
+            // firefox sucks and doesn't keep session storage in order
+            // For each row, insert the TSB, available bit, pointer, and data into separate cells
+            for (var trackNum = 0; trackNum < _Disk.totalTracks; trackNum++) {
+                for (var sectorNum = 0; sectorNum < _Disk.totalSectors; sectorNum++) {
+                    for (var blockNum = 0; blockNum < _Disk.totalBlocks; blockNum++) {
+                        // generate proper tsb id since firefox sucks and doesn't keep session storage ordered
+                        var tsbID = trackNum + ":" + sectorNum + ":" + blockNum;
+                        var row = table.insertRow(rowNum);
+                        rowNum++;
+                        row.style.backgroundColor = "white";
+                        var tsb = row.insertCell(0);
+                        tsb.innerHTML = tsbID;
+                        tsb.style.color = "lightcoral";
+                        var availableBit = row.insertCell(1);
+                        availableBit.innerHTML = JSON.parse(sessionStorage.getItem(tsbID)).availableBit;
+                        availableBit.style.color = "lightgreen";
+                        var pointer = row.insertCell(2);
+                        var pointerVal = JSON.parse(sessionStorage.getItem(tsbID)).pointer;
+                        pointer.innerHTML = pointerVal;
+                        pointer.style.color = "lightgray";
+                        var data = row.insertCell(3);
+                        data.innerHTML = JSON.parse(sessionStorage.getItem(tsbID)).data.join("").toString();
+                        data.style.color = "lightblue";
+                    }
+                }
+            }
+        };
+        // Initialize HDD display
+        Control.initDiskDisplay = function () {
+            this.hostDisk();
         };
         return Control;
     }());

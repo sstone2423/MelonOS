@@ -17,7 +17,7 @@ module TSOS {
             this.pId = processId;
         }
         
-        public init(partition: number) {
+        public init(partition: number): void {
             this.state = "Ready";
             this.PC = 0;
             this.IR = "00";

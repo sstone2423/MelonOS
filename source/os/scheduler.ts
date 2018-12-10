@@ -10,7 +10,7 @@ module TSOS {
             // Set default quantum of 6
             this.quantum = 6;
             // Set default algorithm to RR
-            this.algorithm = "RR";
+            this.algorithm = "rr";
         }
 
         // ShellQuantum calls this function

@@ -3,15 +3,15 @@ module TSOS {
         constructor(public q = new Array()) {
         }
 
-        public getSize() {
+        public getSize(): number {
             return this.q.length;
         }
 
-        public isEmpty() {
+        public isEmpty(): boolean {
             return (this.q.length === 0);
         }
 
-        public enqueue(element) {
+        public enqueue(element): void {
             this.q.push(element);
         }
 

@@ -1,6 +1,6 @@
 module TSOS {
     export class Utils {
-        public static trim(str): string {
+        public trim(str): string {
             // Use a regular expression to remove leading and trailing spaces.
             return str.replace(/^\s+ | \s+$/g, "");
             /*
@@ -13,7 +13,7 @@ module TSOS {
             */
         }
 
-        public static rot13(str: string): string {
+        public rot13(str: string): string {
             /*
                This is an easy-to understand implementation of the famous and common Rot13 obfuscator.
                You can do this in three lines with a complex regular expression, but I'd have

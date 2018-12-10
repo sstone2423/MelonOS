@@ -26,6 +26,8 @@ const FILENAME_EXISTS: number = 0;
 const FILENAME_NOT_EXISTS: number = 3;
 const SUCCESS: number = 1;
 const DISK_IS_FULL: number = 2;
+const QUICK_FORMAT: number = 0;
+const FULL_FORMAT: number = 1;
 
 // Global variables
 

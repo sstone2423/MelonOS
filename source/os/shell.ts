@@ -1,8 +1,6 @@
 ///<reference path="../globals.ts" />
-///<reference path="../utils.ts" />
 ///<reference path="shellCommand.ts" />
 ///<reference path="userCommand.ts" />
-///<reference path="memoryManager.ts" />
 
 /* ------------
    Shell.ts
@@ -248,7 +246,7 @@ module TSOS {
                 this.execute(fn, args);
             } else {
                 // It's not found, so check for curses and apologies before declaring the command invalid.
-                if (this.curses.indexOf("[" + Utils.rot13(cmd) + "]") >= 0) {     // Check for curses.
+                if (this.curses.indexOf("[" + _Utils.rot13(cmd) + "]") >= 0) {     // Check for curses.
                     this.execute(this.shellCurse);
                 } else if (this.apologies.indexOf("[" + cmd + "]") >= 0) {        // Check for apologies.
                     this.execute(this.shellApology);
@@ -276,7 +274,7 @@ module TSOS {
             const retVal = new UserCommand();
 
             // 1. Remove leading and trailing spaces.
-            buffer = Utils.trim(buffer);
+            buffer = _Utils.trim(buffer);
 
             // 2. Lower-case it.
             buffer = buffer.toLowerCase();
@@ -287,13 +285,13 @@ module TSOS {
             // 4. Take the first (zeroth) element and use that as the command.
             let cmd = tempList.shift();  // Yes, you can do that to an array in JavaScript.  See the Queue class.
             // 4.1 Remove any left-over spaces.
-            cmd = Utils.trim(cmd);
+            cmd = _Utils.trim(cmd);
             // 4.2 Record it in the return value.
             retVal.command = cmd;
 
             // 5. Now create the args array from what's left.
             for (const i in tempList) {
-                const arg = Utils.trim(tempList[i]);
+                const arg = _Utils.trim(tempList[i]);
                 if (arg !== "") {
                     retVal.args[retVal.args.length] = tempList[i];
                 }
@@ -333,11 +331,11 @@ module TSOS {
            }
         }
 
-        public shellVer(args): void {
+        public shellVer(): void {
             _StdOut.putText(APP_NAME + " version " + APP_VERSION);
         }
 
-        public shellHelp(args): void {
+        public shellHelp(): void {
             _StdOut.putText("Commands:");
             for (const i in _OsShell.commandList) {
                 _StdOut.advanceLine();
@@ -345,7 +343,7 @@ module TSOS {
             }
         }
 
-        public shellShutdown(args): void {
+        public shellShutdown(): void {
             _StdOut.putText("Shutting down...");
             // Call Kernel shutdown routine.
             _Kernel.krnShutdown();
@@ -466,7 +464,7 @@ module TSOS {
         }
 
         public shellTrace(args): void {
-            if (args.length > 0) {
+            if (args.length == 1) {
                 const setting = args[0];
                 switch (setting) {
                     case "on":
@@ -492,7 +490,7 @@ module TSOS {
         public shellRot13(args): void {
             if (args.length > 0) {
                 // Requires Utils.ts for rot13() function.
-                _StdOut.putText(args.join(" ") + " = '" + Utils.rot13(args.join(" ")) + "'");
+                _StdOut.putText(args.join(" ") + " = '" + _Utils.rot13(args.join(" ")) + "'");
             } else {
                 _StdOut.putText("Usage: rot13 <string>  Please supply a string.");
             }
@@ -512,7 +510,7 @@ module TSOS {
         }
 
         public shellWhereami(): void {
-            _StdOut.putText("Current location is Melon Country");
+            _StdOut.putText("Current location: Melon Country");
         }
 
         public shellMelon(): void {
@@ -582,7 +580,7 @@ module TSOS {
 
         // Add the process to the ready queue - Arg will be the processId
         public shellRun(args): void {
-            if (args.length > 0 && Number.isInteger(parseInt(args[0]))) {
+            if (args.length == 1 && Number.isInteger(parseInt(args[0]))) {
                 let found = false;
                 let waitQueueLength = _MemoryManager.residentQueue.getSize();
                 // Check to see if CPU is already executing
@@ -688,7 +686,7 @@ module TSOS {
         // Kill process according to given <pid>
         public shellKill(args): void {
             // Check if there is an arg and its an integer
-            if (args.length > 0 && Number.isInteger(parseInt(args[0]))) {
+            if (args.length == 1 && Number.isInteger(parseInt(args[0]))) {
                 _MemoryManager.killProcess(args[0]);
             } else {
                 _StdOut.putText("Usage: kill <pid> Please supply a process ID.");
@@ -698,7 +696,7 @@ module TSOS {
         // Change the round robin scheduling according to given <int>
         public shellQuantum(args): void {
             // Check if there is an argument and if the argument is an integer
-            if (args.length > 0 && Number.isInteger(parseInt(args[0]))) {
+            if (args.length == 1 && Number.isInteger(parseInt(args[0]))) {
                 // Make sure the number is above 0. 0 will make melons enter the black hole
                 if (args[0] > 0) {
                     // Notify the user that the quantum has been changed
@@ -719,8 +717,42 @@ module TSOS {
         }
 
         // Format/Initialize all blocks on disk
-        public shellFormat(): void {
-
+        public shellFormat(args): void {
+            // Check if there is only 1 arg
+            if (args.length == 1) {
+                // Perform quick format
+                if (args[0] == "-quick") {
+                    if (_DiskDriver.format(QUICK_FORMAT)) {
+                        _StdOut.putText("Disk formatted successfully!");
+                    }
+                    else {
+                        _StdOut.putText("CPU is executing. Cannot format disk.");
+                    }
+                // Perform full format
+                } else if(args[0] == "-full"){
+                    if (_DiskDriver.format(FULL_FORMAT)){
+                        _StdOut.putText("Disk formatted successfully!");
+                    }
+                    else {
+                        _StdOut.putText("CPU is executing. Cannot format disk.");
+                    }
+                }
+                else {
+                    _StdOut.putText("Usage: format [-quick]|[-full]");
+                }
+            // Too many arguments..
+            } else if (args.length > 1) {
+                _StdOut.putText("Usage: format [-quick]|[-full]");
+            // Default to full format
+            } else {
+                // Call the disk device driver to format the disk
+                if (_DiskDriver.format(FULL_FORMAT)) {
+                    _StdOut.putText("Disk formatted successfully!");
+                }
+                else {
+                    _StdOut.putText("CPU is executing. Can't format disk.");
+                }
+            }
         }
 
         // Delete <filename> from disk
@@ -790,7 +822,7 @@ module TSOS {
         // Set the scheduling algorithm to rr, fcfs, priority
         public shellSetSchedule(args): void {
             // Check if there is args and that they match one of the allowed algorithms
-            if (args.length > 0 && (args[0] == "rr" || args[0] == "fcfs" || args[0] == "priority")) {
+            if (args.length == 1 && (args[0] == "rr" || args[0] == "fcfs" || args[0] == "priority")) {
                 _Scheduler.changeAlgorithm(args[0]);
                 _StdOut.putText("CPU Scheduling algorithm set to " + args[0]);
             } else {

@@ -24,6 +24,8 @@ var FILENAME_EXISTS = 0;
 var FILENAME_NOT_EXISTS = 3;
 var SUCCESS = 1;
 var DISK_IS_FULL = 2;
+var QUICK_FORMAT = 0;
+var FULL_FORMAT = 1;
 // Global variables
 var _CPU; // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
 var _OSclock = 0; // Page 23.

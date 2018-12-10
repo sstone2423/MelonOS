@@ -213,5 +213,53 @@
 
             return;
         }
+
+        // Format the disk with the specified format
+        public format(formatType: number): boolean {
+            // If CPU is executing, return false
+            if (_CPU.isExecuting) {
+                return false;
+            }
+            // If quick format, set pointers to 0 and available bit to 0
+            if (formatType == QUICK_FORMAT) {
+                for (let i = 0; i < _Disk.totalTracks * _Disk.totalSectors * _Disk.totalBlocks; i++){
+                    // Get the JSON from the stored string
+                    let block = JSON.parse(sessionStorage.getItem(sessionStorage.key(i)));
+                    block.availableBit = "0";
+                    block.pointer = "0:0:0";
+                    sessionStorage.setItem(sessionStorage.key(i), JSON.stringify(block));
+                }
+            // Default to full format
+            } else {
+                // For all values in session storage, set available bit to 0, pointer to 0,0,0, and fill data with 00s
+                let zeroes: Array<String> = [];
+                for (let i = 0; i < 60; i++) {
+                    zeroes.push("00");
+                }
+                for (let j = 0; j < _Disk.totalTracks * _Disk.totalSectors * _Disk.totalBlocks; j++){
+                    // Get the JSON from the stored string
+                    let block = JSON.parse(sessionStorage.getItem(sessionStorage.key(j)));
+                    block.availableBit = "0";
+                    block.pointer = "0:0:0";
+                    block.data = zeroes;
+                    sessionStorage.setItem(sessionStorage.key(j), JSON.stringify(block));
+                }
+            }
+            // Format should also remove any processes that are swapped from the resident queue
+            let size = _MemoryManager.residentQueue.getSize();
+            for (let i = 0; i < size; i++) {
+                let pcb = _MemoryManager.residentQueue.dequeue();
+                if (pcb.Swapped) {
+                    // Do nothing
+                }
+                else {
+                    // Put the process back into the resident queue
+                    _MemoryManager.residentQueue.enqueue(pcb); 
+                }
+            }
+            // Update disk display
+            Control.hostDisk();
+            return true;
+        }
     }
 }

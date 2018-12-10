@@ -264,6 +264,84 @@ var TSOS;
             TSOS.Control.hostDisk();
             return true;
         };
+        // Returns an array of filenames currently on disk
+        DeviceDriverDisk.prototype.ls = function () {
+            var filenames = [];
+            // Look for first free block in directory data structure (first track)
+            for (var sectorNum = 0; sectorNum < _Disk.totalSectors; sectorNum++) {
+                for (var blockNum = 0; blockNum < _Disk.totalBlocks; blockNum++) {
+                    // If first block / MBR, continue to next iteration
+                    if (sectorNum == 0 && blockNum == 0) {
+                        continue;
+                    }
+                    var tsbId = "0" + ":" + sectorNum + ":" + blockNum;
+                    var dirBlock = JSON.parse(sessionStorage.getItem(tsbId));
+                    // Don't look in blocks not in use
+                    if (dirBlock.availableBit == "1") {
+                        var size = this.getSize(dirBlock.pointer);
+                        var info = {
+                            data: dirBlock.data,
+                            size: size + "bytes"
+                        };
+                        filenames.push(info);
+                    }
+                }
+            }
+            // Convert all hex filenames to human-readable form
+            for (var i = 0; i < filenames.length; i++) {
+                var dataPtr = 4;
+                // Filename
+                var res = [];
+                while (true) {
+                    if (filenames[i]['data'][dataPtr] != "00") {
+                        // Push each character into array
+                        res.push(String.fromCharCode(parseInt(filenames[i]['data'][dataPtr], 16)));
+                        dataPtr++;
+                    }
+                    else {
+                        break;
+                    }
+                }
+                filenames[i]['name'] = res.join("");
+                // Parse out the date
+                filenames[i]['month'] = parseInt(filenames[i]['data'][0], 16);
+                filenames[i]['day'] = parseInt(filenames[i]['data'][1], 16);
+                filenames[i]['year'] = parseInt(filenames[i]['data'][2] + filenames[i]['data'][3], 16);
+            }
+            // Return array of filenames
+            return filenames;
+        };
+        DeviceDriverDisk.prototype.readFile = function (filename) {
+            // If name is found
+            if (this.checkForExistingFile(filename)) {
+                var dirBlock = JSON.parse(sessionStorage.getItem(tsbId));
+                // Perform a recursive read
+                var tsb = dirBlock.pointer;
+                var data = this.readData(tsb);
+                var dataPtr = 0;
+                var fileData = [];
+                var foundTerminated = false;
+                while (!foundTerminated) {
+                    // Read until we reach 00-terminated string
+                    if (data[dataPtr] != "00") {
+                        // Push each character into array
+                        fileData.push(String.fromCharCode(parseInt(data[dataPtr], 16)));
+                        dataPtr++;
+                        // Swap boolean break from loop
+                    }
+                    else {
+                        foundTerminated = true;
+                    }
+                }
+                // // Print out file
+                // _StdOut.putText(fileData.join(""));
+                // Return success
+                return { "data": data, "fileData": fileData };
+            }
+            else {
+                return FILENAME_NOT_EXISTS;
+            }
+        };
         return DeviceDriverDisk;
     }(TSOS.DeviceDriver));
     TSOS.DeviceDriverDisk = DeviceDriverDisk;

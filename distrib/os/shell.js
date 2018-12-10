@@ -91,7 +91,7 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellKill, "kill", "- Kills the specified process ID.");
             this.commandList[this.commandList.length] = sc;
             // ls
-            sc = new TSOS.ShellCommand(this.shellLs, "ls", "- Lists files currently on disk.");
+            sc = new TSOS.ShellCommand(this.shellLs, "ls", "- Lists files currently on disk. ls -l will show hidden files as well.");
             this.commandList[this.commandList.length] = sc;
             // getschedule
             sc = new TSOS.ShellCommand(this.shellGetSchedule, "getschedule", "- Returns the current scheduling algorithm.");
@@ -327,7 +327,7 @@ var TSOS;
                         _StdOut.putText("quantum <int> will change the round round scheduling time.");
                         break;
                     case "ls":
-                        _StdOut.putText("ls lists all non-hidden files on disk.");
+                        _StdOut.putText("ls lists all non-hidden files on disk. Use ls -l to see hidden files.");
                         break;
                     case "format":
                         _StdOut.putText("format initializes and clears the disk.");
@@ -606,8 +606,54 @@ var TSOS;
             }
         };
         // List all non-hidden files on disk
-        Shell.prototype.shellLs = function () {
-            // Check if files are not hidden, then print to console
+        Shell.prototype.shellLs = function (args) {
+            if (args.length == 1 && args[0] == "-l") {
+                // Get the list of files
+                var filenames = _DiskDriver.ls();
+                // Check if there is any files
+                if (filenames.length > 0) {
+                    _StdOut.putText("Files in the filesystem:");
+                    _StdOut.advanceLine();
+                    for (var _i = 0, filenames_1 = filenames; _i < filenames_1.length; _i++) {
+                        var f = filenames_1[_i];
+                        // Don't show swap files
+                        if (f['name'].includes("$SWAP")) {
+                            continue;
+                        }
+                        _StdOut.putText(f['name'] + " - creation date: " + f['month'] + "/" + f['day'] + "/" + f['year'] + ". size: " + f['size']);
+                        _StdOut.advanceLine();
+                    }
+                }
+                else {
+                    _StdOut.putText("There are no files in the filesystem.");
+                }
+                // Only display files that are not hidden and not swapped
+            }
+            else if (args.length == 0) {
+                // Get the list of files
+                var filenames = _DiskDriver.ls();
+                // Check if there is any files
+                if (filenames.length > 0) {
+                    for (var _a = 0, filenames_2 = filenames; _a < filenames_2.length; _a++) {
+                        var f = filenames_2[_a];
+                        // Don't show swap files
+                        if (f['name'].includes("$SWAP")) {
+                            continue;
+                        }
+                        // Don't show hidden files
+                        if (f['name'].charAt(0) != ".") {
+                            _StdOut.putText(f['name']);
+                            _StdOut.advanceLine();
+                        }
+                    }
+                }
+                else {
+                    _StdOut.putText("There are no files in the filesystem.");
+                }
+            }
+            else {
+                _StdOut.putText("Usage: ls [-l]");
+            }
         };
         // Format/Initialize all blocks on disk
         Shell.prototype.shellFormat = function (args) {
@@ -678,6 +724,23 @@ var TSOS;
         };
         // Read <filename> from disk
         Shell.prototype.shellReadFile = function (args) {
+            // Check if there is only 1 arg
+            if (args.length == 1) {
+                // Avoid swap files
+                if (args[0].includes("$")) {
+                    _StdOut.putText("Cannot read a swapped file.");
+                    return;
+                }
+                var status_2 = _DiskDriver.readFile(args[0]);
+                if (status_2 == FILENAME_NOT_EXISTS) {
+                    _StdOut.putText("The file: " + args[0] + " does not exist.");
+                }
+                // Print out file
+                _StdOut.putText(status_2.fileData.join(""));
+            }
+            else {
+                _StdOut.putText("Usage: read <filename>  Please supply a filename.");
+            }
         };
         // Create <filename> on disk
         Shell.prototype.shellCreateFile = function (args) {
@@ -690,14 +753,14 @@ var TSOS;
                     return;
                 }
                 // Return the status of the file creation
-                var status_2 = _DiskDriver.createFile(args[0]);
-                if (status_2 == SUCCESS) {
+                var status_3 = _DiskDriver.createFile(args[0]);
+                if (status_3 == SUCCESS) {
                     _StdOut.putText("File successfully created: " + args[0]);
                 }
-                else if (status_2 == FILENAME_EXISTS) {
+                else if (status_3 == FILENAME_EXISTS) {
                     _StdOut.putText("File name already exists. Please use another file name.");
                 }
-                else if (status_2 == DISK_IS_FULL) {
+                else if (status_3 == DISK_IS_FULL) {
                     _StdOut.putText("File creation failure: No more space on disk. Delete some?");
                 }
             }

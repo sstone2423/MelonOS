@@ -261,5 +261,83 @@
             Control.hostDisk();
             return true;
         }
+
+        // Returns an array of filenames currently on disk
+        public ls(): Array<String> {
+            let filenames = [];
+            // Look for first free block in directory data structure (first track)
+            for (let sectorNum = 0; sectorNum < _Disk.totalSectors; sectorNum++) {
+                for (let blockNum = 0; blockNum < _Disk.totalBlocks; blockNum++) {
+                    // If first block / MBR, continue to next iteration
+                    if (sectorNum == 0 && blockNum == 0) {
+                        continue;
+                    }
+                    let tsbId = "0" + ":" + sectorNum + ":" + blockNum;
+                    let dirBlock = JSON.parse(sessionStorage.getItem(tsbId));
+
+                    // Don't look in blocks not in use
+                    if (dirBlock.availableBit == "1") {
+                        let size = this.getSize(dirBlock.pointer);
+                        let info = {
+                            data: dirBlock.data,
+                            size: size + "bytes"
+                        }
+                        filenames.push(info);
+                    }
+                }
+            }
+            // Convert all hex filenames to human-readable form
+            for (let i = 0; i < filenames.length; i++) {
+                let dataPtr = 4;
+                // Filename
+                let res = [];
+                while (true) {
+                    if (filenames[i]['data'][dataPtr] != "00") {
+                        // Push each character into array
+                        res.push(String.fromCharCode(parseInt(filenames[i]['data'][dataPtr], 16)));
+                        dataPtr++; 
+                    } else {
+                        break;
+                    }
+                }
+                filenames[i]['name'] = res.join("");
+                // Parse out the date
+                filenames[i]['month'] = parseInt(filenames[i]['data'][0], 16);
+                filenames[i]['day'] = parseInt(filenames[i]['data'][1], 16);
+                filenames[i]['year'] = parseInt(filenames[i]['data'][2] + filenames[i]['data'][3], 16);
+            }
+            // Return array of filenames
+            return filenames;
+        }
+
+        public readFile(filename: String) {
+            // If name is found
+            if (this.checkForExistingFile(filename)) {
+                let dirBlock = JSON.parse(sessionStorage.getItem(tsbId));
+                // Perform a recursive read
+                let tsb = dirBlock.pointer;
+                let data = this.readData(tsb);
+                let dataPtr = 0;
+                let fileData = [];
+                let foundTerminated = false;
+                while (!foundTerminated) {
+                    // Read until we reach 00-terminated string
+                    if(data[dataPtr] != "00"){
+                        // Push each character into array
+                        fileData.push(String.fromCharCode(parseInt(data[dataPtr], 16)));
+                        dataPtr++; 
+                    // Swap boolean break from loop
+                    } else {
+                        foundTerminated = true;
+                    }
+                }
+                // // Print out file
+                // _StdOut.putText(fileData.join(""));
+                // Return success
+                return {"data" : data, "fileData" : fileData};
+            } else {
+                return FILENAME_NOT_EXISTS;
+            }
+        }
     }
 }

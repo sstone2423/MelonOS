@@ -157,7 +157,7 @@ module TSOS {
             // ls
             sc = new ShellCommand(this.shellLs,
                                   "ls",
-                                  "- Lists files currently on disk.");
+                                  "- Lists files currently on disk. ls -l will show hidden files as well.");
             this.commandList[this.commandList.length] = sc;
 
             // getschedule
@@ -432,7 +432,7 @@ module TSOS {
                         _StdOut.putText("quantum <int> will change the round round scheduling time.");
                         break;
                     case "ls":
-                        _StdOut.putText("ls lists all non-hidden files on disk.");
+                        _StdOut.putText("ls lists all non-hidden files on disk. Use ls -l to see hidden files.");
                         break;
                     case "format":
                         _StdOut.putText("format initializes and clears the disk.");
@@ -712,8 +712,49 @@ module TSOS {
         }
 
         // List all non-hidden files on disk
-        public shellLs(): void {
-            // Check if files are not hidden, then print to console
+        public shellLs(args): void {
+            if (args.length == 1 && args[0] == "-l") {
+                // Get the list of files
+                let filenames = _DiskDriver.ls();
+                // Check if there is any files
+                if (filenames.length > 0) {
+                    _StdOut.putText("Files in the filesystem:");
+                    _StdOut.advanceLine();
+                    for (let f of filenames) {
+                        // Don't show swap files
+                        if (f['name'].includes("$SWAP")) {
+                            continue;
+                        }
+                        _StdOut.putText(f['name'] + " - creation date: " + f['month'] + "/" + f['day'] + "/" + f['year'] + ". size: " + f['size']);
+                        _StdOut.advanceLine();
+                    }
+                } else {
+                    _StdOut.putText("There are no files in the filesystem.");
+                }
+            // Only display files that are not hidden and not swapped
+            } else if (args.length == 0) {
+                // Get the list of files
+                let filenames = _DiskDriver.ls();
+                // Check if there is any files
+                if (filenames.length > 0) {
+                    for (let f of filenames) {
+                        // Don't show swap files
+                        if (f['name'].includes("$SWAP")) {
+                            continue;
+                        }
+                        // Don't show hidden files
+                        if (f['name'].charAt(0) != ".") {
+                            _StdOut.putText(f['name']);
+                            _StdOut.advanceLine();
+                        }
+                    }
+                } else {
+                    _StdOut.putText("There are no files in the filesystem.");
+                }
+            } else {
+                _StdOut.putText("Usage: ls [-l]");
+            }
+
         }
 
         // Format/Initialize all blocks on disk
@@ -785,7 +826,22 @@ module TSOS {
 
         // Read <filename> from disk
         public shellReadFile(args): void {
-
+            // Check if there is only 1 arg
+            if (args.length == 1) {
+                // Avoid swap files
+                if (args[0].includes("$")) {
+                    _StdOut.putText("Cannot read a swapped file.");
+                    return;
+                }
+                let status = _DiskDriver.readFile(args[0]);
+                if (status == FILENAME_NOT_EXISTS) {
+                    _StdOut.putText("The file: " + args[0] + " does not exist.");
+                }
+                // Print out file
+                _StdOut.putText(status.fileData.join(""));
+            } else {
+                _StdOut.putText("Usage: read <filename>  Please supply a filename.");
+            }
         }
 
         // Create <filename> on disk

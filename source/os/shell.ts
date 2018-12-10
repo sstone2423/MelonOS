@@ -157,10 +157,52 @@ module TSOS {
                                   "- Kills the specified process ID.");
             this.commandList[this.commandList.length] = sc;
 
-            // quantum <int>
-            sc = new ShellCommand(this.shellQuantum,
-                                  "quantum",
-                                  "- Sets the round robin quantum to the specific integer.");
+            // ls
+            sc = new ShellCommand(this.shellLs,
+                                  "ls",
+                                  "- Lists files currently on disk.");
+            this.commandList[this.commandList.length] = sc;
+
+            // getschedule
+            sc = new ShellCommand(this.shellGetSchedule,
+                                  "getschedule",
+                                  "- Returns the current scheduling algorithm.");
+            this.commandList[this.commandList.length] = sc;
+
+            // setschedule rr, fcfs, priority
+            sc = new ShellCommand(this.shellSetSchedule,
+                                  "setschedule",
+                                  "<rr, fcfs, priority> - Sets the CPU scheduling algorithm.");
+            this.commandList[this.commandList.length] = sc;
+
+            // format
+            sc = new ShellCommand(this.shellFormat,
+                                  "format",
+                                  "- Initialize all blocks in all sectors in all tracks.");
+            this.commandList[this.commandList.length] = sc;
+
+            // delete <filename>
+            sc = new ShellCommand(this.shellDelete,
+                                  "delete",
+                                  "<filename> - Delete the specified file from disk.");
+            this.commandList[this.commandList.length] = sc;
+
+            // write <filename> "data"
+            sc = new ShellCommand(this.shellWrite,
+                                  "write",
+                                  "<filename> \"data\" - Write data to the specified file on disk.");
+            this.commandList[this.commandList.length] = sc;
+
+            // read <filename>
+            sc = new ShellCommand(this.shellRead,
+                                  "read",
+                                  "<filename> - Read the specified file from disk.");
+            this.commandList[this.commandList.length] = sc;
+
+            // create <filename>
+            sc = new ShellCommand(this.shellCreate,
+                                  "create",
+                                  "<filename> - Create a file fon disk.");
             this.commandList[this.commandList.length] = sc;
 
             // Display the initial prompt.
@@ -321,77 +363,100 @@ module TSOS {
                 const topic = args[0];
                 switch (topic) {
                     case "help":
-                        _StdOut.putText("Help displays a list of (hopefully) valid commands.");
+                        _StdOut.putText("help displays a list of (hopefully) valid commands.");
                         break;
                     case "curse":
-                        _StdOut.putText("Curse issues all of your derogatory remarks for you!");
+                        _StdOut.putText("curse issues all of your derogatory remarks for you!");
                         break;
                     case "apology":
-                        _StdOut.putText("Apology mends your relationship with MelonOS because it has feelings too.");
+                        _StdOut.putText("apology mends your relationship with MelonOS because it has feelings too.");
                         break;
                     case "ver":
-                        _StdOut.putText("Ver displays the current version.");
+                        _StdOut.putText("ver displays the current version.");
                         break;
                     case "v":
-                        _StdOut.putText("V displays the current version.");
+                        _StdOut.putText("v displays the current version.");
                         break;
                     case "version":
-                        _StdOut.putText("Version displays the current version.");
+                        _StdOut.putText("version displays the current version.");
                         break;
                     case "shutdown":
-                        _StdOut.putText("Shutdown calls the kernel shutdown routine.");
+                        _StdOut.putText("shutdown calls the kernel shutdown routine.");
                         break;
                     case "cls":
-                        _StdOut.putText("Cls clears the screen for additional melons.");
+                        _StdOut.putText("cls clears the screen for additional melons.");
                         break;
                     case "trace":
-                        _StdOut.putText("Trace displays the clock intervals.");
+                        _StdOut.putText("trace displays the clock intervals.");
                         break;
                     case "rot13":
-                        _StdOut.putText("Rot13 converts characters in the string to character + 13. "
-                                        + "It was one of the first ciphers created.");
+                        _StdOut.putText("rot13 converts characters in the string to character + 13. It was one of the first ciphers created.");
                         break;
                     case "prompt":
-                        _StdOut.putText("Prompt changes the initial prompt to the specific string.");
+                        _StdOut.putText("prompt changes the initial prompt to the specific string.");
                         break;
                     case "date":
-                        _StdOut.putText("Date displays the current date.");
+                        _StdOut.putText("date displays the current date.");
                         break;
                     case "whereami":
-                        _StdOut.putText("Whereami displays the current location.");
+                        _StdOut.putText("whereami displays the current location.");
                         break;
                     case "melon":
-                        _StdOut.putText("Melon will give you juicy puns to use with all of your friends!");
+                        _StdOut.putText("melon will give you juicy puns to use with all of your friends!");
                         break;
                     case "status":
-                        _StdOut.putText("Status changes the status display bar to whatever string your"
+                        _StdOut.putText("status changes the status display bar to whatever string your"
                                         + " heart desires.");
                         break;
                     case "load":
-                        _StdOut.putText("Load validates the user input program to ensure only hex digits"
+                        _StdOut.putText("load validates the user input program to ensure only hex digits"
                                         + " and spaces exist.");
                         break;
                     case "dropit":
-                        _StdOut.putText("Dropit can not be undone.. Please don't drop the melons."
+                        _StdOut.putText("dropit can not be undone.. Please don't drop the melons."
                                         + " and spaces exist.");
                         break;
                     case "run":
-                        _StdOut.putText("Run will run the current process loaded in memory.");
+                        _StdOut.putText("run will run the current process loaded in memory.");
                         break;
                     case "clearmem":
-                        _StdOut.putText("Clearmem will *cough* init *cough* clear all memory partitions.");
+                        _StdOut.putText("clearmem will *cough* init *cough* clear all memory partitions.");
                         break;
                     case "runall":
-                        _StdOut.putText("Runall will execute all programs in memory.");
+                        _StdOut.putText("runall will execute all programs in memory.");
                         break;
                     case "ps":
-                        _StdOut.putText("Ps will list all processes and their process IDs.");
+                        _StdOut.putText("ps will list all processes and their process IDs.");
                         break;
                     case "kill":
-                        _StdOut.putText("Kill <id> will terminate the corresponding process");
+                        _StdOut.putText("kill <id> will terminate the corresponding process");
                         break;
                     case "quantum":
-                        _StdOut.putText("Quantum <int> will change the round round scheduling time.");
+                        _StdOut.putText("quantum <int> will change the round round scheduling time.");
+                        break;
+                    case "ls":
+                        _StdOut.putText("ls lists all non-hidden files on disk.");
+                        break;
+                    case "format":
+                        _StdOut.putText("format initializes and clears the disk.");
+                        break;
+                    case "delete":
+                        _StdOut.putText("delete <filename> will delete the specified file from disk.");
+                        break;
+                    case "write":
+                        _StdOut.putText("write <filename> \"disk\" will write data to the specified file on disk.");
+                        break;
+                    case "read":
+                        _StdOut.putText("read <filename> will read the specified file on disk.");
+                        break;
+                    case "create":
+                        _StdOut.putText("create <filename> will create the specified file on disk.");
+                        break;
+                    case "getschedule":
+                        _StdOut.putText("getschedule will display the current CPU scheduling algorithm.");
+                        break;
+                    case "setschedule":
+                        _StdOut.putText("setschedule <algorithm> will set the CPU scheduling algorithm to fcfs (First come first serve), rr (Round robin), or priority.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -646,6 +711,52 @@ module TSOS {
                 }
             } else {
                 _StdOut.putText("Usage: quantum <int>  Please supply an integer.");
+            }
+        }
+
+        // List all non-hidden files on disk
+        public shellLs(): void {
+            // Check if files are not hidden, then print to console
+        }
+
+        // Format/Initialize all blocks on disk
+        public shellFormat(): void {
+
+        }
+
+        // Delete <filename> from disk
+        public shellDelete(args): void {
+
+        }
+
+        // Write <filename> "data" to disk
+        public shellWrite(args): void {
+
+        }
+
+        // Read <filename> from disk
+        public shellRead(args): void {
+
+        }
+
+        // Create <filename> on disk
+        public shellCreate(args): void {
+
+        }
+
+        // Get the current scheduling algorithm
+        public shellGetSchedule(): void {
+
+        }
+
+        // Set the scheduling algorithm to rr, fcfs, priority
+        public shellSetSchedule(args): void {
+            // Check if there is args and that they match one of the allowed algorithms
+            if (args.length > 0 && (args[0] == "rr" || args[0] == "fcfs" || args[0] == "priority")) {
+                _Scheduler.changeAlgorithm(args[0]);
+                _StdOut.putText("CPU Scheduling algorithm set to " + args[0]);
+            } else {
+                _StdOut.putText("Usage: setschedule <algorithm>  Please supply an algorithm (rr, fcfs, or priority).");
             }
         }
     }

@@ -103,9 +103,10 @@ module TSOS {
             } else if (keyCode === 222) {                       // '
                 this.basicKeyPress((keyCode - 183));
             } else if ((keyCode === 188)                    ||  // ,
-                      (keyCode === 190)                     ||  // .
-                      (isShifted && (keyCode === 187))      ||  // +
-                      (keyCode === 191)) {                      // /
+                       (keyCode === 189)                    ||  // -
+                       (keyCode === 190)                    ||  // .
+                       (isShifted && (keyCode === 187))     ||  // +
+                       (keyCode === 191)) {                     // /
                 this.basicKeyPress(keyCode - 144);
             } else if (keyCode === 187) {                       // =
                 this.basicKeyPress((keyCode - 126));

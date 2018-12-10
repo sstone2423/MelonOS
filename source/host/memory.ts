@@ -8,15 +8,15 @@
                     
             constructor() {
                 this.partitions = [
-                    {"base": 0, "limit": _PartitionSize, "isEmpty": true},
-                    {"base": 256, "limit": _PartitionSize, "isEmpty": true},
-                    {"base": 512, "limit": _PartitionSize, "isEmpty": true}
+                    {"base": 0, "limit": PARTITION_SIZE, "isEmpty": true},
+                    {"base": 256, "limit": PARTITION_SIZE, "isEmpty": true},
+                    {"base": 512, "limit": PARTITION_SIZE, "isEmpty": true}
                 ];
             }
 
             // Initialize the memory with 768 bytes
             public init(): void {
-                this.memoryArray = new Array<string>(_TotalMemorySize);
+                this.memoryArray = new Array<string>(TOTAL_MEMORY_SIZE);
                 // Initialize memory with 00's
                 for (let i = 0; i < this.memoryArray.length; i++) {
                     this.memoryArray[i] = "00";

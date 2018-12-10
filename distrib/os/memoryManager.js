@@ -14,7 +14,7 @@ var TSOS;
         // Create a process for the loaded program (called from shellLoad command)
         MemoryManager.prototype.createProcess = function (opCodes) {
             // Check to see if the program is greater than the partition size
-            if (opCodes.length > _PartitionSize) {
+            if (opCodes.length > PARTITION_SIZE) {
                 _StdOut.putText("Program load failed. Program is over 256 bytes in length.");
                 _StdOut.advanceLine();
             }

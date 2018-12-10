@@ -18,16 +18,21 @@ var CONSOLE_WRITE_IRQ = 3;
 var INVALID_OP_IRQ = 4;
 var BOUNDS_ERROR_IRQ = 5;
 var CONTEXT_SWITCH_IRQ = 6;
+var TOTAL_MEMORY_SIZE = 768; // 786 bytes, 3 segments of 256 bytes
+var PARTITION_SIZE = 256;
+var FILE_NAME_EXISTS = 0;
+var SUCCESS = 1;
+var DISK_IS_FULL = 2;
 // Global variables
 var _CPU; // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
 var _OSclock = 0; // Page 23.
 var _Mode = 0; // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
 var _Disk;
+var _DiskDriver;
+var _Utils;
 // Memory related global variables
 var _Memory;
 var _MemoryManager;
-var _TotalMemorySize = 768; // 786 bytes, 3 segments of 256 bytes
-var _PartitionSize = 256;
 // Process related global variables
 var _PCB;
 var _ProcessCount = 0;

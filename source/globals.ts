@@ -20,6 +20,11 @@ const CONSOLE_WRITE_IRQ: number = 3;
 const INVALID_OP_IRQ: number = 4;
 const BOUNDS_ERROR_IRQ: number = 5;
 const CONTEXT_SWITCH_IRQ: number = 6;
+const TOTAL_MEMORY_SIZE: number = 768; // 786 bytes, 3 segments of 256 bytes
+const PARTITION_SIZE: number = 256;
+const FILE_NAME_EXISTS: number = 0;
+const SUCCESS: number = 1;
+const DISK_IS_FULL: number = 2;
 
 // Global variables
 
@@ -27,12 +32,12 @@ let _CPU: TSOS.Cpu;  // Utilize TypeScript's type annotation system to ensure th
 let _OSclock: number = 0;  // Page 23.
 let _Mode: number = 0;     // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
 let _Disk: TSOS.Disk;
+let _DiskDriver: TSOS.DeviceDriverDisk;
+let _Utils: TSOS.Utils;
 
 // Memory related global variables
 let _Memory: TSOS.Memory;
 let _MemoryManager: TSOS.MemoryManager;
-const _TotalMemorySize = 768; // 786 bytes, 3 segments of 256 bytes
-const _PartitionSize = 256;
 
 // Process related global variables
 let _PCB: TSOS.ProcessControlBlock;

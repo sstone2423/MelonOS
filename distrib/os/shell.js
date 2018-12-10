@@ -114,7 +114,7 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellRead, "read", "<filename> - Read the specified file from disk.");
             this.commandList[this.commandList.length] = sc;
             // create <filename>
-            sc = new TSOS.ShellCommand(this.shellCreate, "create", "<filename> - Create a file fon disk.");
+            sc = new TSOS.ShellCommand(this.shellCreateFile, "create", "<filename> - Create a file fon disk.");
             this.commandList[this.commandList.length] = sc;
             // Display the initial prompt.
             this.putPrompt();
@@ -624,7 +624,28 @@ var TSOS;
         Shell.prototype.shellRead = function (args) {
         };
         // Create <filename> on disk
-        Shell.prototype.shellCreate = function (args) {
+        Shell.prototype.shellCreateFile = function (args) {
+            // Check if there is only 1 arg
+            if (args.length == 1) {
+                // Filenames must be 60 characters or less
+                if (args[0].length > 60) {
+                    _StdOut.putText("File name is too long. It must be 60 characters or less.");
+                }
+                // Return the status of the file creation
+                var status_1 = _DiskDriver.createFile(args[0]);
+                if (status_1 == SUCCESS) {
+                    _StdOut.putText("File successfully created: " + args[0]);
+                }
+                else if (status_1 == FILE_NAME_EXISTS) {
+                    _StdOut.putText("File name already exists.");
+                }
+                else if (status_1 == DISK_IS_FULL) {
+                    _StdOut.putText("File creation failure: No more space on disk.");
+                }
+            }
+            else {
+                _StdOut.putText("Usage: create <filename>  Please supply a filename.");
+            }
         };
         // Get the current scheduling algorithm
         Shell.prototype.shellGetSchedule = function () {

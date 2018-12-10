@@ -36,5 +36,17 @@ module TSOS {
             }
             return retVal;
         }
+
+        // Convert string to ASCII to hex
+        public stringToASCIItoHex(string: String) {
+            let hexArray = [];
+            // Look at each character's ASCII value and convert it to a hex string
+            for (let i = 0; i < string.length; i++){
+                let hexChar = string.charCodeAt(i).toString(16);
+                hexArray.push(hexChar);
+            }
+            // Returns an array of each character represented as hex
+            return hexArray;
+        }
     }
 }

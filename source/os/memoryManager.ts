@@ -22,7 +22,7 @@
         // Create a process for the loaded program (called from shellLoad command)
         public createProcess(opCodes): void {
             // Check to see if the program is greater than the partition size
-            if (opCodes.length > _PartitionSize) {
+            if (opCodes.length > PARTITION_SIZE) {
                 _StdOut.putText("Program load failed. Program is over 256 bytes in length.");
                 _StdOut.advanceLine();
             } else {

@@ -199,7 +199,7 @@ module TSOS {
             this.commandList[this.commandList.length] = sc;
 
             // create <filename>
-            sc = new ShellCommand(this.shellCreate,
+            sc = new ShellCommand(this.shellCreateFile,
                                   "create",
                                   "<filename> - Create a file fon disk.");
             this.commandList[this.commandList.length] = sc;
@@ -739,8 +739,27 @@ module TSOS {
         }
 
         // Create <filename> on disk
-        public shellCreate(args): void {
-
+        public shellCreateFile(args): void {
+            // Check if there is only 1 arg
+            if (args.length == 1) {
+                // Filenames must be 60 characters or less
+                if(args[0].length > 60){
+                    _StdOut.putText("File name is too long. It must be 60 characters or less.");
+                }
+                // Return the status of the file creation
+                let status = _DiskDriver.createFile(args[0]);
+                if (status == SUCCESS) {
+                    _StdOut.putText("File successfully created: " + args[0]);
+                } else if (status == FILE_NAME_EXISTS) {
+                    _StdOut.putText("File name already exists.");
+                }
+                else if (status == DISK_IS_FULL) {
+                    _StdOut.putText("File creation failure: No more space on disk.");
+                }
+            }
+            else {
+                _StdOut.putText("Usage: create <filename>  Please supply a filename.");
+            }
         }
 
         // Get the current scheduling algorithm

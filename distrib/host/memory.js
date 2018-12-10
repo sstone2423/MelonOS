@@ -4,14 +4,14 @@ var TSOS;
     var Memory = /** @class */ (function () {
         function Memory() {
             this.partitions = [
-                { "base": 0, "limit": _PartitionSize, "isEmpty": true },
-                { "base": 256, "limit": _PartitionSize, "isEmpty": true },
-                { "base": 512, "limit": _PartitionSize, "isEmpty": true }
+                { "base": 0, "limit": PARTITION_SIZE, "isEmpty": true },
+                { "base": 256, "limit": PARTITION_SIZE, "isEmpty": true },
+                { "base": 512, "limit": PARTITION_SIZE, "isEmpty": true }
             ];
         }
         // Initialize the memory with 768 bytes
         Memory.prototype.init = function () {
-            this.memoryArray = new Array(_TotalMemorySize);
+            this.memoryArray = new Array(TOTAL_MEMORY_SIZE);
             // Initialize memory with 00's
             for (var i = 0; i < this.memoryArray.length; i++) {
                 this.memoryArray[i] = "00";

@@ -20,7 +20,8 @@ var BOUNDS_ERROR_IRQ = 5;
 var CONTEXT_SWITCH_IRQ = 6;
 var TOTAL_MEMORY_SIZE = 768; // 786 bytes, 3 segments of 256 bytes
 var PARTITION_SIZE = 256;
-var FILE_NAME_EXISTS = 0;
+var FILENAME_EXISTS = 0;
+var FILENAME_NOT_EXISTS = 3;
 var SUCCESS = 1;
 var DISK_IS_FULL = 2;
 // Global variables

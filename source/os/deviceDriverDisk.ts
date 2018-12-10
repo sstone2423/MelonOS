@@ -26,8 +26,11 @@
         }
 
         // Creates a new file with specified filename
-        public createFile(filename: String) {
+        public createFile(filename: String): number {
             // Check for existing filename
+            if (this.checkForExistingFile(filename)) {
+                return FILENAME_EXISTS;
+            }
             
             // Look for first free block in directory data structure (first track)
             for (let sectorNum = 0; sectorNum < _Disk.totalSectors; sectorNum++) {
@@ -38,7 +41,7 @@
                     }
                     let tsbId = "0" + ":" + sectorNum + ":" + blockNum;
                     let dirBlock = JSON.parse(sessionStorage.getItem(tsbId));
-                    // If the block is available...
+                    // If the block is available
                     if (dirBlock.availableBit == "0") {
                         // Look for first free block in data structure to put the file
                         let dataBlockTSB = this.findFreeDataBlock();
@@ -148,5 +151,67 @@
             return block;
         }
 
+        // Delete a file with the specified filename
+        public deleteFile(filename: string): number {
+            // Look for the filename in the directory structure
+            let hexArray = _Utils.stringToASCIItoHex(filename);
+            // Look for first free block in directory data structure (first track)
+            for (let sectorNum = 0; sectorNum < _Disk.totalSectors; sectorNum++) {
+                for (let blockNum = 0; blockNum < _Disk.totalBlocks; blockNum++) {
+                    // If first block / MBR, continue to next iteration
+                    if (sectorNum == 0 && blockNum == 0) {
+                        continue;
+                    }
+                    let tsbId = "0" + ":" + sectorNum + ":" + blockNum;
+                    let dirBlock = JSON.parse(sessionStorage.getItem(tsbId));
+                    let matchingFileName = true;
+                    // Don't look in blocks not in use
+                    if (dirBlock.availableBit == "1") {
+                        for (let k = 4, j = 0; j < hexArray.length; k++, j++){
+                            if (hexArray[j] != dirBlock.data[k]) {
+                                matchingFileName = false;
+                            }
+                        }
+                        // If we reach the end of the dirBlock, return false
+                        if(dirBlock.data[hexArray.length + 6] != "00"){
+                            matchingFileName = false;
+                        }
+                        // If filename was found
+                        if (matchingFileName) {
+                            // Perform recursive delete given first TSB
+                            this.deleteData(dirBlock.pointer);
+                            // Update directory block
+                            dirBlock.availableBit = "0"
+                            // Keep the pointer for chkdsk
+                            // dirBlock.pointer = "0:0:0"; 
+                            // Set in storage
+                            sessionStorage.setItem(tsbId, JSON.stringify(dirBlock));
+                            // Update display
+                            Control.hostDisk();
+
+                            return SUCCESS;
+                        }
+                    }
+                }
+            }
+            return FILENAME_NOT_EXISTS;
+        }
+
+        // Recursively deletes from a given TSB
+        public deleteData(pointer_tsb): void {
+            // Block that belongs to the TSB
+            let ptrBlock = JSON.parse(sessionStorage.getItem(pointer_tsb)); 
+            if (ptrBlock.pointer != "0:0:0") {
+                // follow links
+                this.deleteData(ptrBlock.pointer);
+            }
+            // ptrBlock.pointer = "0:0:0";
+            // Set the block to available
+            ptrBlock.availableBit = "0";
+            // Update the item in sessionStorage
+            sessionStorage.setItem(pointer_tsb, JSON.stringify(ptrBlock));
+
+            return;
+        }
     }
 }

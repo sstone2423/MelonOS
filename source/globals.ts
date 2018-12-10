@@ -22,7 +22,8 @@ const BOUNDS_ERROR_IRQ: number = 5;
 const CONTEXT_SWITCH_IRQ: number = 6;
 const TOTAL_MEMORY_SIZE: number = 768; // 786 bytes, 3 segments of 256 bytes
 const PARTITION_SIZE: number = 256;
-const FILE_NAME_EXISTS: number = 0;
+const FILENAME_EXISTS: number = 0;
+const FILENAME_NOT_EXISTS: number = 3;
 const SUCCESS: number = 1;
 const DISK_IS_FULL: number = 2;
 

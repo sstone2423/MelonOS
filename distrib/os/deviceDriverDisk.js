@@ -39,6 +39,9 @@ var TSOS;
         // Creates a new file with specified filename
         DeviceDriverDisk.prototype.createFile = function (filename) {
             // Check for existing filename
+            if (this.checkForExistingFile(filename)) {
+                return FILENAME_EXISTS;
+            }
             // Look for first free block in directory data structure (first track)
             for (var sectorNum = 0; sectorNum < _Disk.totalSectors; sectorNum++) {
                 for (var blockNum = 0; blockNum < _Disk.totalBlocks; blockNum++) {
@@ -48,7 +51,7 @@ var TSOS;
                     }
                     var tsbId = "0" + ":" + sectorNum + ":" + blockNum;
                     var dirBlock = JSON.parse(sessionStorage.getItem(tsbId));
-                    // If the block is available...
+                    // If the block is available
                     if (dirBlock.availableBit == "0") {
                         // Look for first free block in data structure to put the file
                         var dataBlockTSB = this.findFreeDataBlock();
@@ -153,6 +156,65 @@ var TSOS;
                 block.data[i] = "00";
             }
             return block;
+        };
+        // Delete a file with the specified filename
+        DeviceDriverDisk.prototype.deleteFile = function (filename) {
+            // Look for the filename in the directory structure
+            var hexArray = _Utils.stringToASCIItoHex(filename);
+            // Look for first free block in directory data structure (first track)
+            for (var sectorNum = 0; sectorNum < _Disk.totalSectors; sectorNum++) {
+                for (var blockNum = 0; blockNum < _Disk.totalBlocks; blockNum++) {
+                    // If first block / MBR, continue to next iteration
+                    if (sectorNum == 0 && blockNum == 0) {
+                        continue;
+                    }
+                    var tsbId = "0" + ":" + sectorNum + ":" + blockNum;
+                    var dirBlock = JSON.parse(sessionStorage.getItem(tsbId));
+                    var matchingFileName = true;
+                    // Don't look in blocks not in use
+                    if (dirBlock.availableBit == "1") {
+                        for (var k = 4, j = 0; j < hexArray.length; k++, j++) {
+                            if (hexArray[j] != dirBlock.data[k]) {
+                                matchingFileName = false;
+                            }
+                        }
+                        // If we reach the end of the dirBlock, return false
+                        if (dirBlock.data[hexArray.length + 6] != "00") {
+                            matchingFileName = false;
+                        }
+                        // If filename was found
+                        if (matchingFileName) {
+                            // Perform recursive delete given first TSB
+                            this.deleteData(dirBlock.pointer);
+                            // Update directory block
+                            dirBlock.availableBit = "0";
+                            // Keep the pointer for chkdsk
+                            // dirBlock.pointer = "0:0:0"; 
+                            // Set in storage
+                            sessionStorage.setItem(tsbId, JSON.stringify(dirBlock));
+                            // Update display
+                            TSOS.Control.hostDisk();
+                            return SUCCESS;
+                        }
+                    }
+                }
+            }
+            return FILENAME_NOT_EXISTS;
+        };
+        // Recursively deletes from a given TSB
+        DeviceDriverDisk.prototype.deleteData = function (pointer_tsb) {
+            // Block that belongs to the TSB
+            var ptrBlock = JSON.parse(sessionStorage.getItem(pointer_tsb));
+            if (ptrBlock.pointer != "0:0:0") {
+                // follow links
+                this.deleteData(ptrBlock.pointer);
+            }
+            // ptrBlock.pointer = "0:0:0";
+            // Set the block to available
+            ptrBlock.availableBit = "0";
+            // Update the item in sessionStorage
+            sessionStorage.setItem(pointer_tsb, JSON.stringify(ptrBlock));
+            return;
         };
         return DeviceDriverDisk;
     }(TSOS.DeviceDriver));

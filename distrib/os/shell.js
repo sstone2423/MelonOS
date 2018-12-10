@@ -105,13 +105,13 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellFormat, "format", "- Initialize all blocks in all sectors in all tracks.");
             this.commandList[this.commandList.length] = sc;
             // delete <filename>
-            sc = new TSOS.ShellCommand(this.shellDelete, "delete", "<filename> - Delete the specified file from disk.");
+            sc = new TSOS.ShellCommand(this.shellDeleteFile, "delete", "<filename> - Delete the specified file from disk.");
             this.commandList[this.commandList.length] = sc;
             // write <filename> "data"
-            sc = new TSOS.ShellCommand(this.shellWrite, "write", "<filename> \"data\" - Write data to the specified file on disk.");
+            sc = new TSOS.ShellCommand(this.shellWriteFile, "write", "<filename> \"data\" - Write data to the specified file on disk.");
             this.commandList[this.commandList.length] = sc;
             // read <filename>
-            sc = new TSOS.ShellCommand(this.shellRead, "read", "<filename> - Read the specified file from disk.");
+            sc = new TSOS.ShellCommand(this.shellReadFile, "read", "<filename> - Read the specified file from disk.");
             this.commandList[this.commandList.length] = sc;
             // create <filename>
             sc = new TSOS.ShellCommand(this.shellCreateFile, "create", "<filename> - Create a file fon disk.");
@@ -615,13 +615,33 @@ var TSOS;
         Shell.prototype.shellFormat = function () {
         };
         // Delete <filename> from disk
-        Shell.prototype.shellDelete = function (args) {
+        Shell.prototype.shellDeleteFile = function (args) {
+            // Check if there is only 1 arg
+            if (args.length == 1) {
+                // Check if it is a swap file
+                if (args[0].includes("$")) {
+                    _StdOut.putText("Swap files cannot be deleted.");
+                    // Back out of the function
+                    return;
+                }
+                // Return the status of the file deletion
+                var status_1 = _DiskDriver.deleteFile(args[0]);
+                if (status_1 == SUCCESS) {
+                    _StdOut.putText("The file: " + args[0] + " has been successfully deleted.");
+                }
+                else if (status_1 == FILENAME_NOT_EXISTS) {
+                    _StdOut.putText("The file: " + args[0] + " does not exist.");
+                }
+            }
+            else {
+                _StdOut.putText("Usage: delete <filename>  Please supply a filename.");
+            }
         };
         // Write <filename> "data" to disk
-        Shell.prototype.shellWrite = function (args) {
+        Shell.prototype.shellWriteFile = function (args) {
         };
         // Read <filename> from disk
-        Shell.prototype.shellRead = function (args) {
+        Shell.prototype.shellReadFile = function (args) {
         };
         // Create <filename> on disk
         Shell.prototype.shellCreateFile = function (args) {
@@ -630,17 +650,19 @@ var TSOS;
                 // Filenames must be 60 characters or less
                 if (args[0].length > 60) {
                     _StdOut.putText("File name is too long. It must be 60 characters or less.");
+                    // Back out of the function
+                    return;
                 }
                 // Return the status of the file creation
-                var status_1 = _DiskDriver.createFile(args[0]);
-                if (status_1 == SUCCESS) {
+                var status_2 = _DiskDriver.createFile(args[0]);
+                if (status_2 == SUCCESS) {
                     _StdOut.putText("File successfully created: " + args[0]);
                 }
-                else if (status_1 == FILE_NAME_EXISTS) {
-                    _StdOut.putText("File name already exists.");
+                else if (status_2 == FILENAME_EXISTS) {
+                    _StdOut.putText("File name already exists. Please use another file name.");
                 }
-                else if (status_1 == DISK_IS_FULL) {
-                    _StdOut.putText("File creation failure: No more space on disk.");
+                else if (status_2 == DISK_IS_FULL) {
+                    _StdOut.putText("File creation failure: No more space on disk. Delete some?");
                 }
             }
             else {

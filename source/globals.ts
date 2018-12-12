@@ -11,6 +11,8 @@
 
 const APP_NAME: string    = "TSOS";   // 'cause Bob and I were at a loss for a better name.
 const APP_VERSION: string = "0.07";   // What did you expect?
+
+// CPU Constants
 const CPU_CLOCK_INTERVAL: number = 100;   // This is in ms (milliseconds) so 1000 = 1 second.
 const TIMER_IRQ: number = 0;  // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
                               // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
@@ -20,8 +22,10 @@ const CONSOLE_WRITE_IRQ: number = 3;
 const INVALID_OP_IRQ: number = 4;
 const BOUNDS_ERROR_IRQ: number = 5;
 const CONTEXT_SWITCH_IRQ: number = 6;
+// Memory Constants
 const TOTAL_MEMORY_SIZE: number = 768; // 786 bytes, 3 segments of 256 bytes
 const PARTITION_SIZE: number = 256;
+// Disk Constants
 const FILENAME_EXISTS: number = 0;
 const FILENAME_DOESNT_EXIST: number = 3;
 const SUCCESS: number = 1;
@@ -62,8 +66,8 @@ let _FontHeightMargin: number = 4;          // Additional space added to font si
 let _Trace: boolean = true;         // Default the OS trace to be on.
 let _Kernel: TSOS.Kernel;
 let _KernelInterruptQueue;
-let _KernelInputQueue: any = null;
-let _KernelBuffers: any[] = null;
+let _KernelInputQueue;
+let _KernelBuffers;
 let _SingleStep: boolean = false;   // Check if Single-step is enabled
 let _NextStep: boolean = false;     // Check if NextStep is enabled
 
@@ -81,11 +85,11 @@ let _SarcasticMode: boolean = false;
 
 // Global Device Driver Objects - page 12
 let _krnKeyboardDriver;
-let _hardwareClockID: number = null;
+let _hardwareClockID: number;
 
 // For testing (and enrichment)...
-let Glados: any = null;  // This is the function Glados() in glados.js on Labouseur.com.
-let _GLaDOS: any = null; // If the above is linked in, this is the instantiated instance of Glados.
+let Glados;  // This is the function Glados() in glados.js on Labouseur.com.
+let _GLaDOS; // If the above is linked in, this is the instantiated instance of Glados.
 
 let onDocumentLoad = () => {
     TSOS.Control.hostInit();

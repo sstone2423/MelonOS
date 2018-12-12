@@ -9,6 +9,7 @@
 // Global CONSTANTS (TypeScript 1.5 introduced const. Very cool.)
 var APP_NAME = "TSOS"; // 'cause Bob and I were at a loss for a better name.
 var APP_VERSION = "0.07"; // What did you expect?
+// CPU Constants
 var CPU_CLOCK_INTERVAL = 100; // This is in ms (milliseconds) so 1000 = 1 second.
 var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
@@ -18,8 +19,10 @@ var CONSOLE_WRITE_IRQ = 3;
 var INVALID_OP_IRQ = 4;
 var BOUNDS_ERROR_IRQ = 5;
 var CONTEXT_SWITCH_IRQ = 6;
+// Memory Constants
 var TOTAL_MEMORY_SIZE = 768; // 786 bytes, 3 segments of 256 bytes
 var PARTITION_SIZE = 256;
+// Disk Constants
 var FILENAME_EXISTS = 0;
 var FILENAME_DOESNT_EXIST = 3;
 var SUCCESS = 1;
@@ -54,8 +57,8 @@ var _FontHeightMargin = 4; // Additional space added to font size when advancing
 var _Trace = true; // Default the OS trace to be on.
 var _Kernel;
 var _KernelInterruptQueue;
-var _KernelInputQueue = null;
-var _KernelBuffers = null;
+var _KernelInputQueue;
+var _KernelBuffers;
 var _SingleStep = false; // Check if Single-step is enabled
 var _NextStep = false; // Check if NextStep is enabled
 // Standard input and output
@@ -69,10 +72,10 @@ var _Control;
 var _SarcasticMode = false;
 // Global Device Driver Objects - page 12
 var _krnKeyboardDriver;
-var _hardwareClockID = null;
+var _hardwareClockID;
 // For testing (and enrichment)...
-var Glados = null; // This is the function Glados() in glados.js on Labouseur.com.
-var _GLaDOS = null; // If the above is linked in, this is the instantiated instance of Glados.
+var Glados; // This is the function Glados() in glados.js on Labouseur.com.
+var _GLaDOS; // If the above is linked in, this is the instantiated instance of Glados.
 var onDocumentLoad = function () {
     TSOS.Control.hostInit();
 };

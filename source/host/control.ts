@@ -188,7 +188,7 @@ module TSOS {
         public static hostProcesses(): void {
             let table = (<HTMLTableElement>document.getElementById('tableProcesses'));
             // Initialize an array of PCBs
-            let displayQueue: Array<ProcessControlBlock> = [];
+            let displayQueue: Array<TSOS.ProcessControlBlock> = [];
             // For each PCB in resident queue, print out a new row for it
             for (let i = 0; i < _MemoryManager.residentQueue.getSize(); i++) {
                 let pcb = _MemoryManager.residentQueue.dequeue();
@@ -237,7 +237,7 @@ module TSOS {
         public static hostReady(): void {
             let table = (<HTMLTableElement>document.getElementById('tableReady'));
             // Initialize an array of PCBs
-            let displayQueue: Array<ProcessControlBlock> = [];
+            let displayQueue: Array<TSOS.ProcessControlBlock> = [];
             // For each PCB in ready queue, print out a new row for it
             for (let i = 0; i < _MemoryManager.readyQueue.getSize(); i++) {
                 let pcb = _MemoryManager.readyQueue.dequeue();

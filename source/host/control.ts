@@ -274,6 +274,8 @@ module TSOS {
         // Initialize memory display
         public static initMemoryDisplay(): void {
             let table = (<HTMLTableElement>document.getElementById('tableMemory'));
+            // Delete the initial dashes
+            table.deleteRow(0);
             // We assume each row will hold 8 memory values
             for (let i = 0; i < _Memory.memoryArray.length/8; i++){
                 let row = table.insertRow(i);
@@ -362,13 +364,7 @@ module TSOS {
         // This will update the disk display with contents of session storage
         public static hostDisk(): void {
             let table = (<HTMLTableElement>document.getElementById('tableDisk'));
-            // Remove all rows
-            let rows = table.rows.length;
-            for (let i = 0; i < rows; i++) {
-                table.deleteRow(0);
-            }
-            let rowNum = 0;
-            // firefox sucks and doesn't keep session storage in order
+            let rowNum = 1;
             // For each row, insert the TSB, available bit, pointer, and data into separate cells
             for (let trackNum = 0; trackNum < _Disk.totalTracks; trackNum++) {
                 for (let sectorNum = 0; sectorNum < _Disk.totalSectors; sectorNum++) {
@@ -377,20 +373,15 @@ module TSOS {
                         let tsbID = trackNum + ":" + sectorNum + ":" + blockNum;
                         let row = table.insertRow(rowNum);
                         rowNum++;
-                        row.style.backgroundColor = "white";
                         let tsb = row.insertCell(0);
                         tsb.innerHTML = tsbID;
-                        tsb.style.color = "lightcoral";
                         let availableBit = row.insertCell(1);
                         availableBit.innerHTML = JSON.parse(sessionStorage.getItem(tsbID)).availableBit;
-                        availableBit.style.color = "lightgreen";
                         let pointer = row.insertCell(2);
                         let pointerVal = JSON.parse(sessionStorage.getItem(tsbID)).pointer;
                         pointer.innerHTML = pointerVal;
-                        pointer.style.color = "lightgray";
                         let data = row.insertCell(3);
                         data.innerHTML = JSON.parse(sessionStorage.getItem(tsbID)).data.join("").toString();
-                        data.style.color = "lightblue";
                     }
                 }
             }

@@ -47,7 +47,7 @@ var TSOS;
                 _MemoryManager.executeProcess();
             }
             else {
-                console.log("stop fucking with me");
+                return;
             }
         };
         Scheduler.prototype.findHighestPriority = function () {

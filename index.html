@@ -38,18 +38,18 @@
         <!-- Other Routines -->
         <script type="text/javascript" src="distrib/utils.js"></script>
         <!-- Uncomment the line below to enable GLaDOS testing. -->
-        <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip0.js"></script>
+        <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip4.js"></script>
 </head>
 <body onload="onDocumentLoad()">
         <div id="divMain" class="container-fluid">
                 <!--Top row with buttons, status, date/time, and logo-->
                 <div class="row">
                         <!--Buttons, status, date/time column-->
-                        <div class="col-sm">
+                        <div class="col-sm-4">
                                 <!--Buttons row-->
                                 <div class="row">
                                         <div class="col-sm">
-                                                <div class="btn-group">
+                                                <div class="btn-group" style="margin-top: 1%;">
                                                         <input type="button"
                                                                 id = "btnStartOS"
                                                                 name="brnStartOS"
@@ -96,21 +96,49 @@
                                 <!--Status/date/time Row-->
                                 <div class="row">
                                         <div class="col-sm">
-                                                <ul class="nav ml-auto">
-                                                        <li class="nav-item">
-                                                                <a class="nav-link" id="status">Status: I love melons</a>
-                                                        </li>
-                                                        <li class="nav-item">
-                                                                <a class="nav-link" id="currentDate"></a>
-                                                        </li>
-                                                </ul>
+                                                <div class="card" style="width: 23.7rem; margin-top: 1%; margin-bottom: 2%;">
+                                                        <ul class="list-group list-group-flush">
+                                                                <li id="status" class="list-group-item">Status: I love melons </li>
+                                                                <li id="currentDate" class="list-group-item">Current Date: ..</li>                                                        </ul>
+                                                </div>
                                         </div>
                                 </div>
                         </div>
-                        <!--Melon logo-->
-                        <div class="col-sm">
-                                <div class="mx-auto">
+                        <!--Melon logo column-->
+                        <div class="col-sm" style="margin-top: 1%;">
+                                <div class="text-center">
                                         <img id ="melonImage" src="melonOS.gif" alt="MelonOS" height="110" width="350"/>
+                                </div>
+                        </div>
+                        <!--CPU Column-->
+                        <div class="col-sm">
+                                <div id="divCPU" style="margin-left: 5%;"">
+                                        <label>
+                                        <span class="badge badge-success" style="margin-top: 3%; padding: 2%;">CPU</span>
+                                        <br>
+                                                <table id="tableCPU" class="table table-striped">
+                                                        <thead>
+                                                                <tr>
+                                                                        <td>PC</td>
+                                                                        <td>IR</td>
+                                                                        <td>Acc</td>
+                                                                        <td>X</td>
+                                                                        <td>Y</td>
+                                                                        <td>ZF</td>
+                                                                </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                                <tr>
+                                                                        <td>-</td>
+                                                                        <td>-</td>
+                                                                        <td>-</td>
+                                                                        <td>-</td>
+                                                                        <td>-</td>
+                                                                        <td>-</td>
+                                                                </tr>
+                                                        </tbody>
+                                                </table>
+                                        </label>
                                 </div>
                         </div>
                 </div>
@@ -121,25 +149,25 @@
                                 <div class="col-sm">
                                         <div id="divLog">
                                                 <label>
-                                                        Host Log
+                                                        <span class="badge badge-success" style="margin-top: 3%; padding: 2%;">Host Log</span>
                                                         <br>
                                                         <textarea name="taHostLog"
                                                                 class="form-control"
                                                                 id="taHostLog"
                                                                 rows="10"
-                                                                cols="35"
+                                                                cols="45"
                                                         ></textarea>
                                                 </label>
                                         </div>
                                         <div id="divUserProgramInput">
                                                 <label>
-                                                        User Program Input
+                                                        <span class="badge badge-success" style="margin-top: 3%; padding: 2%;">User Program Input</span>
                                                         <br>
                                                         <textarea name="taProgramInput"
                                                                 class="form-control"
                                                                 id="taProgramInput"
-                                                                rows="5"
-                                                                cols="35"
+                                                                rows="4"
+                                                                cols="45"
                                                         >A9 03 8D 41 00 A9 01 8D 40 00 AC 40 00 A2 01 FF EE 40 00 AE 40 00 EC 41 00 D0 EF A9 44 8D 42 00 A9 4F 8D 43 00 A9 4E 8D 44 00 A9 45 8D 45 00 A9 00 8D 46 00 A2 02 A0 42 FF 00</textarea>
                                                 </label>
                                         </div>
@@ -150,141 +178,147 @@
                                                 <canvas id="display" width="530px" height="5000px" tabindex="3"></canvas>
                                         </div>
                                 </div>
-                                <!--Memory column-->
+                                <!--Memory, Resident, Ready queues column-->
                                 <div class="col-sm">
-                                        <div id="divMemory">
-                                                <label>
-                                                        Memory
-                                                        <br>
-                                                        <table id="tableMemory" class="table table-striped">
-                                                                <tbody></tbody>
-                                                        </table>
-                                                </label>
+                                        <!--Resident Queue row-->
+                                        <div class="row">
+                                                <div class="col-sm">
+                                                        <div id="divProcess">
+                                                                <label>
+                                                                        <span class="badge badge-success" style="margin-top: 3%; padding: 2%; ">Resident Queue</span>
+                                                                        <br>
+                                                                        <table id="tableProcesses" class="table table-striped" style="height: 125px; overflow: scroll; display: block;">
+                                                                                <thead>
+                                                                                        <tr>
+                                                                                                <td>PID</td>
+                                                                                                <td>PC</td>
+                                                                                                <td>IR</td>
+                                                                                                <td>ACC</td>
+                                                                                                <td>X</td>
+                                                                                                <td>Y</td>
+                                                                                                <td>Z</td>
+                                                                                                <td>State</td>
+                                                                                                <td>Priority</td>
+                                                                                        </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                        <tr>
+                                                                                                <td>-</td>
+                                                                                                <td>-</td>
+                                                                                                <td>-</td>
+                                                                                                <td>-</td>
+                                                                                                <td>-</td>
+                                                                                                <td>-</td>
+                                                                                                <td>-</td>
+                                                                                                <td>-</td>
+                                                                                                <td>-</td>
+                                                                                        </tr>
+                                                                                </tbody>
+                                                                        </table>
+                                                                </label>
+                                                        </div>
+                                                </div>
                                         </div>
+                                         <!--Ready Queue row-->
+                                        <div class="row">
+                                                <div class="col-sm">
+                                                        <div id="divReady">
+                                                                <label>
+                                                                        <span class="badge badge-success" style="margin-top: 3%; padding: 2%;">Ready Queue</span>
+                                                                        <br>
+                                                                        <table id="tableReady" class="table table-striped" style="height: 125px; overflow: scroll; display: block;">
+                                                                                <thead>
+                                                                                        <tr>
+                                                                                                <td>PID</td>
+                                                                                                <td>PC</td>
+                                                                                                <td>IR</td>
+                                                                                                <td>ACC</td>
+                                                                                                <td>X</td>
+                                                                                                <td>Y</td>
+                                                                                                <td>Z</td>
+                                                                                                <td>State</td>
+                                                                                                <td>Priority</td>
+                                                                                        </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                        <tr>
+                                                                                                <td>-</td>
+                                                                                                <td>-</td>
+                                                                                                <td>-</td>
+                                                                                                <td>-</td>
+                                                                                                <td>-</td>
+                                                                                                <td>-</td>
+                                                                                                <td>-</td>
+                                                                                                <td>-</td>
+                                                                                                <td>-</td>
+                                                                                        </tr>
+                                                                                </tbody>
+                                                                        </table>
+                                                                </label>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                        <!--Memory row-->
+                                        <div class="row">
+                                                <div class="col-sm">
+                                                        <div id="divMemory">
+                                                                <label>
+                                                                        <span class="badge badge-success" style="margin-top: 3%; padding: 2%;">Memory</span>
+                                                                        <br>
+                                                                        <table id="tableMemory" 
+                                                                        class="table table-striped"
+                                                                        style="height: 125px; overflow: scroll; display: block;">
+                                                                        <tbody>
+                                                                                <tr>
+                                                                                        <td>-x--</td>
+                                                                                        <td>--</td>
+                                                                                        <td>--</td>
+                                                                                        <td>--</td>
+                                                                                        <td>--</td>
+                                                                                        <td>--</td>
+                                                                                        <td>--</td>
+                                                                                        <td>--</td>
+                                                                                        <td>--</td>
+                                                                                </tr>
+                                                                        </tbody>
+                                                                        </table>
+                                                                </label>
+                                                        </div>
+                                                </div>
+                                        </div>        
                                 </div>
                         </div>
                         <!--2nd row for disk-->
                         <div class="row">
                                 <div class="col-sm">
-                                        <div id="divDisk">
-						<label class="center-align">
-							<div class="label-header">Disk</div>
+                                        <div id="divDisk" class="text-center">
+						<label>
+                                                        <span class="badge badge-success" style="float:left; padding: .5%;">HDD</span>
+                                                        <br>
 							<table name="tableDisk"
 							        id="tableDisk"
-								bgcolor="white"
-								style="color: black; height: 250px; overflow: scroll; display: block; width: 100%;"
-								class="table table-bordered table-striped table-sm">
+								style="height: 250px; overflow: scroll; display: block;"
+                                                                class="table table-striped">
+                                                                <thead>
+                                                                        <tr>
+                                                                                <td>TSB</td>
+                                                                                <td>Available Bit</td>
+                                                                                <td>Pointer</td>
+                                                                                <td>Data</td>
+                                                                        </tr>
+                                                                        
+                                                                </thead>
+                                                                <tbody>
+                                                                        <tr>
+                                                                                <td>-:-:-</td>
+                                                                                <td>-</td>
+                                                                                <td>-:-:-</td>
+                                                                                <td>------------------------------------------------------------------------------------------------------------------------</td>
+                                                                        </tr>
+                                                                </tbody>
 							</table>
 						</label>
 					</div>
-                                </div>
-                        </div>
-                        <!--Last row for CPU, Resident Queue, Ready Queue-->
-                        <div class="row">
-                                <!--CPU column-->
-                                <div class="col-sm">
-                                        <div id="divCPU">
-                                                <label>
-                                                        CPU
-                                                        <br>
-                                                        <table id="tableCPU" class="table table-striped">
-                                                                <thead>
-                                                                        <tr>
-                                                                                <td>PC</td>
-                                                                                <td>IR</td>
-                                                                                <td>Acc</td>
-                                                                                <td>X</td>
-                                                                                <td>Y</td>
-                                                                                <td>ZF</td>
-                                                                        </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                        <tr>
-                                                                                <td>-</td>
-                                                                                <td>-</td>
-                                                                                <td>-</td>
-                                                                                <td>-</td>
-                                                                                <td>-</td>
-                                                                                <td>-</td>
-                                                                        </tr>
-                                                                </tbody>
-                                                        </table>
-                                                </label>
-                                        </div>
-                                </div>
-                                <!--Resident queue column-->
-                                <div class="col-sm">
-                                        <div id="divProcess">
-                                                <label>
-                                                        Resident Queue
-                                                        <br>
-                                                        <table id="tableProcesses" class="table table-striped">
-                                                                <thead>
-                                                                        <tr>
-                                                                                <td>PID</td>
-                                                                                <td>PC</td>
-                                                                                <td>IR</td>
-                                                                                <td>ACC</td>
-                                                                                <td>X</td>
-                                                                                <td>Y</td>
-                                                                                <td>Z</td>
-                                                                                <td>State</td>
-                                                                                <td>Priority</td>
-                                                                        </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                        <tr>
-                                                                                <td>-</td>
-                                                                                <td>-</td>
-                                                                                <td>-</td>
-                                                                                <td>-</td>
-                                                                                <td>-</td>
-                                                                                <td>-</td>
-                                                                                <td>-</td>
-                                                                                <td>-</td>
-                                                                                <td>-</td>
-                                                                        </tr>
-                                                                </tbody>
-                                                        </table>
-                                                </label>
-                                        </div>
-                                </div>
-                                <!--Ready queue column-->
-                                <div class="col-sm">
-                                        <div id="divReady">
-                                                <label>
-                                                        Ready Queue
-                                                        <br>
-                                                        <table id="tableReady" class="table table-striped">
-                                                                <thead>
-                                                                        <tr>
-                                                                                <td>PID</td>
-                                                                                <td>PC</td>
-                                                                                <td>IR</td>
-                                                                                <td>ACC</td>
-                                                                                <td>X</td>
-                                                                                <td>Y</td>
-                                                                                <td>Z</td>
-                                                                                <td>State</td>
-                                                                                <td>Priority</td>
-                                                                        </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                        <tr>
-                                                                                <td>-</td>
-                                                                                <td>-</td>
-                                                                                <td>-</td>
-                                                                                <td>-</td>
-                                                                                <td>-</td>
-                                                                                <td>-</td>
-                                                                                <td>-</td>
-                                                                                <td>-</td>
-                                                                                <td>-</td>
-                                                                        </tr>
-                                                                </tbody>
-                                                        </table>
-                                                </label>
-                                        </div>
                                 </div>
                         </div>
                 </div>

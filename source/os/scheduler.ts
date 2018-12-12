@@ -54,7 +54,7 @@ module TSOS {
                 // Put the next PCB into runningProcess
                 _MemoryManager.executeProcess();
             } else {
-                console.log("stop fucking with me");
+                return;
             }
         }
 

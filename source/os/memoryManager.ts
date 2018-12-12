@@ -142,8 +142,6 @@
             _StdOut.putText("Turnaround time: " + this.runningProcess.turnAroundTime + " cycles.");
             _StdOut.advanceLine();
             _StdOut.putText("Wait time: " + this.runningProcess.waitTime + " cycles.");
-            _StdOut.advanceLine();
-            _OsShell.putPrompt();
             // Reset the runningProcess to null
             this.runningProcess = null;
         }

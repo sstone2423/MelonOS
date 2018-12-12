@@ -173,8 +173,6 @@ var TSOS;
             switch (irq) {
                 case TIMER_IRQ:
                     this.krnTimerISR(); // Kernel built-in routine for timers (not the clock).
-                    _StdOut.putText("Time's up!");
-                    _StdOut.advanceLine();
                     break;
                 case KEYBOARD_IRQ:
                     _krnKeyboardDriver.isr(params); // Kernel mode device driver

@@ -273,7 +273,7 @@ var TSOS;
             return true;
         };
         // Returns an array of filenames currently on disk
-        DeviceDriverDisk.prototype.ls = function () {
+        DeviceDriverDisk.prototype.listFiles = function () {
             var filenames = [];
             // Look for first free block in directory data structure (first track)
             for (var sectorNum = 0; sectorNum < _Disk.totalSectors; sectorNum++) {
@@ -289,7 +289,7 @@ var TSOS;
                         var size = this.getTsbSize(dirBlock.pointer);
                         var info = {
                             data: dirBlock.data,
-                            size: size + "bytes"
+                            size: size + " bytes"
                         };
                         filenames.push(info);
                     }
@@ -299,18 +299,18 @@ var TSOS;
             for (var i = 0; i < filenames.length; i++) {
                 var dataPtr = 4;
                 // Filename
-                var res = [];
+                var info = [];
                 while (true) {
                     if (filenames[i]['data'][dataPtr] != "00") {
                         // Push each character into array
-                        res.push(String.fromCharCode(parseInt(filenames[i]['data'][dataPtr], 16)));
+                        info.push(String.fromCharCode(parseInt(filenames[i]['data'][dataPtr], 16)));
                         dataPtr++;
                     }
                     else {
                         break;
                     }
                 }
-                filenames[i]['name'] = res.join("");
+                filenames[i]['name'] = info.join("");
                 // Parse out the date
                 filenames[i]['month'] = parseInt(filenames[i]['data'][0], 16);
                 filenames[i]['day'] = parseInt(filenames[i]['data'][1], 16);
@@ -322,37 +322,37 @@ var TSOS;
         // Read a file from disk
         DeviceDriverDisk.prototype.readFile = function (filename) {
             var check = this.checkForExistingFile(filename);
-            var output;
+            var info;
             // If name is found
             if (check.matchingFileName) {
                 var dirBlock = JSON.parse(sessionStorage.getItem(check.tsbId));
                 // Perform a recursive read
                 var tsb = dirBlock.pointer;
                 var data = this.readData(tsb);
-                output = {
+                info = {
                     "status": SUCCESS,
                     "data": data
                 };
                 // Return success and data
-                return output;
+                return info;
             }
             else {
-                output = {
+                info = {
                     "status": FILENAME_DOESNT_EXIST
                 };
                 // Return failure
-                return output;
+                return info;
             }
         };
         DeviceDriverDisk.prototype.readData = function (tsb) {
             var dataBlock = JSON.parse(sessionStorage.getItem(tsb));
             var dataPtr = 0;
             // Hex array of data
-            var res = [];
+            var data = [];
             var end = false;
+            // Read until we reach end of the data block
             while (!end) {
-                // Read until we reach end of the data block
-                res.push(dataBlock.data[dataPtr]);
+                data.push(dataBlock.data[dataPtr]);
                 dataPtr++;
                 if (dataPtr == _Disk.dataSize) {
                     // Go to next TSB if there is a pointer to it.
@@ -365,7 +365,7 @@ var TSOS;
                     }
                 }
             }
-            return res;
+            return data;
         };
         // Write to a file on disk
         DeviceDriverDisk.prototype.writeFile = function (filename, data) {

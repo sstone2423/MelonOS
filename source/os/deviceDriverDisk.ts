@@ -271,7 +271,7 @@
         }
 
         // Returns an array of filenames currently on disk
-        public ls(): Array<String> {
+        public listFiles(): Array<String> {
             let filenames = [];
             // Look for first free block in directory data structure (first track)
             for (let sectorNum = 0; sectorNum < _Disk.totalSectors; sectorNum++) {
@@ -288,7 +288,7 @@
                         let size = this.getTsbSize(dirBlock.pointer);
                         let info = {
                             data: dirBlock.data,
-                            size: size + "bytes"
+                            size: size + " bytes"
                         }
                         filenames.push(info);
                     }
@@ -298,17 +298,17 @@
             for (let i = 0; i < filenames.length; i++) {
                 let dataPtr = 4;
                 // Filename
-                let res = [];
+                let info = [];
                 while (true) {
                     if (filenames[i]['data'][dataPtr] != "00") {
                         // Push each character into array
-                        res.push(String.fromCharCode(parseInt(filenames[i]['data'][dataPtr], 16)));
+                        info.push(String.fromCharCode(parseInt(filenames[i]['data'][dataPtr], 16)));
                         dataPtr++; 
                     } else {
                         break;
                     }
                 }
-                filenames[i]['name'] = res.join("");
+                filenames[i]['name'] = info.join("");
                 // Parse out the date
                 filenames[i]['month'] = parseInt(filenames[i]['data'][0], 16);
                 filenames[i]['day'] = parseInt(filenames[i]['data'][1], 16);
@@ -321,37 +321,37 @@
         // Read a file from disk
         public readFile(filename: String) {
             let check = this.checkForExistingFile(filename);
-            let output;
+            let info;
             // If name is found
             if (check.matchingFileName) {
                 let dirBlock = JSON.parse(sessionStorage.getItem(check.tsbId));
                 // Perform a recursive read
                 let tsb = dirBlock.pointer;
                 let data = this.readData(tsb);
-                output = {
+                info = {
                     "status": SUCCESS,
                     "data" : data
                 };
                 // Return success and data
-                return output;
+                return info;
             } else {
-                output = {
+                info = {
                     "status": FILENAME_DOESNT_EXIST
                 }
                 // Return failure
-                return output;
+                return info;
             }
         }
 
         public readData(tsb: string) {
             let dataBlock = JSON.parse(sessionStorage.getItem(tsb));
-            let dataPtr = 0;
+            let dataPtr: number = 0;
             // Hex array of data
-            let res = [];
+            let data = [];
             let end: boolean = false;
+            // Read until we reach end of the data block
             while (!end) {
-                // Read until we reach end of the data block
-                res.push(dataBlock.data[dataPtr]);
+                data.push(dataBlock.data[dataPtr]);
                 dataPtr++; 
                 if (dataPtr == _Disk.dataSize) {
                     // Go to next TSB if there is a pointer to it.
@@ -364,7 +364,7 @@
                 }
             }
 
-            return res;
+            return data;
         }
 
         // Write to a file on disk

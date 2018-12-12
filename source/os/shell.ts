@@ -702,44 +702,67 @@ module TSOS {
 
         // List all non-hidden files on disk
         public shellLs(args): void {
+            // If they use -l, show all files including hidden
             if (args.length == 1 && args[0] == "-l") {
                 // Get the list of files
-                let filenames = _DiskDriver.ls();
+                let filenames = _DiskDriver.listFiles();
                 // Check if there is any files
                 if (filenames.length > 0) {
                     _StdOut.putText("Files in the filesystem:");
                     _StdOut.advanceLine();
+                    // Count swaps to see if there is no other files except for swaps
+                    let numOfSwaps = 0;
                     for (let f of filenames) {
                         // Don't show swap files
                         if (f['name'].includes("$SWAP")) {
+                            numOfSwaps++;
                             continue;
                         }
-                        _StdOut.putText(f['name'] + " - creation date: " + f['month'] + "/" + f['day'] + "/" + f['year'] + ". size: " + f['size']);
+                        _StdOut.putText(f['name'] + " - Date Created: " + f['month'] + "/" + f['day'] + "/" + f['year'] + ", Size: " + f['size']);
                         _StdOut.advanceLine();
                     }
+                    // Let them know there's only swaps
+                    if (numOfSwaps == filenames.length) {
+                        _StdOut.putText("There are only swap files in the filesystem.");
+                    }
+                // Let them know theres no files
                 } else {
                     _StdOut.putText("There are no files in the filesystem.");
                 }
             // Only display files that are not hidden and not swapped
             } else if (args.length == 0) {
                 // Get the list of files
-                let filenames = _DiskDriver.ls();
+                let filenames = _DiskDriver.listFiles();
                 // Check if there is any files
                 if (filenames.length > 0) {
+                    _StdOut.putText("Files in the filesystem:");
+                    _StdOut.advanceLine();
+                    // Counter swaps and hidden files to see if theyre the only files on disk
+                    let numOfOtherFiles: number = 0;
                     for (let f of filenames) {
-                        // Don't show swap files
+                        // Don't show swap files and count
                         if (f['name'].includes("$SWAP")) {
+                            numOfOtherFiles++
                             continue;
-                        }
-                        // Don't show hidden files
-                        if (f['name'].charAt(0) != ".") {
+                        // Show unhidden files
+                        } else if (f['name'].charAt(0) != ".") {
                             _StdOut.putText(f['name']);
                             _StdOut.advanceLine();
+                        // Count hidden files
+                        } else {
+                            numOfOtherFiles++;
+                            continue;
                         }
                     }
+                    // Let them know theres only 'other' files
+                    if (numOfOtherFiles == filenames.length) {
+                        _StdOut.putText("There are only swap/hidden files in the filesystem.");
+                    }
+                // Let them know theres no files
                 } else {
                     _StdOut.putText("There are no files in the filesystem.");
                 }
+            // Try again!
             } else {
                 _StdOut.putText("Usage: ls [-l]");
             }
@@ -834,9 +857,9 @@ module TSOS {
                 }
                 let status = _DiskDriver.writeFile(args[0], string);
                 if (status == SUCCESS) {
-                    _StdOut.putText("The file: " + args[0] + " has been successfully written to.");
+                    _StdOut.putText("The file " + args[0] + " has been successfully written to.");
                 } else if (status == FILENAME_DOESNT_EXIST) {
-                    _StdOut.putText("The file: " + args[0] + " does not exist.");
+                    _StdOut.putText("The file " + args[0] + " does not exist.");
                 } else if (status == DISK_IS_FULL) {
                     _StdOut.putText("Unable to write to the file: " + args[0] + ". Not enough disk space to write.");
                 }

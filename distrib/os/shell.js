@@ -1,6 +1,7 @@
 ///<reference path="../globals.ts" />
 ///<reference path="shellCommand.ts" />
 ///<reference path="userCommand.ts" />
+///<reference path="../utils.ts" />
 /* ------------
    Shell.ts
 
@@ -114,6 +115,9 @@ var TSOS;
             // create <filename>
             sc = new TSOS.ShellCommand(this.shellCreateFile, "create", "<filename> - Create a file fon disk.");
             this.commandList[this.commandList.length] = sc;
+            // create <filename>
+            sc = new TSOS.ShellCommand(this.shellChkDsk, "chkdsk", "- Recovers deleted files. Hopefully?");
+            this.commandList[this.commandList.length] = sc;
             // Display the initial prompt.
             this.putPrompt();
         };
@@ -153,7 +157,7 @@ var TSOS;
             }
             else {
                 // It's not found, so check for curses and apologies before declaring the command invalid.
-                if (this.curses.indexOf("[" + _Utils.rot13(cmd) + "]") >= 0) { // Check for curses.
+                if (this.curses.indexOf("[" + TSOS.Utils.rot13(cmd) + "]") >= 0) { // Check for curses.
                     this.execute(this.shellCurse);
                 }
                 else if (this.apologies.indexOf("[" + cmd + "]") >= 0) { // Check for apologies.
@@ -180,7 +184,7 @@ var TSOS;
         Shell.prototype.parseInput = function (buffer) {
             var retVal = new TSOS.UserCommand();
             // 1. Remove leading and trailing spaces.
-            buffer = _Utils.trim(buffer);
+            buffer = TSOS.Utils.trim(buffer);
             // 2. Lower-case it.
             buffer = buffer.toLowerCase();
             // 3. Separate on spaces so we can determine the command and command-line args, if any.
@@ -188,12 +192,12 @@ var TSOS;
             // 4. Take the first (zeroth) element and use that as the command.
             var cmd = tempList.shift(); // Yes, you can do that to an array in JavaScript.  See the Queue class.
             // 4.1 Remove any left-over spaces.
-            cmd = _Utils.trim(cmd);
+            cmd = TSOS.Utils.trim(cmd);
             // 4.2 Record it in the return value.
             retVal.command = cmd;
             // 5. Now create the args array from what's left.
             for (var i in tempList) {
-                var arg = _Utils.trim(tempList[i]);
+                var arg = TSOS.Utils.trim(tempList[i]);
                 if (arg !== "") {
                     retVal.args[retVal.args.length] = tempList[i];
                 }
@@ -350,6 +354,9 @@ var TSOS;
                     case "setschedule":
                         _StdOut.putText("setschedule <algorithm> will set the CPU scheduling algorithm to fcfs (First come first serve), rr (Round robin), or priority.");
                         break;
+                    case "chkdsk":
+                        _StdOut.putText("chkdsk recovers all deleted files.. Hopefully.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -386,7 +393,7 @@ var TSOS;
         Shell.prototype.shellRot13 = function (args) {
             if (args.length > 0) {
                 // Requires Utils.ts for rot13() function.
-                _StdOut.putText(args.join(" ") + " = '" + _Utils.rot13(args.join(" ")) + "'");
+                _StdOut.putText(args.join(" ") + " = '" + TSOS.Utils.rot13(args.join(" ")) + "'");
             }
             else {
                 _StdOut.putText("Usage: rot13 <string>  Please supply a string.");
@@ -447,7 +454,7 @@ var TSOS;
                 _StdOut.putText("Usage: status <string> Please supply a string.");
             }
         };
-        Shell.prototype.shellLoad = function () {
+        Shell.prototype.shellLoad = function (args) {
             // Get value inside program input (the program)
             var userInputProgram = document.getElementById("taProgramInput").value;
             // Create regex pattern
@@ -456,8 +463,14 @@ var TSOS;
             if (hexRegex.test(userInputProgram)) {
                 // Split the program into 2-bit hex
                 var splitProgram = userInputProgram.split(" ");
-                // Create a process using the process manager
-                _MemoryManager.createProcess(splitProgram);
+                // If priority arg is a number
+                if (args.length == 1 && args[0].match(/^[0-9]\d*$/)) {
+                    // Create a process using the process manager
+                    _MemoryManager.createProcess(splitProgram, args);
+                }
+                else {
+                    _StdOut.putText("Usage: load <priority>  Please supply a valid priority number (0 is highest, 1 is default).");
+                }
             }
             else {
                 _StdOut.putText("Program must only contain hexadecimal values (A-F, a-f, 0-9) or spaces.");
@@ -503,33 +516,7 @@ var TSOS;
         };
         // Clear all memory partitions
         Shell.prototype.shellClearmem = function () {
-            // Check if CPU is executing
-            if (!_CPU.isExecuting) {
-                var readyQueueLength = _MemoryManager.readyQueue.getSize();
-                // Check ready queue first since these will be executing shortly
-                if (readyQueueLength > 0) {
-                    for (var i = 0; i < readyQueueLength; i++) {
-                        // Kill the process
-                        var pcb = _MemoryManager.readyQueue.dequeue();
-                        // Clear the memory partition
-                        _Memory.clearPartition(pcb.partition);
-                        _StdOut.putText("Clearing Process ID: " + pcb.pId + " from partition: " + pcb.partition);
-                        _StdOut.advanceLine();
-                    }
-                }
-                // Check wait queue second
-                var waitQueueLength = _MemoryManager.residentQueue.getSize();
-                if (waitQueueLength > 0) {
-                    for (var i = 0; i < waitQueueLength; i++) {
-                        // Kill the process
-                        var pcb = _MemoryManager.residentQueue.dequeue();
-                        // Clear the memory partition
-                        _Memory.clearPartition(pcb.partition);
-                        _StdOut.putText("Clearing Process ID: " + pcb.pId + " from partition: " + pcb.partition);
-                        _StdOut.advanceLine();
-                    }
-                }
-            }
+            _Memory.clearAllMemory();
         };
         // Run all processes in memory
         Shell.prototype.shellRunall = function () {
@@ -711,7 +698,7 @@ var TSOS;
                 if (status_1 == SUCCESS) {
                     _StdOut.putText("The file: " + args[0] + " has been successfully deleted.");
                 }
-                else if (status_1 == FILENAME_NOT_EXISTS) {
+                else if (status_1 == FILENAME_DOESNT_EXIST) {
                     _StdOut.putText("The file: " + args[0] + " does not exist.");
                 }
             }
@@ -721,6 +708,42 @@ var TSOS;
         };
         // Write <filename> "data" to disk
         Shell.prototype.shellWriteFile = function (args) {
+            if (args.length >= 2) {
+                // Avoid swap files
+                if (args[0].includes("$")) {
+                    _StdOut.putText("Cannot write to swapped file.");
+                    return;
+                }
+                // If user entered spaces, concatenate the arguments
+                var string = "";
+                for (var i = 1; i < args.length; i++) {
+                    string += args[i] + " ";
+                }
+                // Check to make sure the user has put quotes
+                if (string.charAt(0) != "\"" || string.charAt(string.length - 2) != "\"") {
+                    _StdOut.putText("Usage: write <filename> \"<text>\"  Please supply a filename and text surrounded by quotes.");
+                    return;
+                }
+                string = string.trim();
+                // Ensure characters and spaces are the only things written to the file
+                if (!string.substring(1, string.length - 1).match(/^.[a-z ]*$/i)) {
+                    _StdOut.putText("Files may only have characters and spaces written to them.");
+                    return;
+                }
+                var status_2 = _DiskDriver.writeFile(args[0], string);
+                if (status_2 == SUCCESS) {
+                    _StdOut.putText("The file: " + args[0] + " has been successfully written to.");
+                }
+                else if (status_2 == FILENAME_DOESNT_EXISTS) {
+                    _StdOut.putText("The file: " + args[0] + " does not exist.");
+                }
+                else if (status_2 == DISK_IS_FULL) {
+                    _StdOut.putText("Unable to write to the file: " + args[0] + ". Not enough disk space to write.");
+                }
+            }
+            else {
+                _StdOut.putText("Usage: write <filename> \"<text>\"  Please supply a filename and text surrounded by quotes.");
+            }
         };
         // Read <filename> from disk
         Shell.prototype.shellReadFile = function (args) {
@@ -731,12 +754,12 @@ var TSOS;
                     _StdOut.putText("Cannot read a swapped file.");
                     return;
                 }
-                var status_2 = _DiskDriver.readFile(args[0]);
-                if (status_2 == FILENAME_NOT_EXISTS) {
+                var status_3 = _DiskDriver.readFile(args[0]);
+                if (status_3 == FILENAME_DOESNT_EXIST) {
                     _StdOut.putText("The file: " + args[0] + " does not exist.");
                 }
                 // Print out file
-                _StdOut.putText(status_2.fileData.join(""));
+                _StdOut.putText(status_3.fileData.join(""));
             }
             else {
                 _StdOut.putText("Usage: read <filename>  Please supply a filename.");
@@ -753,14 +776,14 @@ var TSOS;
                     return;
                 }
                 // Return the status of the file creation
-                var status_3 = _DiskDriver.createFile(args[0]);
-                if (status_3 == SUCCESS) {
+                var status_4 = _DiskDriver.createFile(args[0]);
+                if (status_4 == SUCCESS) {
                     _StdOut.putText("File successfully created: " + args[0]);
                 }
-                else if (status_3 == FILENAME_EXISTS) {
+                else if (status_4 == FILENAME_EXISTS) {
                     _StdOut.putText("File name already exists. Please use another file name.");
                 }
-                else if (status_3 == DISK_IS_FULL) {
+                else if (status_4 == DISK_IS_FULL) {
                     _StdOut.putText("File creation failure: No more space on disk. Delete some?");
                 }
             }
@@ -782,6 +805,11 @@ var TSOS;
             else {
                 _StdOut.putText("Usage: setschedule <algorithm>  Please supply an algorithm (rr, fcfs, or priority).");
             }
+        };
+        // Recovers deleted files
+        Shell.prototype.shellChkDsk = function () {
+            _DiskDriver.checkDiskRecover();
+            _StdOut.putText("All deleted files recovered");
         };
         return Shell;
     }());

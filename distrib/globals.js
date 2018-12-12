@@ -21,7 +21,7 @@ var CONTEXT_SWITCH_IRQ = 6;
 var TOTAL_MEMORY_SIZE = 768; // 786 bytes, 3 segments of 256 bytes
 var PARTITION_SIZE = 256;
 var FILENAME_EXISTS = 0;
-var FILENAME_NOT_EXISTS = 3;
+var FILENAME_DOESNT_EXIST = 3;
 var SUCCESS = 1;
 var DISK_IS_FULL = 2;
 var QUICK_FORMAT = 0;
@@ -32,7 +32,7 @@ var _OSclock = 0; // Page 23.
 var _Mode = 0; // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
 var _Disk;
 var _DiskDriver;
-var _Utils;
+var _Swapper;
 // Memory related global variables
 var _Memory;
 var _MemoryManager;

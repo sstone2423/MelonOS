@@ -1,9 +1,14 @@
+/* ------------
+   utils.ts
+   This is the client OS implementation of global utilities such as trim, rot13,
+   and converting ASCII strings to Hex
+   ------------ */
 var TSOS;
 (function (TSOS) {
     var Utils = /** @class */ (function () {
         function Utils() {
         }
-        Utils.prototype.trim = function (str) {
+        Utils.trim = function (str) {
             // Use a regular expression to remove leading and trailing spaces.
             return str.replace(/^\s+ | \s+$/g, "");
             /*
@@ -15,7 +20,7 @@ var TSOS;
             - "" is nothing, which is what we replace the whitespace with.
             */
         };
-        Utils.prototype.rot13 = function (str) {
+        Utils.rot13 = function (str) {
             /*
                This is an easy-to understand implementation of the famous and common Rot13 obfuscator.
                You can do this in three lines with a complex regular expression, but I'd have
@@ -42,7 +47,7 @@ var TSOS;
             return retVal;
         };
         // Convert string to ASCII to hex
-        Utils.prototype.stringToASCIItoHex = function (string) {
+        Utils.stringToASCIItoHex = function (string) {
             var hexArray = [];
             // Look at each character's ASCII value and convert it to a hex string
             for (var i = 0; i < string.length; i++) {

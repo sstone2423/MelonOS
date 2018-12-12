@@ -1,3 +1,7 @@
+/* ------------
+   userCommand.ts
+   This is the client OS implementation of a user command.
+   ------------ */
 var TSOS;
 (function (TSOS) {
     var UserCommand = /** @class */ (function () {

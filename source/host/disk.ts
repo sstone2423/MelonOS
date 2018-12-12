@@ -4,11 +4,11 @@
      disk.ts
      Requires global.ts.
      Contains 3 tracks, with 8 sectors each, each with 8 bytes
-     Routines for the host disk simulation, NOT for the OS itself.
-     In this manner, it's A LITTLE BIT like a hypervisor,
-     in that the Document environment inside a browser is the "bare metal" (so to speak) for which we write code
-     that hosts our client OS. But that analogy only goes so far, and the lines are blurred, because we are using
-     TypeScript/JavaScript in both the host and client environments.
+     Routines for the host disk simulation, NOT for the OS itself. In this manner, it's A LITTLE 
+     BIT like a hypervisor, in that the Document environment inside a browser is the "bare metal" 
+     (so to speak) for which we write code that hosts our client OS. But that analogy only goes 
+     so far, and the lines are blurred, because we are using TypeScript/JavaScript in both the 
+     host and client environments.
      ------------ */
 
      module TSOS {
@@ -27,7 +27,7 @@
                     for (let j = 0; j < this.totalSectors; j++) {
                         for (let k = 0; k < this.totalBlocks; k++) {
                             let key = i + ":" + j + ":" + k;
-                            let zeroes: Array<String>;
+                            let zeroes: Array<String> = [];
 
                             for (let l = 0; l < this.dataSize; l++) {
                                 zeroes.push("00");

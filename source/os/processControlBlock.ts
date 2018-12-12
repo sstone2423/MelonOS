@@ -1,4 +1,7 @@
-///<reference path="../globals.ts" />
+/* ------------
+   processControlBlock.ts
+   This is the client OS implementation of a PCB
+   ------------ */
 
 module TSOS {
     export class ProcessControlBlock {
@@ -12,6 +15,10 @@ module TSOS {
         public yReg: number;
         public zFlag: number;
         public partition: number;
+        public swapped: boolean;
+        public TSB: string;
+        public turnAroundTime: number;
+        public waitTime: number;
     
         constructor(public processId) {
             this.pId = processId;
@@ -27,6 +34,8 @@ module TSOS {
             this.zFlag = 0;
             this.partition = partition;
             this.priority = 1;
+            this.turnAroundTime = 0;
+            this.waitTime = 0;
         }
     }
 }

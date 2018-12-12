@@ -1,4 +1,7 @@
-///<reference path="../globals.ts" />
+/* ------------
+   processControlBlock.ts
+   This is the client OS implementation of a PCB
+   ------------ */
 var TSOS;
 (function (TSOS) {
     var ProcessControlBlock = /** @class */ (function () {
@@ -16,6 +19,8 @@ var TSOS;
             this.zFlag = 0;
             this.partition = partition;
             this.priority = 1;
+            this.turnAroundTime = 0;
+            this.waitTime = 0;
         };
         return ProcessControlBlock;
     }());

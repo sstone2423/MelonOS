@@ -1,6 +1,12 @@
+/* ------------
+   utils.ts
+   This is the client OS implementation of global utilities such as trim, rot13, 
+   and converting ASCII strings to Hex
+   ------------ */
+
 module TSOS {
     export class Utils {
-        public trim(str): string {
+        public static trim(str): string {
             // Use a regular expression to remove leading and trailing spaces.
             return str.replace(/^\s+ | \s+$/g, "");
             /*
@@ -13,7 +19,7 @@ module TSOS {
             */
         }
 
-        public rot13(str: string): string {
+        public static rot13(str: string): string {
             /*
                This is an easy-to understand implementation of the famous and common Rot13 obfuscator.
                You can do this in three lines with a complex regular expression, but I'd have
@@ -38,7 +44,7 @@ module TSOS {
         }
 
         // Convert string to ASCII to hex
-        public stringToASCIItoHex(string: String) {
+        public static stringToASCIItoHex(string: String) {
             let hexArray = [];
             // Look at each character's ASCII value and convert it to a hex string
             for (let i = 0; i < string.length; i++){

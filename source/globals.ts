@@ -23,7 +23,7 @@ const CONTEXT_SWITCH_IRQ: number = 6;
 const TOTAL_MEMORY_SIZE: number = 768; // 786 bytes, 3 segments of 256 bytes
 const PARTITION_SIZE: number = 256;
 const FILENAME_EXISTS: number = 0;
-const FILENAME_NOT_EXISTS: number = 3;
+const FILENAME_DOESNT_EXIST: number = 3;
 const SUCCESS: number = 1;
 const DISK_IS_FULL: number = 2;
 const QUICK_FORMAT: number = 0;
@@ -36,7 +36,7 @@ let _OSclock: number = 0;  // Page 23.
 let _Mode: number = 0;     // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
 let _Disk: TSOS.Disk;
 let _DiskDriver: TSOS.DeviceDriverDisk;
-let _Utils: TSOS.Utils;
+let _Swapper: TSOS.Swapper;
 
 // Memory related global variables
 let _Memory: TSOS.Memory;

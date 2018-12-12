@@ -1,4 +1,14 @@
 ///<reference path="../globals.ts" />
+/* ------------
+     memory.ts
+     Requires global.ts.
+     Contains 3 partitions, 256 bytes long.
+     Routines for the host memory simulation, NOT for the OS itself. In this manner, it's A LITTLE
+     BIT like a hypervisor, in that the Document environment inside a browser is the "bare metal"
+     (so to speak) for which we write code that hosts our client OS. But that analogy only goes
+     so far, and the lines are blurred, because we are using TypeScript/JavaScript in both the
+     host and client environments.
+     ------------ */
 var TSOS;
 (function (TSOS) {
     var Memory = /** @class */ (function () {
@@ -92,6 +102,44 @@ var TSOS;
         // Loops address
         Memory.prototype.branchLoop = function (PC, branch, partition) {
             return (PC + branch + 2) % this.partitions[partition].limit;
+        };
+        Memory.prototype.getPartitionData = function (partition) {
+            var data = [];
+            var base = this.partitions[partition].base;
+            var limit = this.partitions[partition].limit + this.partitions[partition].base;
+            for (var i = base; i < limit; i++) {
+                data.push(_Memory.memoryArray[i]);
+            }
+            return data;
+        };
+        Memory.prototype.clearAllMemory = function () {
+            // Check if CPU is executing
+            if (!_CPU.isExecuting) {
+                var readyQueueLength = _MemoryManager.readyQueue.getSize();
+                // Check ready queue first since these will be executing shortly
+                if (readyQueueLength > 0) {
+                    for (var i = 0; i < readyQueueLength; i++) {
+                        // Kill the process
+                        var pcb = _MemoryManager.readyQueue.dequeue();
+                        // Clear the memory partition
+                        _Memory.clearPartition(pcb.partition);
+                        _StdOut.putText("Clearing Process ID: " + pcb.pId + " from partition: " + pcb.partition);
+                        _StdOut.advanceLine();
+                    }
+                }
+                // Check wait queue second
+                var waitQueueLength = _MemoryManager.residentQueue.getSize();
+                if (waitQueueLength > 0) {
+                    for (var i = 0; i < waitQueueLength; i++) {
+                        // Kill the process
+                        var pcb = _MemoryManager.residentQueue.dequeue();
+                        // Clear the memory partition
+                        _Memory.clearPartition(pcb.partition);
+                        _StdOut.putText("Clearing Process ID: " + pcb.pId + " from partition: " + pcb.partition);
+                        _StdOut.advanceLine();
+                    }
+                }
+            }
         };
         return Memory;
     }());

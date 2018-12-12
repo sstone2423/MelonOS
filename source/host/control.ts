@@ -16,9 +16,10 @@ module TSOS {
     
     export class Control {
 
+        // This is called from index.html's onLoad event via the onDocumentLoad function pointer.
         public static hostInit(): void {
-            // This is called from index.html's onLoad event via the onDocumentLoad function pointer.
-            // Get a global reference to the canvas.  TODO: Should we move this stuff into a Display Device Driver?
+            // TODO: Should we move this stuff into a Display Device Driver?
+            // Get a global reference to the canvas.
             _Canvas = document.getElementById("display") as HTMLCanvasElement;
             // Get a global reference to the drawing context.
             _DrawingContext = _Canvas.getContext("2d");
@@ -38,6 +39,7 @@ module TSOS {
             }
         }
 
+        // Updates the taHostLog with OS clock
         public static hostLog(msg: string, source: string = "?"): void {
             // Note the OS CLOCK.
             const clock: number = _OSclock;
@@ -51,6 +53,7 @@ module TSOS {
             taLog.value = str + taLog.value;
         }
 
+        // Activated when user clicks start button. Will start the OS.
         public static hostBtnStartOS_click(btn): void {
             // Disable the (passed-in) start button...
             btn.disabled = true;
@@ -59,6 +62,7 @@ module TSOS {
             (document.getElementById("btnReset") as HTMLButtonElement).disabled = false;
             (document.getElementById("btnSingleStep") as HTMLButtonElement).disabled = false;
             (document.getElementById("btnSingleStep") as HTMLButtonElement).style.backgroundColor = "red";
+            (document.getElementById("btnSingleStep") as HTMLButtonElement).style.color = "white";
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
             // ... Create and initialize the CPU (because it's part of the hardware)  ...
@@ -215,7 +219,7 @@ module TSOS {
                 cell.innerHTML = displayPcb.state;
                 // Priority
                 cell = row.insertCell();
-                cell.innerHTML = displayPcb.priority;
+                cell.innerHTML = displayPcb.priority.toString();
             }
         }
 
@@ -267,7 +271,7 @@ module TSOS {
                 cell.innerHTML = displayPcb.state;
                 // Priority
                 cell = row.insertCell();
-                cell.innerHTML = displayPcb.priority;
+                cell.innerHTML = displayPcb.priority.toString();
             }
         }
 

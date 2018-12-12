@@ -591,7 +591,7 @@ module TSOS {
 
         // Add the process to the ready queue - Arg will be the processId
         public shellRun(args): void {
-            if (args.length == 1 && Number.isInteger(parseInt(args[0]))) {
+            if (args.length == 1 && isNaN(parseInt(args[0]))) {
                 let found = false;
                 let waitQueueLength = _MemoryManager.residentQueue.getSize();
                 // Check to see if CPU is already executing
@@ -671,7 +671,7 @@ module TSOS {
         // Kill process according to given <pid>
         public shellKill(args): void {
             // Check if there is an arg and its an integer
-            if (args.length == 1 && Number.isInteger(parseInt(args[0]))) {
+            if (args.length == 1 && isNaN(parseInt(args[0]))) {
                 _MemoryManager.killProcess(args[0]);
             } else {
                 _StdOut.putText("Usage: kill <pid> Please supply a process ID.");
@@ -681,7 +681,7 @@ module TSOS {
         // Change the round robin scheduling according to given <int>
         public shellQuantum(args): void {
             // Check if there is an argument and if the argument is an integer
-            if (args.length == 1 && Number.isInteger(parseInt(args[0]))) {
+            if (args.length == 1 && isNaN(parseInt(args[0]))) {
                 // Make sure the number is above 0. 0 will make melons enter the black hole
                 if (args[0] > 0) {
                     // Notify the user that the quantum has been changed

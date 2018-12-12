@@ -484,7 +484,7 @@ var TSOS;
         };
         // Add the process to the ready queue - Arg will be the processId
         Shell.prototype.shellRun = function (args) {
-            if (args.length == 1 && Number.isInteger(parseInt(args[0]))) {
+            if (args.length == 1 && isNaN(parseInt(args[0]))) {
                 var found = false;
                 var waitQueueLength = _MemoryManager.residentQueue.getSize();
                 // Check to see if CPU is already executing
@@ -566,7 +566,7 @@ var TSOS;
         // Kill process according to given <pid>
         Shell.prototype.shellKill = function (args) {
             // Check if there is an arg and its an integer
-            if (args.length == 1 && Number.isInteger(parseInt(args[0]))) {
+            if (args.length == 1 && isNaN(parseInt(args[0]))) {
                 _MemoryManager.killProcess(args[0]);
             }
             else {
@@ -576,7 +576,7 @@ var TSOS;
         // Change the round robin scheduling according to given <int>
         Shell.prototype.shellQuantum = function (args) {
             // Check if there is an argument and if the argument is an integer
-            if (args.length == 1 && Number.isInteger(parseInt(args[0]))) {
+            if (args.length == 1 && isNaN(parseInt(args[0]))) {
                 // Make sure the number is above 0. 0 will make melons enter the black hole
                 if (args[0] > 0) {
                     // Notify the user that the quantum has been changed

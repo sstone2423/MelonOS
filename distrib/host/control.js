@@ -15,9 +15,10 @@ var TSOS;
     var Control = /** @class */ (function () {
         function Control() {
         }
+        // This is called from index.html's onLoad event via the onDocumentLoad function pointer.
         Control.hostInit = function () {
-            // This is called from index.html's onLoad event via the onDocumentLoad function pointer.
-            // Get a global reference to the canvas.  TODO: Should we move this stuff into a Display Device Driver?
+            // TODO: Should we move this stuff into a Display Device Driver?
+            // Get a global reference to the canvas.
             _Canvas = document.getElementById("display");
             // Get a global reference to the drawing context.
             _DrawingContext = _Canvas.getContext("2d");
@@ -36,6 +37,7 @@ var TSOS;
                 _GLaDOS.init();
             }
         };
+        // Updates the taHostLog with OS clock
         Control.hostLog = function (msg, source) {
             if (source === void 0) { source = "?"; }
             // Note the OS CLOCK.
@@ -49,6 +51,7 @@ var TSOS;
             var taLog = document.getElementById("taHostLog");
             taLog.value = str + taLog.value;
         };
+        // Activated when user clicks start button. Will start the OS.
         Control.hostBtnStartOS_click = function (btn) {
             // Disable the (passed-in) start button...
             btn.disabled = true;
@@ -57,6 +60,7 @@ var TSOS;
             document.getElementById("btnReset").disabled = false;
             document.getElementById("btnSingleStep").disabled = false;
             document.getElementById("btnSingleStep").style.backgroundColor = "red";
+            document.getElementById("btnSingleStep").style.color = "white";
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
             // ... Create and initialize the CPU (because it's part of the hardware)  ...
@@ -206,7 +210,7 @@ var TSOS;
                 cell.innerHTML = displayPcb.state;
                 // Priority
                 cell = row.insertCell();
-                cell.innerHTML = displayPcb.priority;
+                cell.innerHTML = displayPcb.priority.toString();
             }
         };
         // Update the ready queue table
@@ -257,7 +261,7 @@ var TSOS;
                 cell.innerHTML = displayPcb.state;
                 // Priority
                 cell = row.insertCell();
-                cell.innerHTML = displayPcb.priority;
+                cell.innerHTML = displayPcb.priority.toString();
             }
         };
         // Initialize memory display

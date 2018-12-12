@@ -43,8 +43,8 @@ gulp.task('copy-css', function() {
 
 // This is the default task that will run when we run `gulp` at the command line.
 gulp.task('default', function() {
-	gulp.watch('source/*.ts',      ['compile-typescript']);
-	gulp.watch('source/host/*.ts', ['compile-typescript']);
-	gulp.watch('source/os/*.ts',   ['compile-typescript']);
-	gulp.watch('source/styles/*.css',      ['copy-css']);
+	gulp.watch('source/*.ts',      gulp.series('compile-typescript'));
+	gulp.watch('source/host/*.ts', gulp.series('compile-typescript'));
+	gulp.watch('source/os/*.ts',   gulp.series('compile-typescript'));
+	gulp.watch('source/styles/*.css',      gulp.series('copy-css'));
 });

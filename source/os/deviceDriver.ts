@@ -8,7 +8,6 @@ module TSOS {
         public version = "0.07";
         public status = "unloaded";
         public preemptable = false;
-
         public driverEntry = null;
         public isr = null;
     }

@@ -1,5 +1,12 @@
 ///<reference path="../globals.ts" />
 
+/* ------------
+   scheduler.ts
+   This is the client OS implementation of a scheduler. This does the appropriate context 
+   switching for processes using specified scheduling algorithms i.e Round robin, First Come
+   First Serve, and priority.
+   ------------ */
+
 module TSOS {
 
     export class Scheduler {
@@ -10,7 +17,7 @@ module TSOS {
             // Set default quantum of 6
             this.quantum = 6;
             // Set default algorithm to RR
-            this.algorithm = "RR";
+            this.algorithm = "rr";
         }
 
         // ShellQuantum calls this function
@@ -20,7 +27,7 @@ module TSOS {
         }
 
         // Change the algorithm
-        public changeAlgorithm(algorithm): void {
+        public changeAlgorithm(algorithm: string): void {
             this.algorithm = algorithm;
         }
 
@@ -47,9 +54,28 @@ module TSOS {
                 // Put the next PCB into runningProcess
                 _MemoryManager.executeProcess();
             } else {
-                console.log("stop fucking with me");
+                return;
             }
-            
+        }
+
+        public findHighestPriority() {
+            let res;
+            let size = _MemoryManager.readyQueue.getSize();
+            for (let i = 0; i < size; i++) {
+                let pcb = _MemoryManager.readyQueue.dequeue();
+                if (res == null) {
+                    res = pcb;
+                } else {
+                    if (pcb.Priority < res.Priority) {
+                        // Put the process back into the ready queue
+                        _MemoryManager.readyQueue.enqueue(res); 
+                        res = pcb;
+                    } else {
+                        _MemoryManager.readyQueue.enqueue(pcb);
+                    }
+                }
+            }
+            return res;
         }
     }
 }

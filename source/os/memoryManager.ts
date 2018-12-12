@@ -3,6 +3,11 @@
 ///<reference path="queue.ts" />
 ///<reference path="shell.ts" />
 
+/* ------------
+   memoryManager.ts
+   This is the client OS implementation of the Memory Manager
+   ------------ */
+
    module TSOS {
 
     export class MemoryManager {
@@ -20,46 +25,92 @@
         }
         
         // Create a process for the loaded program (called from shellLoad command)
-        public createProcess(opCodes): void {
+        public createProcess(opCodes, args): void {
             // Check to see if the program is greater than the partition size
-            if (opCodes.length > _PartitionSize) {
+            if (opCodes.length > PARTITION_SIZE) {
                 _StdOut.putText("Program load failed. Program is over 256 bytes in length.");
                 _StdOut.advanceLine();
+            // Check if there is a partition available
+            } else if (_Memory.checkMemorySpace()) {
+                // Create a new PCB with the current processIncrementor
+                let pcb = new ProcessControlBlock(this.processIncrementor);
+                // Increment the processIncrementor
+                this.processIncrementor++;
+                // Get an empty partition
+                let partition = _Memory.getEmptyPartition();
+                // Initialize the values of the PCB
+                pcb.init(partition);
+                // Assign priority if given
+                if (args.length > 0) {
+                    pcb.priority = parseInt(args[0]);
+                } else {
+                    pcb.priority = 1;
+                }
+                // Load into memory
+                _Memory.loadIntoMemory(opCodes, pcb.partition);
+                // Add pcb to residentQueue
+                this.residentQueue.enqueue(pcb);
+                // Update the memory,processes, and host log displays
+                _StdOut.putText("Process " + pcb.pId + " loaded successfully.");
+                Control.hostMemory();
+                Control.hostProcesses();
+            // If there is no more memory, then go find free space in the disk
+            // Call the swapper to perform swapping operations
             } else {
-                // Check if there is a partition available
-                if (_Memory.checkMemorySpace()) {
-                    // Create a new PCB with the current processIncrementor
+                // We also have to make sure the program is not too large. A program is limited by the partition size.
+                let tsb = _Swapper.putProcessToDisk(opCodes, this.processIncrementor);
+                // See if there is space on the disk for the process
+                if (tsb != "full" || tsb != "doesn't exist") {
+                    // There is space on the disk for the process, so create a new PCB
                     let pcb = new ProcessControlBlock(this.processIncrementor);
                     // Increment the processIncrementor
                     this.processIncrementor++;
-                    // Get an empty partition
-                    let partition = _Memory.getEmptyPartition();
-                    // Initialize the values of the PCB
-                    pcb.init(partition);
-                    // Load into memory
-                    _Memory.loadIntoMemory(opCodes, pcb.partition);
-                    // Add pcb to residentQueue
+                    pcb.init(-1);
+                    // Assign priority if given
+                    if (args.length > 0) {
+                        pcb.priority = args[0];
+                    } else {
+                        pcb.priority = 1;
+                    }
+                    // Set the PCB's process as swapped out to disk
+                    pcb.swapped = true;
+                    // pcb.TSB = tsb;
+                    pcb.state = "Swapped";
+                    // Put the new PCB onto the resident queue where it waits for CPU time
                     this.residentQueue.enqueue(pcb);
-                    // Update the memory,processes, and host log displays
                     _StdOut.putText("Process " + pcb.pId + " loaded successfully.");
-                    Control.hostMemory();
-                    Control.hostProcesses();
+                } else if (tsb === "full") {
+                    _StdOut.putText("Loading of program failed. Disk is full.");
                 } else {
-                    _StdOut.putText("There are no free memory partitions.");
-                    _StdOut.advanceLine();
+                    _StdOut.putText("Loading of program failed. Filename exists.");
                 }
             }
         }
     
         public executeProcess(): void {
-            this.runningProcess = _MemoryManager.readyQueue.dequeue();
-            _CPU.PC = this.runningProcess.PC;
-            _CPU.Acc = this.runningProcess.acc;
-            _CPU.Xreg = this.runningProcess.xReg;
-            _CPU.Yreg = this.runningProcess.yReg;
-            _CPU.Zflag = this.runningProcess.zFlag;
-            _CPU.isExecuting = true;
-            this.runningProcess.state = "Executing";
+            // Call the scheduler to reorder the ready queue if the scheduling scheme is Priority
+            if (_Scheduler.algorithm == "priority") {
+                this.runningProcess = _Scheduler.findHighestPriority();
+            } else {
+                this.runningProcess = _MemoryManager.readyQueue.dequeue();
+                _CPU.PC = this.runningProcess.PC;
+                _CPU.Acc = this.runningProcess.acc;
+                _CPU.Xreg = this.runningProcess.xReg;
+                _CPU.Yreg = this.runningProcess.yReg;
+                _CPU.Zflag = this.runningProcess.zFlag;
+                // We need to check if the process is stored in disk. If so, we need to have the swapper roll in from disk, and 
+                // roll out a process in memory if there is not enough space in memory for the rolled-in process.
+                if (this.runningProcess.swapped) {
+                    // Roll it in from disk
+                    _Swapper.rollIn(this.runningProcess);
+                    // No longer swapped out to disk
+                    this.runningProcess.swapped = false;
+                    this.runningProcess.TSB = "0:0:0";
+                }
+                _CPU.isExecuting = true;
+                this.runningProcess.state = "Executing";
+                
+            }
         }
 
         public checkReadyQueue(): void {
@@ -83,6 +134,14 @@
             _StdOut.advanceLine();
             _StdOut.putText("Exiting process " + this.runningProcess.pId);
             _StdOut.advanceLine();
+            // Check if swap file exists for process, delete it if there is
+            let filename = "$SWAP" + this.runningProcess.pId;
+            // Remove the program from disk by deleting the swap file
+            _DiskDriver.deleteFile(filename);
+            // Print out the wait time and turnaround time for that process
+            _StdOut.putText("Turnaround time: " + this.runningProcess.turnAroundTime + " cycles.");
+            _StdOut.advanceLine();
+            _StdOut.putText("Wait time: " + this.runningProcess.waitTime + " cycles.");
             // Reset the runningProcess to null
             this.runningProcess = null;
         }
@@ -91,7 +150,7 @@
         // TODO: make this more efficient?
         public killProcess(processID): void {
             let found = false;
-            // Check if running process is null
+            // Check if a process is running
             if (this.runningProcess !== null) {
                 // Check if the process is executing
                 if (this.runningProcess.pId == processID) {
@@ -106,12 +165,12 @@
                 console.log("ready");
                 for (let i = 0; i < readyQueueLength; i++) {
                     let pcb = this.readyQueue.dequeue();
-                    // If it matches, clear the partitionIf it doesnt match, put it back in the queue
+                    // If it matches, clear the partition and check for swap. 
                     if (pcb.pId == processID) {
-                        _Memory.clearPartition(pcb.partition);
-                        _StdOut.putText("Exiting process " + processID);
+                        this.clearPartitionCheckSwap(pcb);
                         found = true;
-                    } else { // if not, put it back in the queue
+                    // If it doesnt match, put it back in the queue
+                    } else {
                         this.readyQueue.enqueue(pcb);
                     }
                 }
@@ -121,12 +180,12 @@
             if (residentQueueLength > 0 && !found) {
                 for (let i = 0; i < residentQueueLength; i++) {
                     let pcb = this.residentQueue.dequeue();
-                    // If it matches, clear the partition
+                    // If it matches, clear the partition and check for swap.
                     if (pcb.pId == processID) {
-                        _Memory.clearPartition(pcb.partition);
-                        _StdOut.putText("Exiting process " + processID);
+                        this.clearPartitionCheckSwap(pcb);
                         found = true;
-                    } else {  // if not, put it back in the queue
+                    // If it doesnt match, put it back in the queue
+                    } else {
                         this.residentQueue.enqueue(pcb);
                     }
                 }
@@ -150,5 +209,28 @@
             }
         }
 
+        public clearPartitionCheckSwap(pcb) {
+            _Memory.clearPartition(pcb.partition);
+            _StdOut.putText("Exiting process " + pcb.pId);
+            if (pcb.swapped) {
+                // Find swap file in directory structure
+                let filename = "$SWAP" + pcb.pId;
+                // Remove the program from disk by deleting the swap file
+                _DiskDriver.deleteFile(filename);
+            }
+        }
+
+        // Update turnaround times and wait times for all processes
+        public processStats(): void {
+            // Increment the turnaround times for all processes
+            // Increment the wait times for all processes in the ready queue
+            this.runningProcess.turnAroundTime++;
+            for (let i = 0; i < this.readyQueue.getSize(); i++) {
+                let pcb = this.readyQueue.dequeue();
+                pcb.turnAroundTime++;
+                pcb.waitTime++;
+                this.readyQueue.enqueue(pcb);
+            }
+        }
     }
 }

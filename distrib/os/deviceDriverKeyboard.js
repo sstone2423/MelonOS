@@ -125,6 +125,7 @@ var TSOS;
                 this.basicKeyPress((keyCode - 183));
             }
             else if ((keyCode === 188) || // ,
+                (keyCode === 189) || // -
                 (keyCode === 190) || // .
                 (isShifted && (keyCode === 187)) || // +
                 (keyCode === 191)) { // /

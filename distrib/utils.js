@@ -1,3 +1,8 @@
+/* ------------
+   utils.ts
+   This is the client OS implementation of global utilities such as trim, rot13,
+   and converting ASCII strings to Hex
+   ------------ */
 var TSOS;
 (function (TSOS) {
     var Utils = /** @class */ (function () {
@@ -32,7 +37,7 @@ var TSOS;
                     retVal = retVal + String.fromCharCode(code);
                 }
                 else if ("nopqrstuvwxyzNOPQRSTUVWXYZ".indexOf(ch) >= 0) {
-                    code = str.charCodeAt(Number(i)) - 13; // It's okay to use 13.  See above.
+                    code = str.charCodeAt(Number(i)) - 13;
                     retVal = retVal + String.fromCharCode(code);
                 }
                 else {
@@ -40,6 +45,17 @@ var TSOS;
                 }
             }
             return retVal;
+        };
+        // Convert string to ASCII to hex
+        Utils.stringToASCIItoHex = function (string) {
+            var hexArray = [];
+            // Look at each character's ASCII value and convert it to a hex string
+            for (var i = 0; i < string.length; i++) {
+                var hexChar = string.charCodeAt(i).toString(16);
+                hexArray.push(hexChar);
+            }
+            // Returns an array of each character represented as hex
+            return hexArray;
         };
         return Utils;
     }());

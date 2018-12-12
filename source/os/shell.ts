@@ -1,8 +1,7 @@
 ///<reference path="../globals.ts" />
-///<reference path="../utils.ts" />
 ///<reference path="shellCommand.ts" />
 ///<reference path="userCommand.ts" />
-///<reference path="memoryManager.ts" />
+///<reference path="../utils.ts" />
 
 /* ------------
    Shell.ts
@@ -14,8 +13,7 @@
           write your own Operating System.
    ------------ */
 
-// TODO: Write a base class / prototype for system services and let
-// Shell inherit from it.
+// TODO: Write a base class / prototype for system services and let Shell inherit from it.
 
 module TSOS {
     export class Shell {
@@ -26,7 +24,7 @@ module TSOS {
         public apologies = "[sorry]";
         public commandsUsedList = [];
 
-        public init() {
+        public init(): void {
             let sc;      
             // Load the command list.
             // v
@@ -157,21 +155,63 @@ module TSOS {
                                   "- Kills the specified process ID.");
             this.commandList[this.commandList.length] = sc;
 
-            // quantum <int>
-            sc = new ShellCommand(this.shellQuantum,
-                                  "quantum",
-                                  "- Sets the round robin quantum to the specific integer.");
+            // ls
+            sc = new ShellCommand(this.shellLs,
+                                  "ls",
+                                  "- Lists files currently on disk. ls -l will show hidden files as well.");
+            this.commandList[this.commandList.length] = sc;
+
+            // getschedule
+            sc = new ShellCommand(this.shellGetSchedule,
+                                  "getschedule",
+                                  "- Returns the current scheduling algorithm.");
+            this.commandList[this.commandList.length] = sc;
+
+            // setschedule rr, fcfs, priority
+            sc = new ShellCommand(this.shellSetSchedule,
+                                  "setschedule",
+                                  "<rr, fcfs, priority> - Sets the CPU scheduling algorithm.");
+            this.commandList[this.commandList.length] = sc;
+
+            // format
+            sc = new ShellCommand(this.shellFormat,
+                                  "format",
+                                  "- Initialize all blocks in all sectors in all tracks.");
+            this.commandList[this.commandList.length] = sc;
+
+            // delete <filename>
+            sc = new ShellCommand(this.shellDeleteFile,
+                                  "delete",
+                                  "<filename> - Delete the specified file from disk.");
+            this.commandList[this.commandList.length] = sc;
+
+            // write <filename> "data"
+            sc = new ShellCommand(this.shellWriteFile,
+                                  "write",
+                                  "<filename> \"data\" - Write data to the specified file on disk.");
+            this.commandList[this.commandList.length] = sc;
+
+            // read <filename>
+            sc = new ShellCommand(this.shellReadFile,
+                                  "read",
+                                  "<filename> - Read the specified file from disk.");
+            this.commandList[this.commandList.length] = sc;
+
+            // create <filename>
+            sc = new ShellCommand(this.shellCreateFile,
+                                  "create",
+                                  "<filename> - Create a file fon disk.");
             this.commandList[this.commandList.length] = sc;
 
             // Display the initial prompt.
             this.putPrompt();
         }
 
-        public putPrompt() {
+        public putPrompt(): void {
             _StdOut.putText(this.promptStr);
         }
 
-        public handleInput(buffer) {
+        public handleInput(buffer): void {
             _Kernel.krnTrace("Shell Command~" + buffer);
 
             // Parse the input...
@@ -218,7 +258,7 @@ module TSOS {
         }
 
         // Note: args is an option parameter, ergo the ? which allows TypeScript to understand that.
-        public execute(fn, args?) {
+        public execute(fn, args?): void {
             // We just got a command, so advance the line...
             _StdOut.advanceLine();
             // ... call the command function passing in the args with some über-cool functional programming ...
@@ -263,7 +303,7 @@ module TSOS {
         // Shell Command Functions.  Kinda not part of Shell() class exactly, but
         // called from here, so kept here to avoid violating the law of least astonishment.
 
-        public shellInvalidCommand() {
+        public shellInvalidCommand(): void {
             _StdOut.putText("Invalid Command. ");
             if (_SarcasticMode) {
                 _StdOut.putText("Unbelievable. You, [subject name here],");
@@ -274,14 +314,14 @@ module TSOS {
             }
         }
 
-        public shellCurse() {
+        public shellCurse(): void {
             _StdOut.putText("Oh, so that's how it's going to be, eh? Fine.");
             _StdOut.advanceLine();
             _StdOut.putText("Bitch.");
             _SarcasticMode = true;
         }
 
-        public shellApology() {
+        public shellApology(): void {
            if (_SarcasticMode) {
               _StdOut.putText("I think we can put our differences behind us.");
               _StdOut.advanceLine();
@@ -292,11 +332,11 @@ module TSOS {
            }
         }
 
-        public shellVer(args) {
+        public shellVer(): void {
             _StdOut.putText(APP_NAME + " version " + APP_VERSION);
         }
 
-        public shellHelp(args) {
+        public shellHelp(): void {
             _StdOut.putText("Commands:");
             for (const i in _OsShell.commandList) {
                 _StdOut.advanceLine();
@@ -304,94 +344,117 @@ module TSOS {
             }
         }
 
-        public shellShutdown(args) {
+        public shellShutdown(): void {
             _StdOut.putText("Shutting down...");
             // Call Kernel shutdown routine.
             _Kernel.krnShutdown();
             // TODO: Stop the final prompt from being displayed.  If possible.  Not a high priority.  (Damn OCD!)
         }
 
-        public shellCls(args) {
+        public shellCls(args): void {
             _StdOut.clearScreen();
             _StdOut.resetXY();
         }
 
-        public shellMan(args) {
+        public shellMan(args): void {
             if (args.length > 0) {
                 const topic = args[0];
                 switch (topic) {
                     case "help":
-                        _StdOut.putText("Help displays a list of (hopefully) valid commands.");
+                        _StdOut.putText("help displays a list of (hopefully) valid commands.");
                         break;
                     case "curse":
-                        _StdOut.putText("Curse issues all of your derogatory remarks for you!");
+                        _StdOut.putText("curse issues all of your derogatory remarks for you!");
                         break;
                     case "apology":
-                        _StdOut.putText("Apology mends your relationship with MelonOS because it has feelings too.");
+                        _StdOut.putText("apology mends your relationship with MelonOS because it has feelings too.");
                         break;
                     case "ver":
-                        _StdOut.putText("Ver displays the current version.");
+                        _StdOut.putText("ver displays the current version.");
                         break;
                     case "v":
-                        _StdOut.putText("V displays the current version.");
+                        _StdOut.putText("v displays the current version.");
                         break;
                     case "version":
-                        _StdOut.putText("Version displays the current version.");
+                        _StdOut.putText("version displays the current version.");
                         break;
                     case "shutdown":
-                        _StdOut.putText("Shutdown calls the kernel shutdown routine.");
+                        _StdOut.putText("shutdown calls the kernel shutdown routine.");
                         break;
                     case "cls":
-                        _StdOut.putText("Cls clears the screen for additional melons.");
+                        _StdOut.putText("cls clears the screen for additional melons.");
                         break;
                     case "trace":
-                        _StdOut.putText("Trace displays the clock intervals.");
+                        _StdOut.putText("trace displays the clock intervals.");
                         break;
                     case "rot13":
-                        _StdOut.putText("Rot13 converts characters in the string to character + 13. "
-                                        + "It was one of the first ciphers created.");
+                        _StdOut.putText("rot13 converts characters in the string to character + 13. It was one of the first ciphers created.");
                         break;
                     case "prompt":
-                        _StdOut.putText("Prompt changes the initial prompt to the specific string.");
+                        _StdOut.putText("prompt changes the initial prompt to the specific string.");
                         break;
                     case "date":
-                        _StdOut.putText("Date displays the current date.");
+                        _StdOut.putText("date displays the current date.");
                         break;
                     case "whereami":
-                        _StdOut.putText("Whereami displays the current location.");
+                        _StdOut.putText("whereami displays the current location.");
                         break;
                     case "melon":
-                        _StdOut.putText("Melon will give you juicy puns to use with all of your friends!");
+                        _StdOut.putText("melon will give you juicy puns to use with all of your friends!");
                         break;
                     case "status":
-                        _StdOut.putText("Status changes the status display bar to whatever string your"
+                        _StdOut.putText("status changes the status display bar to whatever string your"
                                         + " heart desires.");
                         break;
                     case "load":
-                        _StdOut.putText("Load validates the user input program to ensure only hex digits"
+                        _StdOut.putText("load validates the user input program to ensure only hex digits"
                                         + " and spaces exist.");
                         break;
                     case "dropit":
-                        _StdOut.putText("Dropit can not be undone.. Please don't drop the melons."
+                        _StdOut.putText("dropit can not be undone.. Please don't drop the melons."
                                         + " and spaces exist.");
                         break;
                     case "run":
-                        _StdOut.putText("Run will run the current process loaded in memory.");
+                        _StdOut.putText("run will run the current process loaded in memory.");
                         break;
                     case "clearmem":
-                        _StdOut.putText("Clearmem will *cough* init *cough* clear all memory partitions.");
+                        _StdOut.putText("clearmem will *cough* init *cough* clear all memory partitions.");
                         break;
                     case "runall":
-                        _StdOut.putText("Runall will execute all programs in memory.");
+                        _StdOut.putText("runall will execute all programs in memory.");
                         break;
                     case "ps":
-                        _StdOut.putText("Ps will list all processes and their process IDs.");
+                        _StdOut.putText("ps will list all processes and their process IDs.");
                         break;
                     case "kill":
-                        _StdOut.putText("Kill <id> will terminate the corresponding process");
+                        _StdOut.putText("kill <id> will terminate the corresponding process");
                         break;
                     case "quantum":
-                        _StdOut.putText("Quantum <int> will change the round round scheduling time.");
+                        _StdOut.putText("quantum <int> will change the round round scheduling time.");
+                        break;
+                    case "ls":
+                        _StdOut.putText("ls lists all non-hidden files on disk. Use ls -l to see hidden files.");
+                        break;
+                    case "format":
+                        _StdOut.putText("format initializes and clears the disk.");
+                        break;
+                    case "delete":
+                        _StdOut.putText("delete <filename> will delete the specified file from disk.");
+                        break;
+                    case "write":
+                        _StdOut.putText("write <filename> \"disk\" will write data to the specified file on disk.");
+                        break;
+                    case "read":
+                        _StdOut.putText("read <filename> will read the specified file on disk.");
+                        break;
+                    case "create":
+                        _StdOut.putText("create <filename> will create the specified file on disk.");
+                        break;
+                    case "getschedule":
+                        _StdOut.putText("getschedule will display the current CPU scheduling algorithm.");
+                        break;
+                    case "setschedule":
+                        _StdOut.putText("setschedule <algorithm> will set the CPU scheduling algorithm to fcfs (First come first serve), rr (Round robin), or priority.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -401,8 +464,8 @@ module TSOS {
             }
         }
 
-        public shellTrace(args) {
-            if (args.length > 0) {
+        public shellTrace(args): void {
+            if (args.length == 1) {
                 const setting = args[0];
                 switch (setting) {
                     case "on":
@@ -425,7 +488,7 @@ module TSOS {
             }
         }
 
-        public shellRot13(args) {
+        public shellRot13(args): void {
             if (args.length > 0) {
                 // Requires Utils.ts for rot13() function.
                 _StdOut.putText(args.join(" ") + " = '" + Utils.rot13(args.join(" ")) + "'");
@@ -434,7 +497,7 @@ module TSOS {
             }
         }
 
-        public shellPrompt(args) {
+        public shellPrompt(args): void {
             if (args.length > 0) {
                 _OsShell.promptStr = args[0];
             } else {
@@ -442,49 +505,49 @@ module TSOS {
             }
         }
 
-        public shellDate() {
+        public shellDate(): void {
             const currentDate = new Date();
             _StdOut.putText("Current date is " + currentDate);
         }
 
-        public shellWhereami() {
-            _StdOut.putText("Current location is Melon Country");
+        public shellWhereami(): void {
+            _StdOut.putText("Current location: Melon Country");
         }
 
-        public shellMelon() {
+        public shellMelon(): void {
             // Get a random number between 1 and 8
-            const randomPun = Math.floor(Math.random() * 8) + 1;
+            const randomPun = Math.floor(Math.random() * 8);
 
             // Find an excellent pun for our melonicious users
             switch (randomPun) {
-                case 1:
+                case 0:
                     _StdOut.putText("Sur-round yourself with melons.");
                     break;
-                case 2:
+                case 1:
                     _StdOut.putText("It's not pulp fiction.");
                     break;
-                case 3:
+                case 2:
                     _StdOut.putText("This may sound a little 'fruity,' but we think you'll like it.");
                     break;
-                case 4:
+                case 3:
                     _StdOut.putText("Who says you cant(alope)?");
                     break;
-                case 5:
+                case 4:
                     _StdOut.putText("With melons you can!");
                     break;
-                case 6:
+                case 5:
                     _StdOut.putText("MelonOS has a thick skin and a fruity interior.");
                     break;
-                case 7:
+                case 6:
                     _StdOut.putText("Dew, or dew not, there is no try.");
                     break;
-                case 8:
+                case 7:
                     _StdOut.putText("Things aren't jellin with these melons.");
                     break;
             }
         }
 
-        public shellStatus(args) {
+        public shellStatus(args): void {
             if (args.length > 0) {
                 const htmlStatus = document.getElementById("status");
                 htmlStatus.innerHTML = "Status: " + args;
@@ -493,7 +556,8 @@ module TSOS {
             }
         }
 
-        public shellLoad() {
+        // Create a process from the user input in HTML with an optional priority. Default is 1
+        public shellLoad(args): void {
             // Get value inside program input (the program)
             const userInputProgram = (<HTMLInputElement>document.getElementById("taProgramInput")).value;
             // Create regex pattern
@@ -502,23 +566,32 @@ module TSOS {
             if (hexRegex.test(userInputProgram)) {
                 // Split the program into 2-bit hex
                 let splitProgram = userInputProgram.split(" ");
-                // Create a process using the process manager
-                _MemoryManager.createProcess(splitProgram);
+                // If priority arg is a number
+                if (args.length == 1 && args[0].match(/^[0-9]\d*$/)) {
+                    // Create a process using the process manager
+                    _MemoryManager.createProcess(splitProgram, args);
+                // Use default priority
+                } else if (args.length == 0) {
+                    _MemoryManager.createProcess(splitProgram, args);
+                // Invalid args
+                } else {
+                    _StdOut.putText("Usage: load [priority] Please supply a priority integer or use the default (1). 0 is the lowest.");
+                }
             } else {
                 _StdOut.putText("Program must only contain hexadecimal values (A-F, a-f, 0-9) or spaces.");
             }
         }
         
         // Display BSOD....
-        public shellDropit() {
+        public shellDropit(): void {
             const oops = "Who dropped those?";
             // Trigger the kernel trap error
             _Kernel.krnTrapError(oops);
         }
 
         // Add the process to the ready queue - Arg will be the processId
-        public shellRun(args) {
-            if (args.length > 0 && Number.isInteger(parseInt(args[0]))) {
+        public shellRun(args): void {
+            if (args.length == 1 && Number.isInteger(parseInt(args[0]))) {
                 let found = false;
                 let waitQueueLength = _MemoryManager.residentQueue.getSize();
                 // Check to see if CPU is already executing
@@ -547,38 +620,12 @@ module TSOS {
         }
 
         // Clear all memory partitions
-        public shellClearmem() {
-            // Check if CPU is executing
-            if (!_CPU.isExecuting) {
-                let readyQueueLength = _MemoryManager.readyQueue.getSize();
-                // Check ready queue first since these will be executing shortly
-                if (readyQueueLength > 0) {
-                    for (let i = 0; i < readyQueueLength; i++) {
-                        // Kill the process
-                        let pcb = _MemoryManager.readyQueue.dequeue();
-                        // Clear the memory partition
-                        _Memory.clearPartition(pcb.partition);
-                        _StdOut.putText("Clearing Process ID: " + pcb.pId + " from partition: " + pcb.partition);
-                        _StdOut.advanceLine();
-                    }
-                }
-                // Check wait queue second
-                let waitQueueLength = _MemoryManager.residentQueue.getSize();
-                if (waitQueueLength > 0) {
-                    for (let i = 0; i < waitQueueLength; i++) {
-                        // Kill the process
-                        let pcb = _MemoryManager.residentQueue.dequeue();
-                        // Clear the memory partition
-                        _Memory.clearPartition(pcb.partition);
-                        _StdOut.putText("Clearing Process ID: " + pcb.pId + " from partition: " + pcb.partition);
-                        _StdOut.advanceLine();
-                    }
-                }
-            }
+        public shellClearmem(): void {
+            _Memory.clearAllMemory();
         }
 
         // Run all processes in memory
-        public shellRunall() {
+        public shellRunall(): void {
             let waitQueueLength = _MemoryManager.residentQueue.getSize();
             // Check if there is any programs loaded
             if (waitQueueLength > 0) {
@@ -593,7 +640,7 @@ module TSOS {
         }
 
         // List all processes and pIDs
-        public shellPs() {
+        public shellPs(): void {
             let waitQueueLength = _MemoryManager.residentQueue.getSize();
             // Check if any programs are loaded
             if (waitQueueLength > 0) {
@@ -622,9 +669,9 @@ module TSOS {
         }
 
         // Kill process according to given <pid>
-        public shellKill(args) {
+        public shellKill(args): void {
             // Check if there is an arg and its an integer
-            if (args.length > 0 && Number.isInteger(parseInt(args[0]))) {
+            if (args.length == 1 && Number.isInteger(parseInt(args[0]))) {
                 _MemoryManager.killProcess(args[0]);
             } else {
                 _StdOut.putText("Usage: kill <pid> Please supply a process ID.");
@@ -632,9 +679,9 @@ module TSOS {
         }
 
         // Change the round robin scheduling according to given <int>
-        public shellQuantum(args) {
+        public shellQuantum(args): void {
             // Check if there is an argument and if the argument is an integer
-            if (args.length > 0 && Number.isInteger(parseInt(args[0]))) {
+            if (args.length == 1 && Number.isInteger(parseInt(args[0]))) {
                 // Make sure the number is above 0. 0 will make melons enter the black hole
                 if (args[0] > 0) {
                     // Notify the user that the quantum has been changed
@@ -646,6 +693,246 @@ module TSOS {
                 }
             } else {
                 _StdOut.putText("Usage: quantum <int>  Please supply an integer.");
+            }
+        }
+
+        // List all non-hidden files on disk
+        public shellLs(args): void {
+            // If they use -l, show all files including hidden
+            if (args.length == 1 && args[0] == "-l") {
+                // Get the list of files
+                let filenames = _DiskDriver.listFiles();
+                // Check if there is any files
+                if (filenames.length > 0) {
+                    _StdOut.putText("Files in the filesystem:");
+                    _StdOut.advanceLine();
+                    // Count swaps to see if there is no other files except for swaps
+                    let numOfSwaps = 0;
+                    for (let f of filenames) {
+                        // Don't show swap files
+                        if (f['name'].includes("$SWAP")) {
+                            numOfSwaps++;
+                            continue;
+                        }
+                        _StdOut.putText(f['name'] + " - Date Created: " + f['month'] + "/" + f['day'] + "/" + f['year'] + ", Size: " + f['size']);
+                        _StdOut.advanceLine();
+                    }
+                    // Let them know there's only swaps
+                    if (numOfSwaps == filenames.length) {
+                        _StdOut.putText("There are only swap files in the filesystem.");
+                    }
+                // Let them know theres no files
+                } else {
+                    _StdOut.putText("There are no files in the filesystem.");
+                }
+            // Only display files that are not hidden and not swapped
+            } else if (args.length == 0) {
+                // Get the list of files
+                let filenames = _DiskDriver.listFiles();
+                // Check if there is any files
+                if (filenames.length > 0) {
+                    _StdOut.putText("Files in the filesystem:");
+                    _StdOut.advanceLine();
+                    // Counter swaps and hidden files to see if theyre the only files on disk
+                    let numOfOtherFiles: number = 0;
+                    for (let f of filenames) {
+                        // Don't show swap files and count
+                        if (f['name'].includes("$SWAP")) {
+                            numOfOtherFiles++
+                            continue;
+                        // Show unhidden files
+                        } else if (f['name'].charAt(0) != ".") {
+                            _StdOut.putText(f['name']);
+                            _StdOut.advanceLine();
+                        // Count hidden files
+                        } else {
+                            numOfOtherFiles++;
+                            continue;
+                        }
+                    }
+                    // Let them know theres only 'other' files
+                    if (numOfOtherFiles == filenames.length) {
+                        _StdOut.putText("There are only swap/hidden files in the filesystem.");
+                    }
+                // Let them know theres no files
+                } else {
+                    _StdOut.putText("There are no files in the filesystem.");
+                }
+            // Try again!
+            } else {
+                _StdOut.putText("Usage: ls [-l]");
+            }
+
+        }
+
+        // Format/Initialize all blocks on disk
+        public shellFormat(args): void {
+            // Check if there is only 1 arg
+            if (args.length == 1) {
+                // Perform quick format
+                if (args[0] == "-quick") {
+                    if (_DiskDriver.format(QUICK_FORMAT)) {
+                        _StdOut.putText("Disk formatted successfully!");
+                    }
+                    else {
+                        _StdOut.putText("CPU is executing. Cannot format disk.");
+                    }
+                // Perform full format
+                } else if (args[0] == "-full") {
+                    if (_DiskDriver.format(FULL_FORMAT)) {
+                        _StdOut.putText("Disk formatted successfully!");
+                    }
+                    else {
+                        _StdOut.putText("CPU is executing. Cannot format disk.");
+                    }
+                }
+                else {
+                    _StdOut.putText("Usage: format [-quick]|[-full]");
+                }
+            // Too many arguments..
+            } else if (args.length > 1) {
+                _StdOut.putText("Usage: format [-quick]|[-full]");
+            // Default to full format
+            } else {
+                // Call the disk device driver to format the disk
+                if (_DiskDriver.format(FULL_FORMAT)) {
+                    _StdOut.putText("Disk formatted successfully!");
+                }
+                else {
+                    _StdOut.putText("CPU is executing. Can't format disk.");
+                }
+            }
+        }
+
+        // Delete <filename> from disk
+        public shellDeleteFile(args): void {
+            // Check if there is only 1 arg
+            if (args.length == 1) {
+                // Check if it is a swap file
+                if (args[0].includes("$")) {
+                    _StdOut.putText("Swap files cannot be deleted.");
+                    // Back out of the function
+                    return;
+                }
+                // Return the status of the file deletion
+                let status = _DiskDriver.deleteFile(args[0]);
+                if (status == SUCCESS) {
+                    _StdOut.putText("The file: " + args[0] + " has been successfully deleted.");
+                } else if( status == FILENAME_DOESNT_EXIST) {
+                    _StdOut.putText("The file: " + args[0] + " does not exist.");
+                }
+            } else {
+                _StdOut.putText("Usage: delete <filename>  Please supply a filename.");
+            }
+
+        }
+
+        // Write <filename> "data" to disk
+        public shellWriteFile(args): void {
+            if (args.length >= 2) {
+                // Avoid swap files
+                if (args[0].includes("$")) {
+                    _StdOut.putText("Cannot write to swapped file.");
+                    return;
+                }
+                // If user entered spaces, concatenate the arguments
+                let string = "";
+                for (let i = 1; i < args.length; i++) {
+                    string += args[i] + " ";
+                }
+                // Check to make sure the user has put quotes
+                if (string.charAt(0) != "\"" || string.charAt(string.length - 2) != "\"") {
+                    _StdOut.putText("Usage: write <filename> \"<text>\"  Please supply a filename and text surrounded by quotes.");
+                    return;
+                }
+                string = string.trim();
+                // Ensure characters and spaces are the only things written to the file
+                if (!string.substring(1,string.length-1).match(/^.[a-z ]*$/i)) {
+                    _StdOut.putText("Files may only have characters and spaces written to them.");
+                    return;
+                }
+                let info = _DiskDriver.writeFile(args[0], string);
+                if (info == SUCCESS) {
+                    _StdOut.putText("The file " + args[0] + " has been successfully written to.");
+                } else if (info == FILENAME_DOESNT_EXIST) {
+                    _StdOut.putText("The file " + args[0] + " does not exist.");
+                } else if (info == DISK_IS_FULL) {
+                    _StdOut.putText("Unable to write to the file: " + args[0] + ". Not enough disk space to write.");
+                }
+            } else {
+                _StdOut.putText("Usage: write <filename> \"<text>\"  Please supply a filename and text surrounded by quotes.");
+            }
+        }
+
+        // Read <filename> from disk
+        public shellReadFile(args): void {
+            // Check if there is only 1 arg
+            if (args.length == 1) {
+                // Avoid swap files
+                if (args[0].includes("$")) {
+                    _StdOut.putText("Cannot read a swapped file.");
+                    return;
+                }
+                let info = _DiskDriver.readFile(args[0]);
+                // If it exists, print out file
+                if (info.status == SUCCESS) {
+                    _StdOut.putText(info.fileData.join(""));
+                // If it doesn't exist, let them know
+                } else {
+                    _StdOut.putText("The file " + args[0] + " does not exist.");
+                }
+            } else {
+                _StdOut.putText("Usage: read <filename>  Please supply a filename.");
+            }
+        }
+
+        // Create <filename> on disk
+        public shellCreateFile(args): void {
+            // Check if there is only 1 arg
+            if (args.length == 1) {
+                // Filenames must be 60 characters or less
+                if(args[0].length > 60){
+                    _StdOut.putText("File name is too long. It must be 60 characters or less.");
+                    // Back out of the function
+                    return;
+                }
+                // Return the status of the file creation
+                let status = _DiskDriver.createFile(args[0]);
+                if (status == SUCCESS) {
+                    _StdOut.putText("File successfully created: " + args[0]);
+                } else if (status == FILENAME_EXISTS) {
+                    _StdOut.putText("File name already exists. Please use another file name.");
+                }
+                // DISK_IS_FULL
+                else {
+                    _StdOut.putText("File creation failure: No more space on disk. Delete some?");
+                }
+            }
+            else {
+                _StdOut.putText("Usage: create <filename>  Please supply a filename.");
+            }
+        }
+
+        // Get the current scheduling algorithm
+        public shellGetSchedule(): void {
+            if (_Scheduler.algorithm == "rr") {
+                _StdOut.putText("Current CPU scheduling algorithm is Round Robin and the quantum is " + _Scheduler.quantum + ".");
+            } else if (_Scheduler.algorithm == "fcfs") {
+                _StdOut.putText("Current CPU scheduling algorithm is First Come First Serve and the quantum is " + _Scheduler.quantum + ".");
+            // Priority
+            } else {
+                _StdOut.putText("Current CPU scheduling algorithm is Priority.");
+            }
+        }
+
+        // Set the scheduling algorithm to rr, fcfs, priority
+        public shellSetSchedule(args): void {
+            // Check if there is args and that they match one of the allowed algorithms
+            if (args.length == 1 && (args[0] == "rr" || args[0] == "fcfs" || args[0] == "priority")) {
+                _Scheduler.changeAlgorithm(args[0]);
+                _StdOut.putText("CPU Scheduling algorithm set to " + args[0]);
+            } else {
+                _StdOut.putText("Usage: setschedule <algorithm>  Please supply an algorithm (rr, fcfs, or priority).");
             }
         }
     }

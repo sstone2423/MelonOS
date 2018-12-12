@@ -29,13 +29,13 @@ module TSOS {
         public isScrollingCommands = false;
         public scrollingCommandIndex = 0;
 
-        public krnKbdDriverEntry() {
+        public krnKbdDriverEntry(): void {
             // Initialization routine for this, the kernel-mode Keyboard Device Driver.
             this.status = "loaded";
             // More?
         }
 
-        public krnKbdDispatchKeyPress(params) {
+        public krnKbdDispatchKeyPress(params): void {
             // Parse the params.    TODO: Check that the params are valid and osTrapError if not.
             const keyCode = params[0];
             const isShifted = params[1];
@@ -103,9 +103,10 @@ module TSOS {
             } else if (keyCode === 222) {                       // '
                 this.basicKeyPress((keyCode - 183));
             } else if ((keyCode === 188)                    ||  // ,
-                      (keyCode === 190)                     ||  // .
-                      (isShifted && (keyCode === 187))      ||  // +
-                      (keyCode === 191)) {                      // /
+                       (keyCode === 189)                    ||  // -
+                       (keyCode === 190)                    ||  // .
+                       (isShifted && (keyCode === 187))     ||  // +
+                       (keyCode === 191)) {                     // /
                 this.basicKeyPress(keyCode - 144);
             } else if (keyCode === 187) {                       // =
                 this.basicKeyPress((keyCode - 126));

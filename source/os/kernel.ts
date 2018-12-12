@@ -16,7 +16,7 @@ module TSOS {
     export class Kernel {
         public timer: number = 0;
         // OS Startup and Shutdown Routines
-        public krnBootstrap() {      // Page 8. {
+        public krnBootstrap(): void {      // Page 8. {
             Control.hostLog("bootstrap", "host");  // Use hostLog because we ALWAYS want this, even if _Trace is off.
 
             // Initialize our global queues.
@@ -29,16 +29,24 @@ module TSOS {
             // Initialize standard input and output to the _Console.
             _StdIn  = _Console;
             _StdOut = _Console;
-            // Initialize memory manager
+            // Load the memory manager
             _MemoryManager = new MemoryManager();
-            // Initialize the scheduler
+            // Load the scheduler
             _Scheduler = new Scheduler();
+            // Load the swapper
+            _Swapper = new Swapper();
 
             // Load the Keyboard Device Driver
             this.krnTrace("Loading the keyboard device driver.");
             _krnKeyboardDriver = new DeviceDriverKeyboard();     // Construct it.
             _krnKeyboardDriver.driverEntry();                    // Call the driverEntry() initialization routine.
             this.krnTrace(_krnKeyboardDriver.status);
+
+            // Load the Disk Device Driver
+            this.krnTrace("Loading the disk device driver");
+            _DiskDriver = new DeviceDriverDisk();
+            _DiskDriver.driverEntry();
+            this.krnTrace(_DiskDriver.status);
 
             // Load current date/time
             Control.hostTime();
@@ -58,9 +66,12 @@ module TSOS {
             }
         }
 
-        public krnShutdown() {
+        public krnShutdown(): void {
             this.krnTrace("begin shutdown OS");
-            // TODO: Check for running processes.  If there are some, alert and stop. Else...
+            // Check for running processes.  If there are some, alert and stop. Else...
+            if(_MemoryManager.runningProcess) {
+                _KernelInterruptQueue.enqueue(new Interrupt(PROCESS_EXIT_IRQ, false));
+            }
             // ... Disable the Interrupts.
             this.krnTrace("Disabling the interrupts.");
             this.krnDisableInterrupts();
@@ -70,19 +81,29 @@ module TSOS {
             this.krnTrace("end shutdown OS");
         }
 
-        public krnOnCPUClockPulse() {
-            /* This gets called from the host hardware simulation every time there is a hardware clock pulse.
-               This is NOT the same as a TIMER, which causes an interrupt and is handled like other interrupts.
-               This, on the other hand, is the clock pulse from the hardware / VM / host that tells the kernel
-               that it has to look for interrupts and process them if it finds any.                           */
-            // If executing, Increment the timer
+        /*  
+            This gets called from the host hardware simulation every time there is a hardware clock pulse.
+            This is NOT the same as a TIMER, which causes an interrupt and is handled like other interrupts.
+            This, on the other hand, is the clock pulse from the hardware / VM / host that tells the kernel
+            that it has to look for interrupts and process them if it finds any.                           
+        */
+        public krnOnCPUClockPulse(): void {
             // Check if timer has reached the quantum
-            if (this.timer > _Scheduler.quantum && _MemoryManager.readyQueue.getSize() > 0 && _CPU.isExecuting) {
-                // Throw the TIMER_IRQ
-                _KernelInterruptQueue.enqueue(new Interrupt(TIMER_IRQ, false));
-                // Reset the timer
+            if (_MemoryManager.readyQueue.getSize() > 0 && _CPU.isExecuting) {
+                if (_Scheduler.algorithm == "rr" && this.timer > _Scheduler.quantum) {
+                    // Throw the TIMER_IRQ and reset timer to 0
+                    this.krnTimerIRQ();
+                } else if (_Scheduler.algorithm == "fcfs" && this.timer > _Scheduler.quantum) {
+                    // Throw the TIMER_IRQ and reset timer to 0
+                    this.krnTimerIRQ();
+                } else if (_Scheduler.algorithm == "priority") {
+
+                }
+            // Only 1 run process is running so reset the timer
+            } else {
                 this.timer = 0;
             }
+            // If executing, Increment the timer
             if (_CPU.isExecuting) {
                 this.timer++;
             }
@@ -101,6 +122,8 @@ module TSOS {
                     // If user clicked next step, execute one step
                     if (_NextStep) {
                         _CPU.cycle();
+                        // Update the wait times and turnaround times for all processes
+                        _MemoryManager.processStats();
                         // Update displays
                         Control.hostCPU();
                         Control.hostMemory();
@@ -112,6 +135,8 @@ module TSOS {
                 // Otherwise, Execute normally
                 } else {
                     _CPU.cycle();
+                    // Update the wait times and turnaround times for all processes
+                    _MemoryManager.processStats();
                     // Update displays
                     Control.hostCPU();
                     Control.hostMemory();
@@ -134,19 +159,19 @@ module TSOS {
 
         // Interrupt Handling
 
-        public krnEnableInterrupts() {
+        public krnEnableInterrupts(): void {
             // Keyboard
             Devices.hostEnableKeyboardInterrupt();
             // Put more here.
         }
 
-        public krnDisableInterrupts() {
+        public krnDisableInterrupts(): void {
             // Keyboard
             Devices.hostDisableKeyboardInterrupt();
             // Put more here.
         }
 
-        public krnInterruptHandler(irq, params) {
+        public krnInterruptHandler(irq, params): void {
             // This is the Interrupt Handler Routine.  See pages 8 and 560.
             // Trace our entrance here so we can compute Interrupt Latency by analyzing the log file later on. Page 766.
             this.krnTrace("Handling IRQ~" + irq);
@@ -158,8 +183,6 @@ module TSOS {
             switch (irq) {
                 case TIMER_IRQ:
                     this.krnTimerISR();              // Kernel built-in routine for timers (not the clock).
-                    _StdOut.putText("Time's up!");
-                    _StdOut.advanceLine();
                     break;
 
                 case KEYBOARD_IRQ:
@@ -197,7 +220,7 @@ module TSOS {
             }
         }
 
-        public krnTimerISR() {
+        public krnTimerISR(): void {
             /* The built-in TIMER (not clock) Interrupt Service Routine (as opposed to an ISR coming from
             a device driver).
             Check multiprogramming parameters and enforce quanta here. Call the scheduler / context
@@ -221,9 +244,9 @@ module TSOS {
 
         // OS Utility Routines */
 
-        public krnTrace(msg: string) {
-             // Check globals to see if trace is set ON.  If so, then (maybe) log the message.
-             if (_Trace) {
+        public krnTrace(msg: string): void {
+            // Check globals to see if trace is set ON.  If so, then (maybe) log the message.
+            if (_Trace) {
                 if (msg === "Idle") {
                     // We can't log every idle clock pulse because it would lag the browser very quickly.
                     if (_OSclock % 10 === 0) {
@@ -234,16 +257,24 @@ module TSOS {
                 } else {
                     Control.hostLog(msg, "OS");
                 }
-             }
+            }
         }
 
-        public krnTrapError(msg) {
+        public krnTrapError(msg): void {
             // Display error
             Control.hostLog("OS ERROR - TRAP: " + msg);
             // Shutdown the kernel
             this.krnShutdown();
             // Issue melon drop
             Control.melonDrop();
+        }
+
+        // When timer is up, throw timer IRQ and reset timer to 0
+        public krnTimerIRQ(): void {
+            // Throw the TIMER_IRQ
+            _KernelInterruptQueue.enqueue(new Interrupt(TIMER_IRQ, false));
+            // Reset the timer
+            this.timer = 0;
         }
     }
 }

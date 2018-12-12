@@ -28,15 +28,22 @@ var TSOS;
             // Initialize standard input and output to the _Console.
             _StdIn = _Console;
             _StdOut = _Console;
-            // Initialize memory manager
+            // Load the memory manager
             _MemoryManager = new TSOS.MemoryManager();
-            // Initialize the scheduler
+            // Load the scheduler
             _Scheduler = new TSOS.Scheduler();
+            // Load the swapper
+            _Swapper = new TSOS.Swapper();
             // Load the Keyboard Device Driver
             this.krnTrace("Loading the keyboard device driver.");
             _krnKeyboardDriver = new TSOS.DeviceDriverKeyboard(); // Construct it.
             _krnKeyboardDriver.driverEntry(); // Call the driverEntry() initialization routine.
             this.krnTrace(_krnKeyboardDriver.status);
+            // Load the Disk Device Driver
+            this.krnTrace("Loading the disk device driver");
+            _DiskDriver = new TSOS.DeviceDriverDisk();
+            _DiskDriver.driverEntry();
+            this.krnTrace(_DiskDriver.status);
             // Load current date/time
             TSOS.Control.hostTime();
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
@@ -53,7 +60,10 @@ var TSOS;
         };
         Kernel.prototype.krnShutdown = function () {
             this.krnTrace("begin shutdown OS");
-            // TODO: Check for running processes.  If there are some, alert and stop. Else...
+            // Check for running processes.  If there are some, alert and stop. Else...
+            if (_MemoryManager.runningProcess) {
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_EXIT_IRQ, false));
+            }
             // ... Disable the Interrupts.
             this.krnTrace("Disabling the interrupts.");
             this.krnDisableInterrupts();
@@ -61,19 +71,31 @@ var TSOS;
             // More?
             this.krnTrace("end shutdown OS");
         };
+        /*
+            This gets called from the host hardware simulation every time there is a hardware clock pulse.
+            This is NOT the same as a TIMER, which causes an interrupt and is handled like other interrupts.
+            This, on the other hand, is the clock pulse from the hardware / VM / host that tells the kernel
+            that it has to look for interrupts and process them if it finds any.
+        */
         Kernel.prototype.krnOnCPUClockPulse = function () {
-            /* This gets called from the host hardware simulation every time there is a hardware clock pulse.
-               This is NOT the same as a TIMER, which causes an interrupt and is handled like other interrupts.
-               This, on the other hand, is the clock pulse from the hardware / VM / host that tells the kernel
-               that it has to look for interrupts and process them if it finds any.                           */
-            // If executing, Increment the timer
             // Check if timer has reached the quantum
-            if (this.timer > _Scheduler.quantum && _MemoryManager.readyQueue.getSize() > 0 && _CPU.isExecuting) {
-                // Throw the TIMER_IRQ
-                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(TIMER_IRQ, false));
-                // Reset the timer
+            if (_MemoryManager.readyQueue.getSize() > 0 && _CPU.isExecuting) {
+                if (_Scheduler.algorithm == "rr" && this.timer > _Scheduler.quantum) {
+                    // Throw the TIMER_IRQ and reset timer to 0
+                    this.krnTimerIRQ();
+                }
+                else if (_Scheduler.algorithm == "fcfs" && this.timer > _Scheduler.quantum) {
+                    // Throw the TIMER_IRQ and reset timer to 0
+                    this.krnTimerIRQ();
+                }
+                else if (_Scheduler.algorithm == "priority") {
+                }
+                // Only 1 run process is running so reset the timer
+            }
+            else {
                 this.timer = 0;
             }
+            // If executing, Increment the timer
             if (_CPU.isExecuting) {
                 this.timer++;
             }
@@ -93,6 +115,8 @@ var TSOS;
                     // If user clicked next step, execute one step
                     if (_NextStep) {
                         _CPU.cycle();
+                        // Update the wait times and turnaround times for all processes
+                        _MemoryManager.processStats();
                         // Update displays
                         TSOS.Control.hostCPU();
                         TSOS.Control.hostMemory();
@@ -105,6 +129,8 @@ var TSOS;
                 }
                 else {
                     _CPU.cycle();
+                    // Update the wait times and turnaround times for all processes
+                    _MemoryManager.processStats();
                     // Update displays
                     TSOS.Control.hostCPU();
                     TSOS.Control.hostMemory();
@@ -147,8 +173,6 @@ var TSOS;
             switch (irq) {
                 case TIMER_IRQ:
                     this.krnTimerISR(); // Kernel built-in routine for timers (not the clock).
-                    _StdOut.putText("Time's up!");
-                    _StdOut.advanceLine();
                     break;
                 case KEYBOARD_IRQ:
                     _krnKeyboardDriver.isr(params); // Kernel mode device driver
@@ -224,6 +248,13 @@ var TSOS;
             this.krnShutdown();
             // Issue melon drop
             TSOS.Control.melonDrop();
+        };
+        // When timer is up, throw timer IRQ and reset timer to 0
+        Kernel.prototype.krnTimerIRQ = function () {
+            // Throw the TIMER_IRQ
+            _KernelInterruptQueue.enqueue(new TSOS.Interrupt(TIMER_IRQ, false));
+            // Reset the timer
+            this.timer = 0;
         };
         return Kernel;
     }());

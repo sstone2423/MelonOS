@@ -1,5 +1,16 @@
 ///<reference path="../globals.ts" />
 
+/* ------------
+     memory.ts
+     Requires global.ts.
+     Contains 3 partitions, 256 bytes long.
+     Routines for the host memory simulation, NOT for the OS itself. In this manner, it's A LITTLE 
+     BIT like a hypervisor, in that the Document environment inside a browser is the "bare metal" 
+     (so to speak) for which we write code that hosts our client OS. But that analogy only goes 
+     so far, and the lines are blurred, because we are using TypeScript/JavaScript in both the 
+     host and client environments.
+     ------------ */
+
      module TSOS {
 
         export class Memory {
@@ -8,15 +19,15 @@
                     
             constructor() {
                 this.partitions = [
-                    {"base": 0, "limit": _PartitionSize, "isEmpty": true},
-                    {"base": 256, "limit": _PartitionSize, "isEmpty": true},
-                    {"base": 512, "limit": _PartitionSize, "isEmpty": true}
+                    {"base": 0, "limit": PARTITION_SIZE, "isEmpty": true},
+                    {"base": 256, "limit": PARTITION_SIZE, "isEmpty": true},
+                    {"base": 512, "limit": PARTITION_SIZE, "isEmpty": true}
                 ];
             }
 
             // Initialize the memory with 768 bytes
             public init(): void {
-                this.memoryArray = new Array<string>(_TotalMemorySize);
+                this.memoryArray = new Array<string>(TOTAL_MEMORY_SIZE);
                 // Initialize memory with 00's
                 for (let i = 0; i < this.memoryArray.length; i++) {
                     this.memoryArray[i] = "00";
@@ -24,10 +35,11 @@
             }
 
             // Clear memory partition
-            public clearPartition(partition): void {
+            public clearPartition(partition: number): void {
                 // Clear from the memoryArray[base] to memoryArray[limit]
                 for (let i = this.partitions[partition].base; i < this.partitions[partition].base + this.partitions[partition].limit; i++) {
                     this.memoryArray[i] = "00";
+                    this.partitions[partition].isEmpty = true;
                 }
             }
 
@@ -102,6 +114,46 @@
             // Loops address
             public branchLoop(PC, branch, partition) {
                 return (PC + branch + 2) % this.partitions[partition].limit;
+            }
+
+            public getPartitionData(partition) {
+                let data = [];
+                let base = this.partitions[partition].base;
+                let limit = this.partitions[partition].limit + this.partitions[partition].base;
+                for (let i = base; i < limit; i++){
+                    data.push(_Memory.memoryArray[i]);
+                }
+                return data;
+            }
+
+            public clearAllMemory(): void {
+                // Check if CPU is executing
+                if (!_CPU.isExecuting) {
+                    let readyQueueLength = _MemoryManager.readyQueue.getSize();
+                    // Check ready queue first since these will be executing shortly
+                    if (readyQueueLength > 0) {
+                        for (let i = 0; i < readyQueueLength; i++) {
+                            // Kill the process
+                            let pcb = _MemoryManager.readyQueue.dequeue();
+                            // Clear the memory partition
+                            _Memory.clearPartition(pcb.partition);
+                            _StdOut.putText("Clearing Process ID: " + pcb.pId + " from partition: " + pcb.partition);
+                            _StdOut.advanceLine();
+                        }
+                    }
+                    // Check wait queue second
+                    let waitQueueLength = _MemoryManager.residentQueue.getSize();
+                    if (waitQueueLength > 0) {
+                        for (let i = 0; i < waitQueueLength; i++) {
+                            // Kill the process
+                            let pcb = _MemoryManager.residentQueue.dequeue();
+                            // Clear the memory partition
+                            _Memory.clearPartition(pcb.partition);
+                            _StdOut.putText("Clearing Process ID: " + pcb.pId + " from partition: " + pcb.partition);
+                            _StdOut.advanceLine();
+                        }
+                    }
+                }
             }
         }
     }

@@ -1,3 +1,9 @@
+/* ------------
+   utils.ts
+   This is the client OS implementation of global utilities such as trim, rot13, 
+   and converting ASCII strings to Hex
+   ------------ */
+
 module TSOS {
     export class Utils {
         public static trim(str): string {
@@ -28,13 +34,25 @@ module TSOS {
                                                             // it's called rot13.
                     retVal = retVal + String.fromCharCode(code);
                 } else if ("nopqrstuvwxyzNOPQRSTUVWXYZ".indexOf(ch) >= 0) {
-                    code = str.charCodeAt(Number(i)) - 13;  // It's okay to use 13.  See above.
+                    code = str.charCodeAt(Number(i)) - 13;
                     retVal = retVal + String.fromCharCode(code);
                 } else {
                     retVal = retVal + ch;
                 }
             }
             return retVal;
+        }
+
+        // Convert string to ASCII to hex
+        public static stringToASCIItoHex(string: String) {
+            let hexArray = [];
+            // Look at each character's ASCII value and convert it to a hex string
+            for (let i = 0; i < string.length; i++){
+                let hexChar = string.charCodeAt(i).toString(16);
+                hexArray.push(hexChar);
+            }
+            // Returns an array of each character represented as hex
+            return hexArray;
         }
     }
 }

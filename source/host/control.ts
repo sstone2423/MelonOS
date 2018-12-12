@@ -65,10 +65,14 @@ module TSOS {
             _CPU = new TSOS.Cpu();  // Note: We could simulate multi-core systems by instantiating more than
                                     // one instance of the CPU here.
             _CPU.init();
-            // Initialize memory and memory manager
+            // Initialize memory
             _Memory = new Memory();
             _Memory.init();
             this.initMemoryDisplay();
+            // Initialize the Disk
+            _Disk = new Disk();
+            _Disk.init();
+            this.initDiskDisplay();
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
             // .. and call the OS Kernel Bootstrap routine.
@@ -77,8 +81,8 @@ module TSOS {
         }
 
         public static hostBtnHaltOS_click(btn): void {
-            Control.hostLog("Emergency halt", "host");
-            Control.hostLog("Attempting Kernel shutdown.", "host");
+            this.hostLog("Emergency halt", "host");
+            this.hostLog("Attempting Kernel shutdown.", "host");
             // Call the OS shutdown routine.
             _Kernel.krnShutdown();
             // Stop the interval that's simulating our clock pulse.
@@ -209,6 +213,9 @@ module TSOS {
                 // State
                 cell = row.insertCell();
                 cell.innerHTML = displayPcb.state;
+                // Priority
+                cell = row.insertCell();
+                cell.innerHTML = displayPcb.priority;
             }
         }
 
@@ -258,12 +265,17 @@ module TSOS {
                 // State
                 cell = row.insertCell();
                 cell.innerHTML = displayPcb.state;
+                // Priority
+                cell = row.insertCell();
+                cell.innerHTML = displayPcb.priority;
             }
         }
 
         // Initialize memory display
         public static initMemoryDisplay(): void {
             let table = (<HTMLTableElement>document.getElementById('tableMemory'));
+            // Delete the initial dashes
+            table.deleteRow(0);
             // We assume each row will hold 8 memory values
             for (let i = 0; i < _Memory.memoryArray.length/8; i++){
                 let row = table.insertRow(i);
@@ -347,6 +359,37 @@ module TSOS {
             const htmlDateTime = document.getElementById("currentDate");
             const currentDateTime = new Date();
             htmlDateTime.innerHTML = currentDateTime + "";
+        }
+
+        // This will update the disk display with contents of session storage
+        public static hostDisk(): void {
+            let table = (<HTMLTableElement>document.getElementById('tableDisk'));
+            let rowNum = 1;
+            // For each row, insert the TSB, available bit, pointer, and data into separate cells
+            for (let trackNum = 0; trackNum < _Disk.totalTracks; trackNum++) {
+                for (let sectorNum = 0; sectorNum < _Disk.totalSectors; sectorNum++) {
+                    for (let blockNum = 0; blockNum < _Disk.totalBlocks; blockNum++) {
+                        // generate proper tsb id since firefox sucks and doesn't keep session storage ordered
+                        let tsbID = trackNum + ":" + sectorNum + ":" + blockNum;
+                        let row = table.insertRow(rowNum);
+                        rowNum++;
+                        let tsb = row.insertCell(0);
+                        tsb.innerHTML = tsbID;
+                        let availableBit = row.insertCell(1);
+                        availableBit.innerHTML = JSON.parse(sessionStorage.getItem(tsbID)).availableBit;
+                        let pointer = row.insertCell(2);
+                        let pointerVal = JSON.parse(sessionStorage.getItem(tsbID)).pointer;
+                        pointer.innerHTML = pointerVal;
+                        let data = row.insertCell(3);
+                        data.innerHTML = JSON.parse(sessionStorage.getItem(tsbID)).data.join("").toString();
+                    }
+                }
+            }
+        }
+
+        // Initialize HDD display
+        public static initDiskDisplay(): void {
+            this.hostDisk();
         }
     }
 }

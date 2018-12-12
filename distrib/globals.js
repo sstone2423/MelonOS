@@ -18,16 +18,24 @@ var CONSOLE_WRITE_IRQ = 3;
 var INVALID_OP_IRQ = 4;
 var BOUNDS_ERROR_IRQ = 5;
 var CONTEXT_SWITCH_IRQ = 6;
+var TOTAL_MEMORY_SIZE = 768; // 786 bytes, 3 segments of 256 bytes
+var PARTITION_SIZE = 256;
+var FILENAME_EXISTS = 0;
+var FILENAME_DOESNT_EXIST = 3;
+var SUCCESS = 1;
+var DISK_IS_FULL = 2;
+var QUICK_FORMAT = 0;
+var FULL_FORMAT = 1;
 // Global variables
-// TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 var _CPU; // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
 var _OSclock = 0; // Page 23.
 var _Mode = 0; // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
+var _Disk;
+var _DiskDriver;
+var _Swapper;
 // Memory related global variables
 var _Memory;
 var _MemoryManager;
-var _TotalMemorySize = 768; // 786 bytes, 3 segments of 256 bytes
-var _PartitionSize = 256;
 // Process related global variables
 var _PCB;
 var _ProcessCount = 0;
@@ -44,16 +52,13 @@ var _FontHeightMargin = 4; // Additional space added to font size when advancing
 // The OS Kernel and its queues.
 var _Trace = true; // Default the OS trace to be on.
 var _Kernel;
-var _KernelInterruptQueue; // Initializing this to null (which I would normally do) would then require us to
-// specify the 'any' type, as below.
-var _KernelInputQueue = null; // Is this better? I don't like uninitialized letiables. But I also don't like using
-// the type specifier 'any'
-var _KernelBuffers = null; // when clearly 'any' is not what we want. There is likely a better way, but what
-// is it?
+var _KernelInterruptQueue;
+var _KernelInputQueue = null;
+var _KernelBuffers = null;
 var _SingleStep = false; // Check if Single-step is enabled
 var _NextStep = false; // Check if NextStep is enabled
 // Standard input and output
-var _StdIn; // Same "to null or not to null" issue as above.
+var _StdIn;
 var _StdOut;
 // UI
 var _Console;
@@ -62,7 +67,7 @@ var _Control;
 // At least this OS is not trying to kill you. (Yet.)
 var _SarcasticMode = false;
 // Global Device Driver Objects - page 12
-var _krnKeyboardDriver; //  = null;
+var _krnKeyboardDriver;
 var _hardwareClockID = null;
 // For testing (and enrichment)...
 var Glados = null; // This is the function Glados() in glados.js on Labouseur.com.

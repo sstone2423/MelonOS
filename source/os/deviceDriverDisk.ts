@@ -190,7 +190,6 @@
                             this.deleteData(dirBlock.pointer);
                             // Update directory block
                             dirBlock.availableBit = "0"
-                            // Keep the pointer for chkdsk
                             dirBlock.pointer = "0:0:0"; 
                             // Set in storage
                             sessionStorage.setItem(tsbId, JSON.stringify(dirBlock));
@@ -533,19 +532,6 @@
                 return SUCCESS;
             }
             return FILENAME_DOESNT_EXIST;
-        }
-
-        public checkDiskRecover() {
-            for (let i = 0; i < _Disk.totalTracks * _Disk.totalSectors * _Disk.totalBlocks; i++) {
-                // Get the JSON from the stored string
-                let block = JSON.parse(sessionStorage.getItem(sessionStorage.key(i)));
-                if (block.availableBit = "0" && block.pointer != "0:0:0") {
-                    block.availableBit = "1";
-                    sessionStorage.setItem(sessionStorage.key(i), JSON.stringify(block));
-                    // Update disk display
-                    Control.hostDisk();
-                }
-            }
         }
     }
 }

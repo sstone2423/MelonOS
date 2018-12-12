@@ -115,9 +115,6 @@ var TSOS;
             // create <filename>
             sc = new TSOS.ShellCommand(this.shellCreateFile, "create", "<filename> - Create a file fon disk.");
             this.commandList[this.commandList.length] = sc;
-            // create <filename>
-            sc = new TSOS.ShellCommand(this.shellChkDsk, "chkdsk", "- Recovers deleted files. Hopefully?");
-            this.commandList[this.commandList.length] = sc;
             // Display the initial prompt.
             this.putPrompt();
         };
@@ -354,9 +351,6 @@ var TSOS;
                     case "setschedule":
                         _StdOut.putText("setschedule <algorithm> will set the CPU scheduling algorithm to fcfs (First come first serve), rr (Round robin), or priority.");
                         break;
-                    case "chkdsk":
-                        _StdOut.putText("chkdsk recovers all deleted files.. Hopefully.");
-                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -454,6 +448,7 @@ var TSOS;
                 _StdOut.putText("Usage: status <string> Please supply a string.");
             }
         };
+        // Create a process from the user input in HTML with an optional priority. Default is 1
         Shell.prototype.shellLoad = function (args) {
             // Get value inside program input (the program)
             var userInputProgram = document.getElementById("taProgramInput").value;
@@ -467,9 +462,14 @@ var TSOS;
                 if (args.length == 1 && args[0].match(/^[0-9]\d*$/)) {
                     // Create a process using the process manager
                     _MemoryManager.createProcess(splitProgram, args);
+                    // Use default priority
+                }
+                else if (args.length == 0) {
+                    _MemoryManager.createProcess(splitProgram, args);
+                    // Invalid args
                 }
                 else {
-                    _StdOut.putText("Usage: load <priority>  Please supply a valid priority number (0 is highest, 1 is default).");
+                    _StdOut.putText("Usage: load [priority] Please supply a priority integer or use the default (1). 0 is the lowest.");
                 }
             }
             else {
@@ -811,7 +811,8 @@ var TSOS;
                 else if (status_2 == FILENAME_EXISTS) {
                     _StdOut.putText("File name already exists. Please use another file name.");
                 }
-                else if (status_2 == DISK_IS_FULL) {
+                // DISK_IS_FULL
+                else {
                     _StdOut.putText("File creation failure: No more space on disk. Delete some?");
                 }
             }
@@ -821,7 +822,16 @@ var TSOS;
         };
         // Get the current scheduling algorithm
         Shell.prototype.shellGetSchedule = function () {
-            _StdOut.putText("Current CPU scheduling algorithm is " + _Scheduler.algorithm);
+            if (_Scheduler.algorithm == "rr") {
+                _StdOut.putText("Current CPU scheduling algorithm is Round Robin and the quantum is " + _Scheduler.quantum + ".");
+            }
+            else if (_Scheduler.algorithm == "fcfs") {
+                _StdOut.putText("Current CPU scheduling algorithm is First Come First Serve and the quantum is " + _Scheduler.quantum + ".");
+                // Priority
+            }
+            else {
+                _StdOut.putText("Current CPU scheduling algorithm is Priority.");
+            }
         };
         // Set the scheduling algorithm to rr, fcfs, priority
         Shell.prototype.shellSetSchedule = function (args) {
@@ -833,11 +843,6 @@ var TSOS;
             else {
                 _StdOut.putText("Usage: setschedule <algorithm>  Please supply an algorithm (rr, fcfs, or priority).");
             }
-        };
-        // Recovers deleted files
-        Shell.prototype.shellChkDsk = function () {
-            _DiskDriver.checkDiskRecover();
-            _StdOut.putText("All deleted files recovered");
         };
         return Shell;
     }());

@@ -203,12 +203,6 @@ module TSOS {
                                   "<filename> - Create a file fon disk.");
             this.commandList[this.commandList.length] = sc;
 
-            // create <filename>
-            sc = new ShellCommand(this.shellChkDsk,
-                                  "chkdsk",
-                                  "- Recovers deleted files. Hopefully?");
-            this.commandList[this.commandList.length] = sc;
-
             // Display the initial prompt.
             this.putPrompt();
         }
@@ -462,9 +456,6 @@ module TSOS {
                     case "setschedule":
                         _StdOut.putText("setschedule <algorithm> will set the CPU scheduling algorithm to fcfs (First come first serve), rr (Round robin), or priority.");
                         break;
-                    case "chkdsk":
-                        _StdOut.putText("chkdsk recovers all deleted files.. Hopefully.");
-                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -565,6 +556,7 @@ module TSOS {
             }
         }
 
+        // Create a process from the user input in HTML with an optional priority. Default is 1
         public shellLoad(args): void {
             // Get value inside program input (the program)
             const userInputProgram = (<HTMLInputElement>document.getElementById("taProgramInput")).value;
@@ -578,8 +570,12 @@ module TSOS {
                 if (args.length == 1 && args[0].match(/^[0-9]\d*$/)) {
                     // Create a process using the process manager
                     _MemoryManager.createProcess(splitProgram, args);
+                // Use default priority
+                } else if (args.length == 0) {
+                    _MemoryManager.createProcess(splitProgram, args);
+                // Invalid args
                 } else {
-                    _StdOut.putText("Usage: load <priority>  Please supply a valid priority number (0 is highest, 1 is default).");
+                    _StdOut.putText("Usage: load [priority] Please supply a priority integer or use the default (1). 0 is the lowest.");
                 }
             } else {
                 _StdOut.putText("Program must only contain hexadecimal values (A-F, a-f, 0-9) or spaces.");
@@ -782,8 +778,8 @@ module TSOS {
                         _StdOut.putText("CPU is executing. Cannot format disk.");
                     }
                 // Perform full format
-                } else if(args[0] == "-full"){
-                    if (_DiskDriver.format(FULL_FORMAT)){
+                } else if (args[0] == "-full") {
+                    if (_DiskDriver.format(FULL_FORMAT)) {
                         _StdOut.putText("Disk formatted successfully!");
                     }
                     else {
@@ -907,7 +903,8 @@ module TSOS {
                 } else if (status == FILENAME_EXISTS) {
                     _StdOut.putText("File name already exists. Please use another file name.");
                 }
-                else if (status == DISK_IS_FULL) {
+                // DISK_IS_FULL
+                else {
                     _StdOut.putText("File creation failure: No more space on disk. Delete some?");
                 }
             }
@@ -918,7 +915,14 @@ module TSOS {
 
         // Get the current scheduling algorithm
         public shellGetSchedule(): void {
-            _StdOut.putText("Current CPU scheduling algorithm is " + _Scheduler.algorithm);
+            if (_Scheduler.algorithm == "rr") {
+                _StdOut.putText("Current CPU scheduling algorithm is Round Robin and the quantum is " + _Scheduler.quantum + ".");
+            } else if (_Scheduler.algorithm == "fcfs") {
+                _StdOut.putText("Current CPU scheduling algorithm is First Come First Serve and the quantum is " + _Scheduler.quantum + ".");
+            // Priority
+            } else {
+                _StdOut.putText("Current CPU scheduling algorithm is Priority.");
+            }
         }
 
         // Set the scheduling algorithm to rr, fcfs, priority
@@ -930,12 +934,6 @@ module TSOS {
             } else {
                 _StdOut.putText("Usage: setschedule <algorithm>  Please supply an algorithm (rr, fcfs, or priority).");
             }
-        }
-
-        // Recovers deleted files
-        public shellChkDsk(): void {
-            _DiskDriver.checkDiskRecover();
-            _StdOut.putText("All deleted files recovered");
         }
     }
 }

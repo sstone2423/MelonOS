@@ -27,7 +27,7 @@ module TSOS {
         }
 
         // Change the algorithm
-        public changeAlgorithm(algorithm): void {
+        public changeAlgorithm(algorithm: string): void {
             this.algorithm = algorithm;
         }
 

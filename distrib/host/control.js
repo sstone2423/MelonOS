@@ -204,6 +204,9 @@ var TSOS;
                 // State
                 cell = row.insertCell();
                 cell.innerHTML = displayPcb.state;
+                // Priority
+                cell = row.insertCell();
+                cell.innerHTML = displayPcb.priority;
             }
         };
         // Update the ready queue table
@@ -252,6 +255,9 @@ var TSOS;
                 // State
                 cell = row.insertCell();
                 cell.innerHTML = displayPcb.state;
+                // Priority
+                cell = row.insertCell();
+                cell.innerHTML = displayPcb.priority;
             }
         };
         // Initialize memory display

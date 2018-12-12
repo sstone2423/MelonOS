@@ -213,6 +213,9 @@ module TSOS {
                 // State
                 cell = row.insertCell();
                 cell.innerHTML = displayPcb.state;
+                // Priority
+                cell = row.insertCell();
+                cell.innerHTML = displayPcb.priority;
             }
         }
 
@@ -262,6 +265,9 @@ module TSOS {
                 // State
                 cell = row.insertCell();
                 cell.innerHTML = displayPcb.state;
+                // Priority
+                cell = row.insertCell();
+                cell.innerHTML = displayPcb.priority;
             }
         }
 

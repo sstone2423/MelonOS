@@ -49,7 +49,7 @@
                                 <!--Buttons row-->
                                 <div class="row">
                                         <div class="col-sm">
-                                                <div class="btn-group" style="margin-top: 1%;">
+                                                <div class="btn-group topRow">
                                                         <input type="button"
                                                                 id = "btnStartOS"
                                                                 name="brnStartOS"
@@ -96,7 +96,7 @@
                                 <!--Status/date/time Row-->
                                 <div class="row">
                                         <div class="col-sm">
-                                                <div class="card" style="width: 23.7rem; margin-top: 1%; margin-bottom: 2%;">
+                                                <div id="statusCard" class="card">
                                                         <ul class="list-group list-group-flush">
                                                                 <li id="status" class="list-group-item">Status: I love melons </li>
                                                                 <li id="currentDate" class="list-group-item">Current Date: ..</li>                                                        </ul>
@@ -105,7 +105,7 @@
                                 </div>
                         </div>
                         <!--Melon logo column-->
-                        <div class="col-sm" style="margin-top: 1%;">
+                        <div class="col-sm topRow">
                                 <div class="text-center">
                                         <img id ="melonImage" src="melonOS.gif" alt="MelonOS" height="110" width="350"/>
                                 </div>
@@ -115,9 +115,9 @@
                                 <div class="row">
                                         <!--CPU column-->
                                         <div class="col-sm">
-                                                <div id="divCPU" style="margin-left: 5%;"">
+                                                <div id="divCPU">
                                                         <label>
-                                                        <span class="badge badge-success" style="margin-top: 3%; padding: 2%;">CPU</span>
+                                                        <span class="badge badge-success badgeQueue">CPU</span>
                                                         <br>
                                                                 <table id="tableCPU" class="table table-striped">
                                                                         <thead>
@@ -147,8 +147,8 @@
                                         <!--Contact column-->
                                         <div class="col-sm">
                                                 <div class="row">
-                                                        <div class="col-sm" style="margin-top: 3%;">
-                                                                <div class="card" style="width: 11rem; margin-top: 1%; margin-bottom: 2%; float: right;">
+                                                        <div class="col-sm topRow">
+                                                                <div class="card" id="contactCard">
                                                                         <ul class="list-group list-group-flush">
                                                                                 <li class="list-group-item text-center">By Stephen Stone</li>
                                                                                 <li class="list-group-item">
@@ -156,7 +156,7 @@
                                                                                                 <img src="GitHub_Logo.png" alt="Stephen's Github" height="22px" width="55px" />
                                                                                         </a>
                                                                                         <a href="https://www.linkedin.com/in/stephen-stone/">
-                                                                                                <img style="margin-left: 3%; margin-bottom: 1%;" src="LinkedIn_Logo.svg.png" alt="Stephen's LinkedIn" height="20px" width="67px" />
+                                                                                                <img id="linkedIn" src="LinkedIn_Logo.svg.png" alt="Stephen's LinkedIn" height="20px" width="67px" />
                                                                                         </a>
                                                                                 </li>   
                                                                         </ul>
@@ -171,10 +171,10 @@
                         <!--Main row-->
                         <div class="row">
                                 <!--Host Log and user input column-->
-                                <div class="col-sm" style="float:left;">
+                                <div class="col-sm"">
                                         <div id="divLog">
                                                 <label>
-                                                        <span class="badge badge-success" style="margin-top: 3%; padding: 2%;">Host Log</span>
+                                                        <span class="badge badge-success badgeQueue">Host Log</span>
                                                         <br>
                                                         <textarea name="taHostLog"
                                                                 class="form-control"
@@ -186,7 +186,7 @@
                                         </div>
                                         <div id="divUserProgramInput">
                                                 <label>
-                                                        <span class="badge badge-success" style="margin-top: 3%; padding: 2%;">User Program Input</span>
+                                                        <span class="badge badge-success badgeQueue">User Program Input</span>
                                                         <br>
                                                         <textarea name="taProgramInput"
                                                                 class="form-control"
@@ -210,9 +210,9 @@
                                                 <div class="col-sm">
                                                         <div id="divProcess">
                                                                 <label>
-                                                                        <span class="badge badge-success" style="margin-top: 3%; padding: 2%; ">Resident Queue</span>
+                                                                        <span class="badge badge-success badgeQueue">Resident Queue</span>
                                                                         <br>
-                                                                        <table id="tableProcesses" class="table table-striped" style="height: 125px; overflow: scroll; display: block;">
+                                                                        <table id="tableProcesses" class="table table-striped tableDisplay">
                                                                                 <thead>
                                                                                         <tr>
                                                                                                 <td>PID</td>
@@ -249,9 +249,9 @@
                                                 <div class="col-sm">
                                                         <div id="divReady">
                                                                 <label>
-                                                                        <span class="badge badge-success" style="margin-top: 3%; padding: 2%;">Ready Queue</span>
+                                                                        <span class="badge badge-success badgeQueue">Ready Queue</span>
                                                                         <br>
-                                                                        <table id="tableReady" class="table table-striped" style="height: 125px; overflow: scroll; display: block;">
+                                                                        <table id="tableReady" class="table table-striped tableDisplay">
                                                                                 <thead>
                                                                                         <tr>
                                                                                                 <td>PID</td>
@@ -288,24 +288,22 @@
                                                 <div class="col-sm">
                                                         <div id="divMemory">
                                                                 <label>
-                                                                        <span class="badge badge-success" style="margin-top: 3%; padding: 2%;">Memory</span>
+                                                                        <span class="badge badge-success badgeQueue">Memory</span>
                                                                         <br>
-                                                                        <table id="tableMemory" 
-                                                                        class="table table-striped"
-                                                                        style="height: 125px; overflow: scroll; display: block;">
-                                                                        <tbody>
-                                                                                <tr>
-                                                                                        <td>-x--</td>
-                                                                                        <td>--</td>
-                                                                                        <td>--</td>
-                                                                                        <td>--</td>
-                                                                                        <td>--</td>
-                                                                                        <td>--</td>
-                                                                                        <td>--</td>
-                                                                                        <td>--</td>
-                                                                                        <td>--</td>
-                                                                                </tr>
-                                                                        </tbody>
+                                                                        <table id="tableMemory" class="table table-striped tableDisplay">
+                                                                                <tbody>
+                                                                                        <tr>
+                                                                                                <td>-x--</td>
+                                                                                                <td>--</td>
+                                                                                                <td>--</td>
+                                                                                                <td>--</td>
+                                                                                                <td>--</td>
+                                                                                                <td>--</td>
+                                                                                                <td>--</td>
+                                                                                                <td>--</td>
+                                                                                                <td>--</td>
+                                                                                        </tr>
+                                                                                </tbody>
                                                                         </table>
                                                                 </label>
                                                         </div>
@@ -318,12 +316,9 @@
                                 <div class="col-sm">
                                         <div id="divDisk" class="text-center">
 						<label>
-                                                        <span class="badge badge-success" style="float:left; padding: .5%;">HDD</span>
+                                                        <span id="badgeHDD" class="badge badge-success">HDD</span>
                                                         <br>
-							<table name="tableDisk"
-							        id="tableDisk"
-								style="height: 250px; overflow: scroll; display: block;"
-                                                                class="table table-striped">
+							<table id="tableDisk" class="table table-striped">
                                                                 <thead>
                                                                         <tr>
                                                                                 <td>TSB</td>

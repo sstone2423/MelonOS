@@ -878,11 +878,13 @@ module TSOS {
                     return;
                 }
                 let info = _DiskDriver.readFile(args[0]);
-                if (info == FILENAME_DOESNT_EXIST) {
-                    _StdOut.putText("The file: " + args[0] + " does not exist.");
+                // If it exists, print out file
+                if (info.status == SUCCESS) {
+                    _StdOut.putText(info.fileData.join(""));
+                // If it doesn't exist, let them know
+                } else {
+                    _StdOut.putText("The file " + args[0] + " does not exist.");
                 }
-                // Print out file
-                _StdOut.putText(info.fileData.join(""));
             } else {
                 _StdOut.putText("Usage: read <filename>  Please supply a filename.");
             }

@@ -1,5 +1,5 @@
 # MelonOS - A Operating System built with Typescript
 
-Browser used: Mozilla Firefox
+Browsers used: Mozilla Firefox & Google Chrome
 
-Linter report will be shown in `linted`
+This virtual operating system consists of virtual hardware consisting of CPU, Memory, and HDD and has multiple scripts that control those pieces of hardware through the kernel.

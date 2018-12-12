@@ -3,5 +3,3 @@
 *.iml
 /node_modules
 yarn.lock
-c
-package.json

@@ -328,9 +328,23 @@
                 // Perform a recursive read
                 let tsb = dirBlock.pointer;
                 let data = this.readData(tsb);
+                let dataPtr = 0;
+                let fileData = [];
+                let end: boolean = false;
+                while (!end) {
+                    // Read until we reach 00-terminated string
+                    if (data[dataPtr] != "00") {
+                        // Push each character into array
+                        fileData.push(String.fromCharCode(parseInt(data[dataPtr], 16))); 
+                        dataPtr++; 
+                    } else {
+                        end = true;
+                    }
+                }
                 info = {
                     "status": SUCCESS,
-                    "data" : data
+                    "data": data,
+                    "fileData": fileData
                 };
                 // Return success and data
                 return info;

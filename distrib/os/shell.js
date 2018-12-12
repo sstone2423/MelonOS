@@ -755,14 +755,14 @@ var TSOS;
                     _StdOut.putText("Files may only have characters and spaces written to them.");
                     return;
                 }
-                var status_2 = _DiskDriver.writeFile(args[0], string);
-                if (status_2 == SUCCESS) {
+                var info = _DiskDriver.writeFile(args[0], string);
+                if (info == SUCCESS) {
                     _StdOut.putText("The file " + args[0] + " has been successfully written to.");
                 }
-                else if (status_2 == FILENAME_DOESNT_EXIST) {
+                else if (info == FILENAME_DOESNT_EXIST) {
                     _StdOut.putText("The file " + args[0] + " does not exist.");
                 }
-                else if (status_2 == DISK_IS_FULL) {
+                else if (info == DISK_IS_FULL) {
                     _StdOut.putText("Unable to write to the file: " + args[0] + ". Not enough disk space to write.");
                 }
             }
@@ -779,12 +779,12 @@ var TSOS;
                     _StdOut.putText("Cannot read a swapped file.");
                     return;
                 }
-                var status_3 = _DiskDriver.readFile(args[0]);
-                if (status_3 == FILENAME_DOESNT_EXIST) {
+                var info = _DiskDriver.readFile(args[0]);
+                if (info == FILENAME_DOESNT_EXIST) {
                     _StdOut.putText("The file: " + args[0] + " does not exist.");
                 }
                 // Print out file
-                _StdOut.putText(status_3.fileData.join(""));
+                _StdOut.putText(info.fileData.join(""));
             }
             else {
                 _StdOut.putText("Usage: read <filename>  Please supply a filename.");
@@ -801,14 +801,14 @@ var TSOS;
                     return;
                 }
                 // Return the status of the file creation
-                var status_4 = _DiskDriver.createFile(args[0]);
-                if (status_4 == SUCCESS) {
+                var status_2 = _DiskDriver.createFile(args[0]);
+                if (status_2 == SUCCESS) {
                     _StdOut.putText("File successfully created: " + args[0]);
                 }
-                else if (status_4 == FILENAME_EXISTS) {
+                else if (status_2 == FILENAME_EXISTS) {
                     _StdOut.putText("File name already exists. Please use another file name.");
                 }
-                else if (status_4 == DISK_IS_FULL) {
+                else if (status_2 == DISK_IS_FULL) {
                     _StdOut.putText("File creation failure: No more space on disk. Delete some?");
                 }
             }

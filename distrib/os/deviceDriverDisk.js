@@ -329,9 +329,24 @@ var TSOS;
                 // Perform a recursive read
                 var tsb = dirBlock.pointer;
                 var data = this.readData(tsb);
+                var dataPtr = 0;
+                var fileData = [];
+                var end = false;
+                while (!end) {
+                    // Read until we reach 00-terminated string
+                    if (data[dataPtr] != "00") {
+                        // Push each character into array
+                        fileData.push(String.fromCharCode(parseInt(data[dataPtr], 16)));
+                        dataPtr++;
+                    }
+                    else {
+                        end = true;
+                    }
+                }
                 info = {
                     "status": SUCCESS,
-                    "data": data
+                    "data": data,
+                    "fileData": fileData
                 };
                 // Return success and data
                 return info;

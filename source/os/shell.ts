@@ -855,12 +855,12 @@ module TSOS {
                     _StdOut.putText("Files may only have characters and spaces written to them.");
                     return;
                 }
-                let status = _DiskDriver.writeFile(args[0], string);
-                if (status == SUCCESS) {
+                let info = _DiskDriver.writeFile(args[0], string);
+                if (info == SUCCESS) {
                     _StdOut.putText("The file " + args[0] + " has been successfully written to.");
-                } else if (status == FILENAME_DOESNT_EXIST) {
+                } else if (info == FILENAME_DOESNT_EXIST) {
                     _StdOut.putText("The file " + args[0] + " does not exist.");
-                } else if (status == DISK_IS_FULL) {
+                } else if (info == DISK_IS_FULL) {
                     _StdOut.putText("Unable to write to the file: " + args[0] + ". Not enough disk space to write.");
                 }
             } else {
@@ -877,12 +877,12 @@ module TSOS {
                     _StdOut.putText("Cannot read a swapped file.");
                     return;
                 }
-                let status = _DiskDriver.readFile(args[0]);
-                if (status == FILENAME_DOESNT_EXIST) {
+                let info = _DiskDriver.readFile(args[0]);
+                if (info == FILENAME_DOESNT_EXIST) {
                     _StdOut.putText("The file: " + args[0] + " does not exist.");
                 }
                 // Print out file
-                _StdOut.putText(status.fileData.join(""));
+                _StdOut.putText(info.fileData.join(""));
             } else {
                 _StdOut.putText("Usage: read <filename>  Please supply a filename.");
             }

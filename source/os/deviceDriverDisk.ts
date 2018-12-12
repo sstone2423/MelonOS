@@ -208,18 +208,14 @@
         // Recursively deletes from a given TSB
         public deleteData(pointer_tsb): void {
             // Block that belongs to the TSB
-            console.log("pointer_tsb: " + pointer_tsb);
             let ptrBlock = JSON.parse(sessionStorage.getItem(pointer_tsb)); 
             if (ptrBlock.pointer != "0:0:0") {
-                console.log("ptrblock.pointer entering recursion: " + ptrBlock.pointer);
-                // follow links
+                // Recursion for daysss
                 this.deleteData(ptrBlock.pointer);
             }
             ptrBlock.pointer = "0:0:0";
             // Set the block to available
             ptrBlock.availableBit = "0";
-            console.log("ptrblock.pointer after check: " + ptrBlock.pointer);
-            console.log("ptrblock.avabit: " + ptrBlock.availableBit);
             // Update the item in sessionStorage
             sessionStorage.setItem(pointer_tsb, JSON.stringify(ptrBlock));
 
@@ -522,7 +518,7 @@
                 this.writeDataToFile(dirBlock.pointer, opCodes);
                 return SUCCESS;
             }
-            return FILENAME_DOESNT_EXISTS;
+            return FILENAME_DOESNT_EXIST;
         }
 
         public checkDiskRecover() {

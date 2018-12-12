@@ -525,32 +525,32 @@ module TSOS {
 
         public shellMelon(): void {
             // Get a random number between 1 and 8
-            const randomPun = Math.floor(Math.random() * 8) + 1;
+            const randomPun = Math.floor(Math.random() * 8);
 
             // Find an excellent pun for our melonicious users
             switch (randomPun) {
-                case 1:
+                case 0:
                     _StdOut.putText("Sur-round yourself with melons.");
                     break;
-                case 2:
+                case 1:
                     _StdOut.putText("It's not pulp fiction.");
                     break;
-                case 3:
+                case 2:
                     _StdOut.putText("This may sound a little 'fruity,' but we think you'll like it.");
                     break;
-                case 4:
+                case 3:
                     _StdOut.putText("Who says you cant(alope)?");
                     break;
-                case 5:
+                case 4:
                     _StdOut.putText("With melons you can!");
                     break;
-                case 6:
+                case 5:
                     _StdOut.putText("MelonOS has a thick skin and a fruity interior.");
                     break;
-                case 7:
+                case 6:
                     _StdOut.putText("Dew, or dew not, there is no try.");
                     break;
-                case 8:
+                case 7:
                     _StdOut.putText("Things aren't jellin with these melons.");
                     break;
             }
@@ -835,7 +835,7 @@ module TSOS {
                 let status = _DiskDriver.writeFile(args[0], string);
                 if (status == SUCCESS) {
                     _StdOut.putText("The file: " + args[0] + " has been successfully written to.");
-                } else if (status == FILENAME_DOESNT_EXISTS) {
+                } else if (status == FILENAME_DOESNT_EXIST) {
                     _StdOut.putText("The file: " + args[0] + " does not exist.");
                 } else if (status == DISK_IS_FULL) {
                     _StdOut.putText("Unable to write to the file: " + args[0] + ". Not enough disk space to write.");

@@ -70,8 +70,7 @@ var TSOS;
         };
         Swapper.prototype.rollOut = function (pcb) {
             // Find swap file in directory structure
-            var filename = "$SWAP" + pcb.Pid;
-            // Get the TSB of the program stored in disk
+            var filename = "$SWAP" + pcb.pId;
             // Get random partition from memory
             var swappedPartition = Math.floor(Math.random() * _Memory.partitions.length);
             // Look for the PCB with that partition
@@ -94,51 +93,65 @@ var TSOS;
                 // Free the partition
                 _Memory.clearPartition(swappedPartition);
                 // Get data from disk
-                var data = _DiskDriver.readFile(filename).data;
-                // let data = _krnDiskDriver.krnDiskReadData(tsb);
-                // Trim off extra bytes
-                var extraData = Math.ceil(PARTITION_SIZE / _Disk.dataSize) * _Disk.dataSize;
-                for (var i = 0; i < extraData - PARTITION_SIZE; i++) {
-                    data.pop();
-                }
-                // Put data from disk into the partition from memory
-                if (_Memory.checkMemorySpace()) {
-                    var partition = _Memory.getEmptyPartition();
-                    _Memory.loadIntoMemory(data, partition);
-                    // Update the PCB's partition to the one it got placed in
-                    pcb.partition = partition;
-                    pcb.swapped = false;
-                    pcb.state = "Ready";
-                    // Remove the program from disk by deleting the swap file
-                    _DiskDriver.deleteFile(filename);
-                    // Update disk display
-                    TSOS.Control.hostDisk();
+                var data = _DiskDriver.readFile(filename);
+                if (data.status === SUCCESS) {
+                    // Trim off extra bytes
+                    var extraData = Math.ceil(PARTITION_SIZE / _Disk.dataSize) * _Disk.dataSize;
+                    for (var i = 0; i < extraData - PARTITION_SIZE; i++) {
+                        data.data.pop();
+                    }
+                    // Put data from disk into the partition from memory
+                    if (_Memory.checkMemorySpace()) {
+                        var partition = _Memory.getEmptyPartition();
+                        _Memory.loadIntoMemory(data.data, partition);
+                        // Update the PCB's partition to the one it got placed in
+                        pcb.partition = partition;
+                        pcb.swapped = false;
+                        pcb.state = "Ready";
+                        // Remove the program from disk by deleting the swap file
+                        var status_2 = _DiskDriver.deleteFile(filename);
+                        if (status_2 === SUCCESS) {
+                            // Update disk display
+                            TSOS.Control.hostDisk();
+                        }
+                        else {
+                            _StdOut.putText("Deletion of file failed. ");
+                            return;
+                        }
+                    }
+                    else {
+                        _StdOut.putText("Memory ran out of space even though I cleared it..");
+                        return;
+                    }
+                    // Put the data from memory into disk and get the TSB of where it was written
+                    var memoryToDiskTSB = this.putProcessToDisk(memoryData, swappedPcb.pId);
+                    if (memoryToDiskTSB != null) {
+                        // Update the PCB to show that it is in disk
+                        swappedPcb.partition = -1;
+                        swappedPcb.swapped = true;
+                        swappedPcb.state = "Swapped";
+                        swappedPcb.TSB = memoryToDiskTSB;
+                        TSOS.Control.hostLog("Performed roll out and roll in", "os");
+                        // Update processes display
+                        TSOS.Control.hostProcesses();
+                        return;
+                        // No more memory in disk even though we just cleared room for it. Raise the alarms.
+                    }
+                    else {
+                        TSOS.Control.hostLog("Not enough space for rollout", "os");
+                        // Stop the CPU from executing, clear memory, and activate BSOD
+                        _Memory.clearAllMemory();
+                        _CPU.isExecuting = false;
+                        _StdOut.putText("Not enough space on disk for rollout. Please reformat your disk.");
+                        _Kernel.krnTrapError("AHHHHHH");
+                    }
                 }
                 else {
-                    return;
+                    _StdOut.putText("File read failure.");
                 }
-                // Put the data from memory into disk and get the TSB of where it was written
-                var memoryToDiskTSB = this.putProcessToDisk(memoryData, swappedPcb.pId);
-                if (memoryToDiskTSB != null) {
-                    // Update the PCB to show that it is in disk
-                    swappedPcb.partition = -1;
-                    swappedPcb.swapped = true;
-                    swappedPcb.state = "Swapped";
-                    swappedPcb.TSB = memoryToDiskTSB;
-                    TSOS.Control.hostLog("Performed roll out and roll in", "os");
-                    // Update processes display
-                    TSOS.Control.hostProcesses();
-                    return;
-                    // No more memory in disk even though we just cleared room for it. Raise the alarms.
-                }
-                else {
-                    TSOS.Control.hostLog("Not enough space for rollout", "os");
-                    // Stop the CPU from executing, clear memory, and activate BSOD
-                    _Memory.clearAllMemory();
-                    _CPU.isExecuting = false;
-                    _StdOut.putText("Not enough space on disk for rollout. Please reformat your disk.");
-                    _Kernel.krnTrapError("AHHHHHH");
-                }
+            }
+            else {
+                _StdOut.putText("Did not find a PCB to swap with..");
             }
         };
         return Swapper;

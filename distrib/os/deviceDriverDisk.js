@@ -212,18 +212,14 @@ var TSOS;
         // Recursively deletes from a given TSB
         DeviceDriverDisk.prototype.deleteData = function (pointer_tsb) {
             // Block that belongs to the TSB
-            console.log("pointer_tsb: " + pointer_tsb);
             var ptrBlock = JSON.parse(sessionStorage.getItem(pointer_tsb));
             if (ptrBlock.pointer != "0:0:0") {
-                console.log("ptrblock.pointer entering recursion: " + ptrBlock.pointer);
-                // follow links
+                // Recursion for daysss
                 this.deleteData(ptrBlock.pointer);
             }
             ptrBlock.pointer = "0:0:0";
             // Set the block to available
             ptrBlock.availableBit = "0";
-            console.log("ptrblock.pointer after check: " + ptrBlock.pointer);
-            console.log("ptrblock.avabit: " + ptrBlock.availableBit);
             // Update the item in sessionStorage
             sessionStorage.setItem(pointer_tsb, JSON.stringify(ptrBlock));
             return;
@@ -519,7 +515,7 @@ var TSOS;
                 this.writeDataToFile(dirBlock.pointer, opCodes);
                 return SUCCESS;
             }
-            return FILENAME_DOESNT_EXISTS;
+            return FILENAME_DOESNT_EXIST;
         };
         DeviceDriverDisk.prototype.checkDiskRecover = function () {
             for (var i = 0; i < _Disk.totalTracks * _Disk.totalSectors * _Disk.totalBlocks; i++) {

@@ -35,10 +35,11 @@
             }
 
             // Clear memory partition
-            public clearPartition(partition): void {
+            public clearPartition(partition: number): void {
                 // Clear from the memoryArray[base] to memoryArray[limit]
                 for (let i = this.partitions[partition].base; i < this.partitions[partition].base + this.partitions[partition].limit; i++) {
                     this.memoryArray[i] = "00";
+                    this.partitions[partition].isEmpty = true;
                 }
             }
 

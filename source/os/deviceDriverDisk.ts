@@ -20,8 +20,8 @@
             this.driverEntry = this.krnDiskDriverEntry;
         }
 
+        // Initialization routine for this, the kernel-mode Disk Device Driver.
         public krnDiskDriverEntry(): void {
-            // Initialization routine for this, the kernel-mode Disk Device Driver.
             this.status = "loaded";
             // More?
         }
@@ -88,13 +88,16 @@
                             Control.hostDisk();
                             return SUCCESS;
                         }
-                        return DISK_IS_FULL; // We ran through the data structure but there were no free blocks, meaning no more space on disk
+                        // We ran through the data structure but there were no free blocks, meaning no more space on disk
+                        return DISK_IS_FULL;
                     }
                 }
             }
-            return DISK_IS_FULL; // We ran through the directory data structure but there were no free blocks, meaning no more space on disk
+            // We ran through the data structure but there were no free blocks, meaning no more space on disk
+            return DISK_IS_FULL;
         }
 
+        // Checks for an existing filename on disk. Returns a status object
         public checkForExistingFile(filename: String) {
             let check;
             let hexArray = Utils.stringToASCIItoHex(filename);
@@ -133,13 +136,13 @@
             return check;
         }
 
-        // Return the TSB of the next free data block. If can't find, return null.
+        // Return the TSB of the next free data block. If it can't find one, return null.
         public findFreeDataBlock() {
             // Generate tsbId
             for (let trackNum = 1; trackNum < _Disk.totalTracks; trackNum++) {
                 for (let sectorNum = 0; sectorNum < _Disk.totalSectors; sectorNum++) {
                     for (let blockNum = 0; blockNum < _Disk.totalBlocks; blockNum++) {
-                        let tsbId = trackNum + ":" + sectorNum + ":" + blockNum;
+                        let tsbId: string = trackNum + ":" + sectorNum + ":" + blockNum;
                         let dataBlock = JSON.parse(sessionStorage.getItem(tsbId));
                         // If the block is available, mark it as unavailable, and set its tsb to the dirBlock pointer
                         if (dataBlock.availableBit == "0") {
@@ -240,7 +243,7 @@
             } else {
                 // For all values in session storage, set available bit to 0, pointer to 0,0,0, and fill data with 00s
                 let zeroes: Array<String> = [];
-                for (let i = 0; i < 60; i++) {
+                for (let i = 0; i < DATA_SIZE; i++) {
                     zeroes.push("00");
                 }
                 for (let j = 0; j < _Disk.totalTracks * _Disk.totalSectors * _Disk.totalBlocks; j++){
@@ -257,7 +260,7 @@
             for (let i = 0; i < size; i++) {
                 let pcb = _MemoryManager.residentQueue.dequeue();
                 if (pcb.Swapped) {
-                    // Do nothing
+                    // Do nothing. That PCB is gone now
                 }
                 else {
                     // Put the process back into the resident queue
@@ -356,7 +359,7 @@
             }
         }
 
-        public readData(tsb: string) {
+        public readData(tsb: string): Array<string> {
             let dataBlock = JSON.parse(sessionStorage.getItem(tsb));
             let dataPtr: number = 0;
             // Hex array of data
@@ -380,8 +383,8 @@
             return data;
         }
 
-        // Write to a file on disk
-        public writeFile(filename: string, data: string) {
+        // Write to a file on disk. Returns status number
+        public writeFile(filename: string, data: string): number {
             let check = this.checkForExistingFile(filename);
             // If name is found
             if (check.matchingFileName) {
@@ -403,9 +406,9 @@
         }
 
         // Write data to a file on disk
-        public writeDataToFile(tsb: string, dataHexArray: Array<String>) {
-            let dataPtr = 0;
-            let currentTSB = tsb;
+        public writeDataToFile(tsb: string, dataHexArray: Array<String>): void {
+            let dataPtr: number = 0;
+            let currentTSB: string = tsb;
             let currentBlock = JSON.parse(sessionStorage.getItem(currentTSB));
             // First, clear out any data that was there previously
             currentBlock = this.clearData(currentBlock);
@@ -413,7 +416,7 @@
                 currentBlock.data[dataPtr] = dataHexArray[i];
                 dataPtr++;
                 // Check to see if we've reached the limit of what data the block can hold. If so, go to the next block.
-                if (dataPtr == 60) {
+                if (dataPtr == DATA_SIZE) {
                     // Set the block in session storage first
                     sessionStorage.setItem(currentTSB, JSON.stringify(currentBlock));
                     currentTSB = currentBlock.pointer;
@@ -432,14 +435,16 @@
             Control.hostDisk();
         }
 
+        // Get and return the size of a TSB
         public getTsbSize(tsb: string): number {
             return this.readData(tsb).length;
         }
 
+        // Allocate disk space
         public allocateDiskSpace(file: Array<String>, tsb: string): boolean {
             // Check size of text. If it is longer than 60, then we need to have enough datablocks
             let stringLength = file.length;
-            // pointer to current block we're looking at
+            // Pointer to current block we're looking at
             let dataBlockTSB = tsb;
             let dataBlock = JSON.parse(sessionStorage.getItem(dataBlockTSB)); 
             // If data block we're writing to is already pointing to something, we need to traverse it.
@@ -448,8 +453,6 @@
                 // If pointer is 0:0:0, then we need to find free blocks
                 if(dataBlock.pointer != "0:0:0" && dataBlock.availableBit == "1"){
                     stringLength -= _Disk.dataSize;
-                    // dataBlock.availableBit = "1";
-                    // sessionStorage.setItem(dataBlockTSB, JSON.stringify(dataBlock));
                     // Update pointers
                     dataBlockTSB = dataBlock.pointer;
                     dataBlock = JSON.parse(sessionStorage.getItem(dataBlock.pointer));
@@ -457,7 +460,6 @@
                     // We reached the end of the blocks that have already been allocated for this file
                     // Mark the starting block as in use
                     dataBlock.availableBit = "1";
-                    // Find enough free data blocks, if can't, return error
                     // First, find out how many more datablocks we need
                     let numBlocks = Math.ceil(stringLength / _Disk.dataSize);
                     // Go find that number of free blocks
@@ -487,10 +489,9 @@
             return true;
         }
 
-        public findFreeDataBlocks(numBlocks: number) {
+        // Find enough free data blocks, if can't, return null
+        public findFreeDataBlocks(numBlocksNeeded: number) {
             let blocks = [];
-            let startOfDiskIndex = _Disk.totalSectors * _Disk.totalBlocks;
-            let endOfDiskIndex = _Disk.totalTracks * _Disk.totalSectors * _Disk.totalBlocks;
             // Generate proper tsbId
             for (let trackNum = 1; trackNum < _Disk.totalTracks; trackNum++) {
                 for (let sectorNum = 0; sectorNum < _Disk.totalSectors; sectorNum++) {
@@ -500,29 +501,32 @@
                         // If the block is available, push it to the array of free blocks we can use
                         if (dataBlock.availableBit == "0") {
                             blocks.push(tsbId);
-                            numBlocks--;
+                            numBlocksNeeded--;
                         }
                         // We found enough free blocks
-                        if (numBlocks == 0) {
+                        if (numBlocksNeeded == 0) {
                             return blocks;
                         }
                     }
                 }
             }
-            if (numBlocks != 0) {
+            if (numBlocksNeeded != 0) {
                 return null;
             }
         }
         
+        // Write swap file to Disk
         public writeSwap(filename: String, opCodes: Array<String>): number {
+            // Check if the file exists
             let check = this.checkForExistingFile(filename);
-
+            // If it exists, attempt to write to disk
             if (check.matchingFileName) {
                 // Allocates enough free space for the file
                 let dirBlock = JSON.parse(sessionStorage.getItem(check.tsbId));
                 let dataBlock = JSON.parse(sessionStorage.getItem(dirBlock.pointer));
                 dataBlock.availableBit = "0";
                 sessionStorage.setItem(dirBlock.pointer, JSON.stringify(dataBlock));
+                // Check if there is enough space
                 let freeSpace: boolean = this.allocateDiskSpace(opCodes, dirBlock.pointer);
                 if (!freeSpace) {
                     return DISK_IS_FULL;

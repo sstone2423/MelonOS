@@ -29,14 +29,17 @@ module TSOS {
         public isScrollingCommands = false;
         public scrollingCommandIndex = 0;
 
+        // Initialization routine for this, the kernel-mode Keyboard Device Driver.
         public krnKbdDriverEntry(): void {
-            // Initialization routine for this, the kernel-mode Keyboard Device Driver.
             this.status = "loaded";
             // More?
         }
 
+        // Parse keypress keyCodes
         public krnKbdDispatchKeyPress(params): void {
-            // Parse the params.    TODO: Check that the params are valid and osTrapError if not.
+            // Parse the params.    
+            // TODO: Check that the params are valid and osTrapError if not.
+            // TODO: Make this more efficient
             const keyCode = params[0];
             const isShifted = params[1];
 

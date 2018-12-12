@@ -18,11 +18,11 @@
 module TSOS {
     export class Shell {
         // Properties
-        public promptStr = ">";
+        public promptStr: string = ">";
         public commandList = [];
-        public curses = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
-        public apologies = "[sorry]";
-        public commandsUsedList = [];
+        public curses: string = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
+        public apologies: string = "[sorry]";
+        public commandsUsedList: Array<string> = [];
 
         public init(): void {
             let sc;      

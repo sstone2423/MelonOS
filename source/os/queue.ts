@@ -8,8 +8,8 @@
 
 module TSOS {
     export class Queue {
-        constructor(public q = new Array()) {
-        }
+
+        constructor(public q = new Array()) { }
 
         public getSize(): number {
             return this.q.length;
@@ -23,7 +23,7 @@ module TSOS {
             this.q.push(element);
         }
 
-        // Dequeue pops the first element of the array off.
+        // Dequeue returns the first element of the array and shifts the array.
         // ex. [a, b, c, d].shift() = a
         public dequeue() {
             let retVal = null;

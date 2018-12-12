@@ -13,9 +13,9 @@
     export class MemoryManager {
         // Initialize variables
         public processIncrementor: number;
-        public residentQueue: any;
-        public readyQueue: any;
-        public runningProcess: any;
+        public residentQueue: TSOS.Queue;
+        public readyQueue: TSOS.Queue;
+        public runningProcess: TSOS.ProcessControlBlock;
 
         constructor() {
             this.processIncrementor = 0;
@@ -25,7 +25,7 @@
         }
         
         // Create a process for the loaded program (called from shellLoad command)
-        public createProcess(opCodes, args): void {
+        public createProcess(opCodes: Array<string>, args: Array<string>): void {
             // Check to see if the program is greater than the partition size
             if (opCodes.length > PARTITION_SIZE) {
                 _StdOut.putText("Program load failed. Program is over 256 bytes in length.");
@@ -57,7 +57,7 @@
             // If there is no more memory, then go find free space in the disk
             // Call the swapper to perform swapping operations
             } else {
-                // We also have to make sure the program is not too large. A program is limited by the partition size.
+                // We also have to make sure the program is larger than the partition size.
                 let tsb = _Swapper.putProcessToDisk(opCodes, this.processIncrementor);
                 // See if there is space on the disk for the process
                 if (tsb != "full" || tsb != "doesn't exist") {
@@ -68,7 +68,7 @@
                     pcb.init(-1);
                     // Assign priority if given
                     if (args.length > 0) {
-                        pcb.priority = args[0];
+                        pcb.priority = parseInt(args[0]);
                     } else {
                         pcb.priority = 1;
                     }
@@ -87,6 +87,7 @@
             }
         }
     
+        // Execute a process from the ready queue or by highest priority
         public executeProcess(): void {
             // Call the scheduler to reorder the ready queue if the scheduling scheme is Priority
             if (_Scheduler.algorithm == "priority") {
@@ -113,6 +114,7 @@
             }
         }
 
+        // Gets called when the CPU is not executing
         public checkReadyQueue(): void {
             if (!this.readyQueue.isEmpty()) {
                 this.executeProcess();
@@ -160,9 +162,7 @@
             }
             // Check if its in the ready queue
             let readyQueueLength = this.readyQueue.getSize();
-            console.log(readyQueueLength + found);
             if (readyQueueLength > 0 && !found) {
-                console.log("ready");
                 for (let i = 0; i < readyQueueLength; i++) {
                     let pcb = this.readyQueue.dequeue();
                     // If it matches, clear the partition and check for swap. 
@@ -199,9 +199,8 @@
         // Checks to make sure the memory being accessed is within the range specified by the base/limit
         public inBounds(address): boolean {
             let partition = this.runningProcess.partition;
-            if(address + _Memory.partitions[partition].base < _Memory.partitions[partition].base
-                + _Memory.partitions[partition].limit && address + _Memory.partitions[partition].base
-                >= _Memory.partitions[partition].base) {
+            if (address + _Memory.partitions[partition].base < _Memory.partitions[partition].base + _Memory.partitions[partition].limit 
+                && address + _Memory.partitions[partition].base >= _Memory.partitions[partition].base) {
                 return true;
             }
             else {
@@ -209,6 +208,7 @@
             }
         }
 
+        // Clear a partition and delete the swap file of the pcb if applicable
         public clearPartitionCheckSwap(pcb) {
             _Memory.clearPartition(pcb.partition);
             _StdOut.putText("Exiting process " + pcb.pId);

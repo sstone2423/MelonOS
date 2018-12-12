@@ -13,6 +13,7 @@ var TSOS;
 (function (TSOS) {
     var Memory = /** @class */ (function () {
         function Memory() {
+            // Each partition has a base, limit of 256, and boolean to check if empty
             this.partitions = [
                 { "base": 0, "limit": PARTITION_SIZE, "isEmpty": true },
                 { "base": 256, "limit": PARTITION_SIZE, "isEmpty": true },
@@ -85,6 +86,7 @@ var TSOS;
             // Ensure to add the current partitions base to the PC
             return this.memoryArray[this.partitions[_MemoryManager.runningProcess.partition].base + programCounter].toString();
         };
+        // Write to memory with a given address and value
         Memory.prototype.writeMemory = function (address, value) {
             // Check if this is in bounds
             if (_MemoryManager.inBounds(address)) {
@@ -100,10 +102,11 @@ var TSOS;
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_EXIT_IRQ, false));
             }
         };
-        // Loops address
+        // Loops address to a new PC
         Memory.prototype.branchLoop = function (PC, branch, partition) {
             return (PC + branch + 2) % this.partitions[partition].limit;
         };
+        // Get data from a specified partition
         Memory.prototype.getPartitionData = function (partition) {
             var data = [];
             var base = this.partitions[partition].base;
@@ -113,6 +116,7 @@ var TSOS;
             }
             return data;
         };
+        // Empty each partition of memory
         Memory.prototype.clearAllMemory = function () {
             // Check if CPU is executing
             if (!_CPU.isExecuting) {

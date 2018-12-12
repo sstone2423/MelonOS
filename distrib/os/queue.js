@@ -21,7 +21,7 @@ var TSOS;
         Queue.prototype.enqueue = function (element) {
             this.q.push(element);
         };
-        // Dequeue pops the first element of the array off.
+        // Dequeue returns the first element of the array and shifts the array.
         // ex. [a, b, c, d].shift() = a
         Queue.prototype.dequeue = function () {
             var retVal = null;

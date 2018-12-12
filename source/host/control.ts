@@ -37,6 +37,16 @@ module TSOS {
                 _GLaDOS = new Glados();
                 _GLaDOS.init();
             }
+
+            // get the Time based on local time
+            function displayTime() {
+                let date = new Date();
+                let utc = date.toLocaleString();
+                document.getElementById('currentDate').innerHTML = utc;
+                let timeout = setTimeout(displayTime, 500);
+            }
+    
+            displayTime();
         }
 
         // Updates the taHostLog with OS clock
@@ -84,6 +94,7 @@ module TSOS {
             _Kernel.krnBootstrap();  // _GLaDOS.afterStartup() will get called in there, if configured.
         }
 
+        // When user clicks halt, the OS attempts to shutdown
         public static hostBtnHaltOS_click(btn): void {
             this.hostLog("Emergency halt", "host");
             this.hostLog("Attempting Kernel shutdown.", "host");
@@ -94,14 +105,17 @@ module TSOS {
             // TODO: Is there anything else we need to do here?
         }
 
+        // When user clicks reset, reload the browser
         public static hostBtnReset_click(btn): void {
             // The easiest and most thorough way to do this is to reload (not refresh) the document.
             location.reload(true);
-            // That boolean parameter is the 'forceget' flag. When it is true it causes the page to always
-            // be reloaded from the server. If it is false or not specified the browser may reload the
-            // page from its cache, which is not what we want.
+            /* That boolean parameter is the 'forceget' flag. When it is true it causes the page to always
+               be reloaded from the server. If it is false or not specified the browser may reload the
+               page from its cache, which is not what we want.
+            */
         }
 
+        // When user clicks single step, enable the next step button
         public static hostBtnSingleStep_click(btn): void {
             if (!_SingleStep) {
                 // Enable the NextStep button
@@ -116,31 +130,26 @@ module TSOS {
             }
         }
 
+        // When user clicks next step, set to true for CPU clock
         public static hostBtnNextStep_click(btn): void {
-            // Set _NextStep = true
             _NextStep = true;
-        }
-
-        public static hostDisableNextStep(): void {
-            // Disable the NextStep button
-            (document.getElementById("btnNextStep") as HTMLButtonElement).disabled = true;
-            _NextStep = false;
         }
 
         // Update the CPU display table
         public static hostCPU(): void {
-            var table = (<HTMLTableElement>document.getElementById('tableCPU'));
+            let table = (<HTMLTableElement>document.getElementById('tableCPU'));
+            // Delete the placeholder row
             table.deleteRow(-1);
-            var row = table.insertRow(-1); // New row appended to table
+            // New row appended to table
+            let row = table.insertRow(-1);
             // PC
-            var cell = row.insertCell();
+            let cell = row.insertCell();
             cell.innerHTML = _CPU.PC.toString(16).toUpperCase();
             // IR
             cell = row.insertCell();
-            if(_CPU.isExecuting){
+            if (_CPU.isExecuting) {
                 cell.innerHTML = _Memory.memoryArray[_CPU.PC].toString(); 
-            }
-            else{
+            } else {
                 cell.innerHTML = "0";
             }
             // Acc
@@ -160,11 +169,12 @@ module TSOS {
         // Update the Memory table
         public static hostMemory(): void {
             let table = (<HTMLTableElement>document.getElementById('tableMemory'));
+            // Start at PC 0
             let memoryPC = 0;
             for (let i = 0; i < table.rows.length; i++) {
                 for (let j = 1; j < 9; j++) {
                     table.rows[i].cells.item(j).innerHTML = _Memory.memoryArray[memoryPC].toString().toUpperCase();
-                    // Check to see if the hex needs a leading zero. Covert to decimal, then to hex, then add leading zero
+                    // Check to see if the hex needs a leading zero. Convert to decimal, then to hex, then add leading zero
                     let convert = parseInt(_Memory.memoryArray[memoryPC].toString(), 16);
                     if (convert < 16 && convert > 0){
                         table.rows[i].cells.item(j).innerHTML = "0" + convert.toString(16).toUpperCase();
@@ -180,19 +190,19 @@ module TSOS {
             // Initialize an array of PCBs
             let displayQueue: Array<ProcessControlBlock> = [];
             // For each PCB in resident queue, print out a new row for it
-            for (let i = 0; i < _MemoryManager.residentQueue.getSize(); i++){
+            for (let i = 0; i < _MemoryManager.residentQueue.getSize(); i++) {
                 let pcb = _MemoryManager.residentQueue.dequeue();
                 _MemoryManager.residentQueue.enqueue(pcb);
                 displayQueue.push(pcb);
             }
-            while(table.rows.length > 1){
+            while (table.rows.length > 1) {
                 table.deleteRow(1);
             }
-            // Display all the other PCBs sitting in the Resident queue
-            // Convert numbers to hex
+            // Display all the other PCBs in the Resident queue
             while(displayQueue.length > 0){
                 let displayPcb = displayQueue.shift();
-                let row = table.insertRow(-1); // New row appended to table
+                // New row appended to table
+                let row = table.insertRow(-1);
                 // PID
                 let cell = row.insertCell();
                 cell.innerHTML = displayPcb.pId.toString(16).toUpperCase();
@@ -229,20 +239,19 @@ module TSOS {
             // Initialize an array of PCBs
             let displayQueue: Array<ProcessControlBlock> = [];
             // For each PCB in ready queue, print out a new row for it
-            for (let i = 0; i < _MemoryManager.readyQueue.getSize(); i++){
+            for (let i = 0; i < _MemoryManager.readyQueue.getSize(); i++) {
                 let pcb = _MemoryManager.readyQueue.dequeue();
                 _MemoryManager.readyQueue.enqueue(pcb);
                 displayQueue.push(pcb);
             }
-            if(_MemoryManager.runningProcess != null){
+            if (_MemoryManager.runningProcess != null) {
                 displayQueue.push(_MemoryManager.runningProcess);
             }
-            while(table.rows.length > 1){
+            while (table.rows.length > 1) {
                 table.deleteRow(1);
             }
-            // Display all the other PCBs sitting in the Resident queue
-            // Convert numbers to hex
-            while(displayQueue.length > 0){
+            // Display all the other PCBs in the Resident queue
+            while (displayQueue.length > 0) {
                 let displayPcb = displayQueue.shift();
                 let row = table.insertRow(-1); // New row appended to table
                 // PID
@@ -278,17 +287,16 @@ module TSOS {
         // Initialize memory display
         public static initMemoryDisplay(): void {
             let table = (<HTMLTableElement>document.getElementById('tableMemory'));
-            // Delete the initial dashes
+            // Delete the initial dash placeholders
             table.deleteRow(0);
             // We assume each row will hold 8 memory values
-            for (let i = 0; i < _Memory.memoryArray.length/8; i++){
+            for (let i = 0; i < _Memory.memoryArray.length/8; i++) {
                 let row = table.insertRow(i);
                 let memoryAddressCell = row.insertCell(0);
                 let address = i * 8;
-                // Display address in proper memory hex notation
-                // Adds leading 0s if necessary
+                // Display address in proper memory hex notation and add leading 0s if necessary
                 let displayAddress = "0x";
-                for (let k = 0; k < 3 - address.toString(16).length; k++){
+                for (let k = 0; k < 3 - address.toString(16).length; k++) {
                     displayAddress += "0";
                 }
                 displayAddress += address.toString(16).toUpperCase();
@@ -305,11 +313,11 @@ module TSOS {
         // BSOD effect
         public static melonDrop(): void {
             // Initialize Canvas and melon variables
-            var ctx;
-            var noOfMelons = 20;
-            var melons = [];
-            var melon;
-            var melonImage = document.getElementById("melonFall");
+            let ctx;
+            let noOfMelons = 20;
+            let melons = [];
+            let melon;
+            let melonImage = document.getElementById("melonFall");
 
             // Set the context
             ctx = _Canvas.getContext('2d');
@@ -318,7 +326,7 @@ module TSOS {
             // Change the canvas height
             _Canvas.height = 500;
             // Create the array of melons
-            for (var i = 0; i < noOfMelons; i++) {
+            for (let i = 0; i < noOfMelons; i++) {
                 melons.push({
                     x: Math.random() * _Canvas.width,
                     y: Math.random() * _Canvas.height,
@@ -356,13 +364,6 @@ module TSOS {
             }
             // Set the interval in which to draw the melons
             setInterval(draw, 30);
-        }
-
-        public static hostTime(): void {
-            // TODO: Remove the time zones and DST
-            const htmlDateTime = document.getElementById("currentDate");
-            const currentDateTime = new Date();
-            htmlDateTime.innerHTML = currentDateTime + "";
         }
 
         // This will update the disk display with contents of session storage

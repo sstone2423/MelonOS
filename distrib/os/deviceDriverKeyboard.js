@@ -38,13 +38,16 @@ var TSOS;
             _this.isr = _this.krnKbdDispatchKeyPress;
             return _this;
         }
+        // Initialization routine for this, the kernel-mode Keyboard Device Driver.
         DeviceDriverKeyboard.prototype.krnKbdDriverEntry = function () {
-            // Initialization routine for this, the kernel-mode Keyboard Device Driver.
             this.status = "loaded";
             // More?
         };
+        // Parse keypress keyCodes
         DeviceDriverKeyboard.prototype.krnKbdDispatchKeyPress = function (params) {
-            // Parse the params.    TODO: Check that the params are valid and osTrapError if not.
+            // Parse the params.    
+            // TODO: Check that the params are valid and osTrapError if not.
+            // TODO: Make this more efficient
             var keyCode = params[0];
             var isShifted = params[1];
             _Kernel.krnTrace("Key code:" + keyCode + " shifted:" + isShifted);

@@ -28,6 +28,7 @@ const SUCCESS: number = 1;
 const DISK_IS_FULL: number = 2;
 const QUICK_FORMAT: number = 0;
 const FULL_FORMAT: number = 1;
+const DATA_SIZE: number = 60;
 
 // Global variables
 

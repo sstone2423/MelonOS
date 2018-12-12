@@ -58,24 +58,25 @@ module TSOS {
             }
         }
 
+        // Find the highest priority PCB by comparing/sorting each PCB's priorities
         public findHighestPriority() {
-            let res;
+            let priorityPcb;
             let size = _MemoryManager.readyQueue.getSize();
             for (let i = 0; i < size; i++) {
                 let pcb = _MemoryManager.readyQueue.dequeue();
-                if (res == null) {
-                    res = pcb;
+                if (priorityPcb == null) {
+                    priorityPcb = pcb;
                 } else {
-                    if (pcb.Priority < res.Priority) {
+                    if (pcb.Priority < priorityPcb.Priority) {
                         // Put the process back into the ready queue
-                        _MemoryManager.readyQueue.enqueue(res); 
-                        res = pcb;
+                        _MemoryManager.readyQueue.enqueue(priorityPcb); 
+                        priorityPcb = pcb;
                     } else {
                         _MemoryManager.readyQueue.enqueue(pcb);
                     }
                 }
             }
-            return res;
+            return priorityPcb;
         }
     }
 }

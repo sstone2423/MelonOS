@@ -40,10 +40,6 @@ canvas {
   overflow:auto;
 }
 
-#divCPU {
-  margin-left: 5%;
-}
-
 .badgeQueue {
   margin-top: 3%; 
   padding: 2%;
@@ -71,7 +67,7 @@ canvas {
 }
 
 #contactCard {
-  width: 11rem; 
+  width: 10rem; 
   margin-top: 1%; 
   margin-bottom: 2%; 
   float: right;

@@ -18,6 +18,7 @@
             public partitions: Array<any>;
                     
             constructor() {
+                // Each partition has a base, limit of 256, and boolean to check if empty
                 this.partitions = [
                     {"base": 0, "limit": PARTITION_SIZE, "isEmpty": true},
                     {"base": 256, "limit": PARTITION_SIZE, "isEmpty": true},
@@ -95,6 +96,7 @@
                 return this.memoryArray[this.partitions[_MemoryManager.runningProcess.partition].base + programCounter].toString();
             }
 
+            // Write to memory with a given address and value
             public writeMemory(address, value): void {
                 // Check if this is in bounds
                 if (_MemoryManager.inBounds(address)) {
@@ -111,11 +113,12 @@
                 
             }
 
-            // Loops address
+            // Loops address to a new PC
             public branchLoop(PC, branch, partition) {
                 return (PC + branch + 2) % this.partitions[partition].limit;
             }
 
+            // Get data from a specified partition
             public getPartitionData(partition) {
                 let data = [];
                 let base = this.partitions[partition].base;
@@ -126,6 +129,7 @@
                 return data;
             }
 
+            // Empty each partition of memory
             public clearAllMemory(): void {
                 // Check if CPU is executing
                 if (!_CPU.isExecuting) {

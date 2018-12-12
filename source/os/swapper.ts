@@ -6,6 +6,7 @@
 
    module TSOS {
     export class Swapper {
+        
         constructor() { }
 
         public putProcessToDisk(opCodes, pId): String {

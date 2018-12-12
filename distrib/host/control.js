@@ -36,6 +36,14 @@ var TSOS;
                 _GLaDOS = new Glados();
                 _GLaDOS.init();
             }
+            // get the Time based on local time
+            function displayTime() {
+                var date = new Date();
+                var utc = date.toLocaleString();
+                document.getElementById('currentDate').innerHTML = utc;
+                var timeout = setTimeout(displayTime, 500);
+            }
+            displayTime();
         };
         // Updates the taHostLog with OS clock
         Control.hostLog = function (msg, source) {
@@ -81,6 +89,7 @@ var TSOS;
             _Kernel = new TSOS.Kernel();
             _Kernel.krnBootstrap(); // _GLaDOS.afterStartup() will get called in there, if configured.
         };
+        // When user clicks halt, the OS attempts to shutdown
         Control.hostBtnHaltOS_click = function (btn) {
             this.hostLog("Emergency halt", "host");
             this.hostLog("Attempting Kernel shutdown.", "host");
@@ -90,13 +99,16 @@ var TSOS;
             clearInterval(_hardwareClockID);
             // TODO: Is there anything else we need to do here?
         };
+        // When user clicks reset, reload the browser
         Control.hostBtnReset_click = function (btn) {
             // The easiest and most thorough way to do this is to reload (not refresh) the document.
             location.reload(true);
-            // That boolean parameter is the 'forceget' flag. When it is true it causes the page to always
-            // be reloaded from the server. If it is false or not specified the browser may reload the
-            // page from its cache, which is not what we want.
+            /* That boolean parameter is the 'forceget' flag. When it is true it causes the page to always
+               be reloaded from the server. If it is false or not specified the browser may reload the
+               page from its cache, which is not what we want.
+            */
         };
+        // When user clicks single step, enable the next step button
         Control.hostBtnSingleStep_click = function (btn) {
             if (!_SingleStep) {
                 // Enable the NextStep button
@@ -111,20 +123,17 @@ var TSOS;
                 document.getElementById("btnSingleStep").style.backgroundColor = "red";
             }
         };
+        // When user clicks next step, set to true for CPU clock
         Control.hostBtnNextStep_click = function (btn) {
-            // Set _NextStep = true
             _NextStep = true;
-        };
-        Control.hostDisableNextStep = function () {
-            // Disable the NextStep button
-            document.getElementById("btnNextStep").disabled = true;
-            _NextStep = false;
         };
         // Update the CPU display table
         Control.hostCPU = function () {
             var table = document.getElementById('tableCPU');
+            // Delete the placeholder row
             table.deleteRow(-1);
-            var row = table.insertRow(-1); // New row appended to table
+            // New row appended to table
+            var row = table.insertRow(-1);
             // PC
             var cell = row.insertCell();
             cell.innerHTML = _CPU.PC.toString(16).toUpperCase();
@@ -152,11 +161,12 @@ var TSOS;
         // Update the Memory table
         Control.hostMemory = function () {
             var table = document.getElementById('tableMemory');
+            // Start at PC 0
             var memoryPC = 0;
             for (var i = 0; i < table.rows.length; i++) {
                 for (var j = 1; j < 9; j++) {
                     table.rows[i].cells.item(j).innerHTML = _Memory.memoryArray[memoryPC].toString().toUpperCase();
-                    // Check to see if the hex needs a leading zero. Covert to decimal, then to hex, then add leading zero
+                    // Check to see if the hex needs a leading zero. Convert to decimal, then to hex, then add leading zero
                     var convert = parseInt(_Memory.memoryArray[memoryPC].toString(), 16);
                     if (convert < 16 && convert > 0) {
                         table.rows[i].cells.item(j).innerHTML = "0" + convert.toString(16).toUpperCase();
@@ -179,11 +189,11 @@ var TSOS;
             while (table.rows.length > 1) {
                 table.deleteRow(1);
             }
-            // Display all the other PCBs sitting in the Resident queue
-            // Convert numbers to hex
+            // Display all the other PCBs in the Resident queue
             while (displayQueue.length > 0) {
                 var displayPcb = displayQueue.shift();
-                var row = table.insertRow(-1); // New row appended to table
+                // New row appended to table
+                var row = table.insertRow(-1);
                 // PID
                 var cell = row.insertCell();
                 cell.innerHTML = displayPcb.pId.toString(16).toUpperCase();
@@ -230,8 +240,7 @@ var TSOS;
             while (table.rows.length > 1) {
                 table.deleteRow(1);
             }
-            // Display all the other PCBs sitting in the Resident queue
-            // Convert numbers to hex
+            // Display all the other PCBs in the Resident queue
             while (displayQueue.length > 0) {
                 var displayPcb = displayQueue.shift();
                 var row = table.insertRow(-1); // New row appended to table
@@ -267,15 +276,14 @@ var TSOS;
         // Initialize memory display
         Control.initMemoryDisplay = function () {
             var table = document.getElementById('tableMemory');
-            // Delete the initial dashes
+            // Delete the initial dash placeholders
             table.deleteRow(0);
             // We assume each row will hold 8 memory values
             for (var i = 0; i < _Memory.memoryArray.length / 8; i++) {
                 var row = table.insertRow(i);
                 var memoryAddressCell = row.insertCell(0);
                 var address = i * 8;
-                // Display address in proper memory hex notation
-                // Adds leading 0s if necessary
+                // Display address in proper memory hex notation and add leading 0s if necessary
                 var displayAddress = "0x";
                 for (var k = 0; k < 3 - address.toString(16).length; k++) {
                     displayAddress += "0";
@@ -318,8 +326,8 @@ var TSOS;
                 // Clear the canvas first
                 ctx.clearRect(0, 0, _Canvas.width, _Canvas.height);
                 // Draw the melons
-                for (var i_1 = 0; i_1 < noOfMelons; i_1++) {
-                    melon = melons[i_1];
+                for (var i = 0; i < noOfMelons; i++) {
+                    melon = melons[i];
                     ctx.drawImage(melon.image, melon.x, melon.y);
                 }
                 // Call the move function to redraw the images to make them seem in motion
@@ -328,8 +336,8 @@ var TSOS;
             // Move will continuously change the y coordinates to make them seem in motion
             function move() {
                 // Loop through all of the melons
-                for (var i_2 = 0; i_2 < noOfMelons; i_2++) {
-                    melon = melons[i_2];
+                for (var i = 0; i < noOfMelons; i++) {
+                    melon = melons[i];
                     // Change the y coordinate to make them "fall"
                     melon.y += melon.ys;
                     // If melons go past the canvas height, redraw them at the top
@@ -341,12 +349,6 @@ var TSOS;
             }
             // Set the interval in which to draw the melons
             setInterval(draw, 30);
-        };
-        Control.hostTime = function () {
-            // TODO: Remove the time zones and DST
-            var htmlDateTime = document.getElementById("currentDate");
-            var currentDateTime = new Date();
-            htmlDateTime.innerHTML = currentDateTime + "";
         };
         // This will update the disk display with contents of session storage
         Control.hostDisk = function () {

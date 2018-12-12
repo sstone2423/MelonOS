@@ -10,7 +10,6 @@ module TSOS {
             // Use a regular expression to remove leading and trailing spaces.
             return str.replace(/^\s+ | \s+$/g, "");
             /*
-            Huh? WTF? Okay... take a breath. Here we go:
             - The "|" separates this into two expressions, as in A or B.
             - "^\s+" matches a sequence of one or more whitespace characters at the beginning of a string.
             - "\s+$" is the same thing, but at the end of the string.
@@ -44,7 +43,7 @@ module TSOS {
         }
 
         // Convert string to ASCII to hex
-        public static stringToASCIItoHex(string: String) {
+        public static stringToASCIItoHex(string: String): Array<string> {
             let hexArray = [];
             // Look at each character's ASCII value and convert it to a hex string
             for (let i = 0; i < string.length; i++){

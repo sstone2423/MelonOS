@@ -39,8 +39,7 @@ module TSOS {
                 _KernelInterruptQueue.enqueue(new Interrupt(PROCESS_EXIT_IRQ, false));
             } else {
                 if (this.isExecuting) {
-                    // Initialize variables because Typescript gets angry when you try to do
-                    // within the block scope..
+                    // Initialize variables
                     let hexString;
                     let fullHexString;
                     let address;
@@ -207,7 +206,7 @@ module TSOS {
                                 while (original != "00"){
                                     let ascii = _Memory.readMemory(address);
                                     // Convert hex to decimal
-                                    var dec = parseInt(ascii.toString(), 16);
+                                    let dec = parseInt(ascii.toString(), 16);
                                     chr = String.fromCharCode(dec);
                                     printString += chr;
                                     address++;
@@ -218,7 +217,8 @@ module TSOS {
                             this.PC++;
                             break;
     
-                        default: // If opCode is invalid, exit process
+                        // If opCode is invalid, exit process
+                        default:
                             _KernelInterruptQueue.enqueue(new Interrupt(PROCESS_EXIT_IRQ, false));
                     }
                 } else {

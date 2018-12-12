@@ -31,8 +31,7 @@ var TSOS;
             }
             else {
                 if (this.isExecuting) {
-                    // Initialize variables because Typescript gets angry when you try to do
-                    // within the block scope..
+                    // Initialize variables
                     var hexString = void 0;
                     var fullHexString = void 0;
                     var address = void 0;
@@ -198,7 +197,8 @@ var TSOS;
                             }
                             this.PC++;
                             break;
-                        default: // If opCode is invalid, exit process
+                        // If opCode is invalid, exit process
+                        default:
                             _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_EXIT_IRQ, false));
                     }
                 }

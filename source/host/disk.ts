@@ -14,10 +14,10 @@
      module TSOS {
 
         export class Disk {
-            public totalTracks: number = 4;  // The number of tracks on the disk
-            public totalSectors: number = 8; // The number of sectors in each track
-            public totalBlocks: number = 8;  // The number of blocks in each sector
-            public dataSize: number = 60;  // The actual amount of bytes we can write data to.
+            public totalTracks: number = 4;
+            public totalSectors: number = 8;
+            public totalBlocks: number = 8;
+            public dataSize: number = 60;
             
             constructor() { }
     

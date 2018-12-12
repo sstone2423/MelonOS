@@ -32,8 +32,8 @@ var TSOS;
             _this.driverEntry = _this.krnDiskDriverEntry;
             return _this;
         }
+        // Initialization routine for this, the kernel-mode Disk Device Driver.
         DeviceDriverDisk.prototype.krnDiskDriverEntry = function () {
-            // Initialization routine for this, the kernel-mode Disk Device Driver.
             this.status = "loaded";
             // More?
         };
@@ -98,12 +98,15 @@ var TSOS;
                             TSOS.Control.hostDisk();
                             return SUCCESS;
                         }
-                        return DISK_IS_FULL; // We ran through the data structure but there were no free blocks, meaning no more space on disk
+                        // We ran through the data structure but there were no free blocks, meaning no more space on disk
+                        return DISK_IS_FULL;
                     }
                 }
             }
-            return DISK_IS_FULL; // We ran through the directory data structure but there were no free blocks, meaning no more space on disk
+            // We ran through the data structure but there were no free blocks, meaning no more space on disk
+            return DISK_IS_FULL;
         };
+        // Checks for an existing filename on disk. Returns a status object
         DeviceDriverDisk.prototype.checkForExistingFile = function (filename) {
             var check;
             var hexArray = TSOS.Utils.stringToASCIItoHex(filename);
@@ -141,7 +144,7 @@ var TSOS;
             check.matchingFileName = false;
             return check;
         };
-        // Return the TSB of the next free data block. If can't find, return null.
+        // Return the TSB of the next free data block. If it can't find one, return null.
         DeviceDriverDisk.prototype.findFreeDataBlock = function () {
             // Generate tsbId
             for (var trackNum = 1; trackNum < _Disk.totalTracks; trackNum++) {
@@ -243,7 +246,7 @@ var TSOS;
             else {
                 // For all values in session storage, set available bit to 0, pointer to 0,0,0, and fill data with 00s
                 var zeroes = [];
-                for (var i = 0; i < 60; i++) {
+                for (var i = 0; i < DATA_SIZE; i++) {
                     zeroes.push("00");
                 }
                 for (var j = 0; j < _Disk.totalTracks * _Disk.totalSectors * _Disk.totalBlocks; j++) {
@@ -260,7 +263,7 @@ var TSOS;
             for (var i = 0; i < size; i++) {
                 var pcb = _MemoryManager.residentQueue.dequeue();
                 if (pcb.Swapped) {
-                    // Do nothing
+                    // Do nothing. That PCB is gone now
                 }
                 else {
                     // Put the process back into the resident queue
@@ -381,7 +384,7 @@ var TSOS;
             }
             return data;
         };
-        // Write to a file on disk
+        // Write to a file on disk. Returns status number
         DeviceDriverDisk.prototype.writeFile = function (filename, data) {
             var check = this.checkForExistingFile(filename);
             // If name is found
@@ -413,7 +416,7 @@ var TSOS;
                 currentBlock.data[dataPtr] = dataHexArray[i];
                 dataPtr++;
                 // Check to see if we've reached the limit of what data the block can hold. If so, go to the next block.
-                if (dataPtr == 60) {
+                if (dataPtr == DATA_SIZE) {
                     // Set the block in session storage first
                     sessionStorage.setItem(currentTSB, JSON.stringify(currentBlock));
                     currentTSB = currentBlock.pointer;
@@ -431,13 +434,15 @@ var TSOS;
             // Update disk display
             TSOS.Control.hostDisk();
         };
+        // Get and return the size of a TSB
         DeviceDriverDisk.prototype.getTsbSize = function (tsb) {
             return this.readData(tsb).length;
         };
+        // Allocate disk space
         DeviceDriverDisk.prototype.allocateDiskSpace = function (file, tsb) {
             // Check size of text. If it is longer than 60, then we need to have enough datablocks
             var stringLength = file.length;
-            // pointer to current block we're looking at
+            // Pointer to current block we're looking at
             var dataBlockTSB = tsb;
             var dataBlock = JSON.parse(sessionStorage.getItem(dataBlockTSB));
             // If data block we're writing to is already pointing to something, we need to traverse it.
@@ -446,8 +451,6 @@ var TSOS;
                 // If pointer is 0:0:0, then we need to find free blocks
                 if (dataBlock.pointer != "0:0:0" && dataBlock.availableBit == "1") {
                     stringLength -= _Disk.dataSize;
-                    // dataBlock.availableBit = "1";
-                    // sessionStorage.setItem(dataBlockTSB, JSON.stringify(dataBlock));
                     // Update pointers
                     dataBlockTSB = dataBlock.pointer;
                     dataBlock = JSON.parse(sessionStorage.getItem(dataBlock.pointer));
@@ -456,7 +459,6 @@ var TSOS;
                     // We reached the end of the blocks that have already been allocated for this file
                     // Mark the starting block as in use
                     dataBlock.availableBit = "1";
-                    // Find enough free data blocks, if can't, return error
                     // First, find out how many more datablocks we need
                     var numBlocks = Math.ceil(stringLength / _Disk.dataSize);
                     // Go find that number of free blocks
@@ -487,10 +489,9 @@ var TSOS;
             sessionStorage.setItem(dataBlockTSB, JSON.stringify(dataBlock));
             return true;
         };
-        DeviceDriverDisk.prototype.findFreeDataBlocks = function (numBlocks) {
+        // Find enough free data blocks, if can't, return null
+        DeviceDriverDisk.prototype.findFreeDataBlocks = function (numBlocksNeeded) {
             var blocks = [];
-            var startOfDiskIndex = _Disk.totalSectors * _Disk.totalBlocks;
-            var endOfDiskIndex = _Disk.totalTracks * _Disk.totalSectors * _Disk.totalBlocks;
             // Generate proper tsbId
             for (var trackNum = 1; trackNum < _Disk.totalTracks; trackNum++) {
                 for (var sectorNum = 0; sectorNum < _Disk.totalSectors; sectorNum++) {
@@ -500,27 +501,31 @@ var TSOS;
                         // If the block is available, push it to the array of free blocks we can use
                         if (dataBlock.availableBit == "0") {
                             blocks.push(tsbId);
-                            numBlocks--;
+                            numBlocksNeeded--;
                         }
                         // We found enough free blocks
-                        if (numBlocks == 0) {
+                        if (numBlocksNeeded == 0) {
                             return blocks;
                         }
                     }
                 }
             }
-            if (numBlocks != 0) {
+            if (numBlocksNeeded != 0) {
                 return null;
             }
         };
+        // Write swap file to Disk
         DeviceDriverDisk.prototype.writeSwap = function (filename, opCodes) {
+            // Check if the file exists
             var check = this.checkForExistingFile(filename);
+            // If it exists, attempt to write to disk
             if (check.matchingFileName) {
                 // Allocates enough free space for the file
                 var dirBlock = JSON.parse(sessionStorage.getItem(check.tsbId));
                 var dataBlock = JSON.parse(sessionStorage.getItem(dirBlock.pointer));
                 dataBlock.availableBit = "0";
                 sessionStorage.setItem(dirBlock.pointer, JSON.stringify(dataBlock));
+                // Check if there is enough space
                 var freeSpace = this.allocateDiskSpace(opCodes, dirBlock.pointer);
                 if (!freeSpace) {
                     return DISK_IS_FULL;

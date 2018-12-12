@@ -48,9 +48,6 @@ module TSOS {
             _DiskDriver.driverEntry();
             this.krnTrace(_DiskDriver.status);
 
-            // Load current date/time
-            Control.hostTime();
-
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
             this.krnEnableInterrupts();
@@ -66,6 +63,7 @@ module TSOS {
             }
         }
 
+        // Shutdowns the kernel
         public krnShutdown(): void {
             this.krnTrace("begin shutdown OS");
             // Check for running processes.  If there are some, alert and stop. Else...
@@ -76,7 +74,9 @@ module TSOS {
             this.krnTrace("Disabling the interrupts.");
             this.krnDisableInterrupts();
 
-            // Unload the Device Drivers?
+            // Unload the Device Drivers
+            _DiskDriver.driverEntry = "unloaded";
+            _krnKeyboardDriver = "unloaded";
             // More?
             this.krnTrace("end shutdown OS");
         }
@@ -96,8 +96,6 @@ module TSOS {
                 } else if (_Scheduler.algorithm == "fcfs" && this.timer > _Scheduler.quantum) {
                     // Throw the TIMER_IRQ and reset timer to 0
                     this.krnTimerIRQ();
-                } else if (_Scheduler.algorithm == "priority") {
-
                 }
             // Only 1 run process is running so reset the timer
             } else {
@@ -107,16 +105,14 @@ module TSOS {
             if (_CPU.isExecuting) {
                 this.timer++;
             }
-            // Update the time
-            Control.hostTime();
             // Check for an interrtsupt Page 560
             if (_KernelInterruptQueue.getSize() > 0) {
                 // Process the first interrupt on the interrupt queue.
                 // TODO: Implement a priority queue based on the IRQ number/id to enforce interrupt priority.
                 const interrupt = _KernelInterruptQueue.dequeue();
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
-            } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is
-                                           // anything being processed.
+            // If there are no interrupts then run one CPU cycle if there is anything being processed.
+            } else if (_CPU.isExecuting) {
                 // Check if _SingleStep is enabled, then wait for the next step click before executing the next instruction
                 if (_SingleStep) {
                     // If user clicked next step, execute one step
@@ -143,8 +139,8 @@ module TSOS {
                     Control.hostProcesses();
                     Control.hostReady();
                 }
-            } else {                      // If there are no interrupts and there is nothing being executed
-                                          // then just be idle.
+            // If there are no interrupts and there is nothing being executed then just be idle.
+            } else {
                 _NextStep = false;  // Revert the boolean when the CPU is finished executing
                 this.krnTrace("Idle");
                 // Check the ready queue on each cycle if CPU is not executing
@@ -171,25 +167,27 @@ module TSOS {
             // Put more here.
         }
 
+        // This is the Interrupt Handler Routine.  See pages 8 and 560.
         public krnInterruptHandler(irq, params): void {
-            // This is the Interrupt Handler Routine.  See pages 8 and 560.
             // Trace our entrance here so we can compute Interrupt Latency by analyzing the log file later on. Page 766.
             this.krnTrace("Handling IRQ~" + irq);
 
             // Invoke the requested Interrupt Service Routine via Switch/Case rather than an Interrupt Vector.
             // TODO: Consider using an Interrupt Vector in the future.
             // Note: There is no need to "dismiss" or acknowledge the interrupts in our design here.
-            //       Maybe the hardware simulation will grow to support/require that in the future.
             switch (irq) {
+                // Triggers when timer has exceeded quantum
                 case TIMER_IRQ:
                     this.krnTimerISR();              // Kernel built-in routine for timers (not the clock).
                     break;
 
+                // Triggers when the keyboard receives input
                 case KEYBOARD_IRQ:
                     _krnKeyboardDriver.isr(params);   // Kernel mode device driver
                     _StdIn.handleInput();
                     break;
 
+                // Triggers when a process is exiting
                 case PROCESS_EXIT_IRQ:
                     _MemoryManager.exitProcess();
                     // Update the CPU and Processes display
@@ -199,16 +197,19 @@ module TSOS {
                     _OsShell.putPrompt();
                     break;
 
+                // Triggers when something is being output to console
                 case CONSOLE_WRITE_IRQ:
                     _StdOut.putText(params.toString());
                     break;
 
+                // Triggers when there is an invalid op code
                 case INVALID_OP_IRQ:
                     _StdOut.putText("Invalid op code in process " + _MemoryManager.runningProcess.pId + ". Exiting the process.")
                     _StdOut.advanceLine();
                     _OsShell.putPrompt();
                     break;
 
+                // Triggers when memory has gone out of bounds for a process
                 case BOUNDS_ERROR_IRQ:
                     _StdOut.putText("Out of bounds error in process " + _MemoryManager.runningProcess.pId + ". Exiting the process.");
                     _StdOut.advanceLine();
@@ -219,28 +220,12 @@ module TSOS {
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }
         }
-
+        /* The built-in TIMER (not clock) Interrupt Service Routine (as opposed to an ISR coming from
+            a device driver).*/
         public krnTimerISR(): void {
-            /* The built-in TIMER (not clock) Interrupt Service Routine (as opposed to an ISR coming from
-            a device driver).
-            Check multiprogramming parameters and enforce quanta here. Call the scheduler / context
-            switch here if necessary. */
+            // Check multiprogramming parameters and enforce quanta here.
             _Scheduler.contextSwitch();
         }
-
-        /* System Calls... that generate software interrupts via tha Application Programming Interface library routines.
-
-         Some ideas:
-         - ReadConsole
-         - WriteConsole
-         - CreateProcess
-         - ExitProcess
-         - WaitForProcessToExit
-         - CreateFile
-         - OpenFile
-         - ReadFile
-         - WriteFile
-         - CloseFile
 
         // OS Utility Routines */
 
@@ -260,6 +245,7 @@ module TSOS {
             }
         }
 
+        // When everything breaks, shut everything down and throw melons out the window
         public krnTrapError(msg): void {
             // Display error
             Control.hostLog("OS ERROR - TRAP: " + msg);

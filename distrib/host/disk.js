@@ -13,10 +13,10 @@ var TSOS;
 (function (TSOS) {
     var Disk = /** @class */ (function () {
         function Disk() {
-            this.totalTracks = 4; // The number of tracks on the disk
-            this.totalSectors = 8; // The number of sectors in each track
-            this.totalBlocks = 8; // The number of blocks in each sector
-            this.dataSize = 60; // The actual amount of bytes we can write data to.
+            this.totalTracks = 4;
+            this.totalSectors = 8;
+            this.totalBlocks = 8;
+            this.dataSize = 60;
         }
         Disk.prototype.init = function () {
             // Initialize storage

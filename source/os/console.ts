@@ -11,24 +11,24 @@ module TSOS {
 
     export class Console {
 
-        constructor(public currentFont = _DefaultFontFamily,
-                    public currentFontSize = _DefaultFontSize,
-                    public currentXPosition = 0,
-                    public currentYPosition = _DefaultFontSize,
-                    public buffer = "") {
-        }
+        constructor(public currentFont: string = _DefaultFontFamily,
+                    public currentFontSize: number = _DefaultFontSize,
+                    public currentXPosition: number = 0,
+                    public currentYPosition: number = _DefaultFontSize,
+                    public buffer: string = "") { }
 
+        // Clear the canvas and reset x, y to 0
         public init(): void {
             this.clearScreen();
             this.resetXY();
         }
 
+        // Handle keyboard inputs
         public handleInput(): void {
             while (_KernelInputQueue.getSize() > 0) {
                 // Get the next character from the kernel input queue.
                 const chr = _KernelInputQueue.dequeue();
                 // Check to see if it's "special" (enter or ctrl-c) or "normal"
-                // (anything else that the keyboard device driver gave us).
                 if (chr === String.fromCharCode(13)) { //     Enter key
                     // The enter key marks the end of a console command, so tell the shell
                     _OsShell.handleInput(this.buffer);
@@ -44,15 +44,9 @@ module TSOS {
             }
         }
 
-        public putText(text): void {
-            /* My first inclination here was to write two functions: putChar() and putString().
-              Then I remembered that JavaScript is (sadly) untyped and it won't differentiate
-              between the two.  So rather than be like PHP and write two (or more) functions that
-              do the same thing, thereby encouraging confusion and decreasing readability, I
-              decided to write one function and use the term "text" to connote string or char.
-
-              UPDATE: Even though we are now working in TypeScript, char and string remain undistinguished.
-                     Consider fixing that. */
+        // Draw text on canvas
+        public putText(text: string): void {
+            // TODO: Make distinct cases for Char and String
             if (text !== "") {
                 for (let i = 0; i < text.length; i++) {
                     // If the x position reaches 510, advance the line and continue drawing
@@ -72,6 +66,7 @@ module TSOS {
             }
          }
 
+        // Advance the x and y position to the next line
         public advanceLine(): void {
             this.currentXPosition = 0;
             /*
@@ -84,11 +79,13 @@ module TSOS {
                                      _FontHeightMargin;
         }
 
+        // Clear the canvas
         private clearScreen(): void {
             _DrawingContext.clearRect(0, 0, _Canvas.width, _Canvas.height);
         }
 
-        public backspaceClear(character): void {
+        // Delete the previous character when backspace is pressed
+        public backspaceClear(character: string): void {
             // Find the width of the previous character
             let offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, character);
             // Change the currentXPosition
@@ -97,6 +94,7 @@ module TSOS {
             _DrawingContext.clearRect(this.currentXPosition, (this.currentYPosition - 12), 20, 20);
         }
 
+        // Reset the x, y coordinates on the canvas
         private resetXY(): void {
             this.currentXPosition = 0;
             this.currentYPosition = this.currentFontSize;

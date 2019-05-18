@@ -7,8 +7,6 @@
    Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 978-0-470-12872-5
    ------------ */
 
-// Global CONSTANTS (TypeScript 1.5 introduced const. Very cool.)
-
 const APP_NAME: string    = "TSOS";   // 'cause Bob and I were at a loss for a better name.
 const APP_VERSION: string = "0.07";   // What did you expect?
 
@@ -33,15 +31,16 @@ const DISK_IS_FULL: number = 2;
 const QUICK_FORMAT: number = 0;
 const FULL_FORMAT: number = 1;
 const DATA_SIZE: number = 60;
+const SWAP: string = "$SWAP";
 
 // Global variables
-
 let _CPU: TSOS.Cpu;  // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
 let _OSclock: number = 0;  // Page 23.
 let _Mode: number = 0;     // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
 let _Disk: TSOS.Disk;
 let _DiskDriver: TSOS.DeviceDriverDisk;
 let _Swapper: TSOS.Swapper;
+const OS: string = "OS";
 
 // Memory related global variables
 let _Memory: TSOS.Memory;
@@ -52,6 +51,9 @@ let _PCB: TSOS.ProcessControlBlock;
 let _ProcessCount = 0;
 let _PCBList = [];
 let _Scheduler: TSOS.Scheduler;
+const RR: string = "rr";
+const FCFS: string = "fcfs";
+const PRIORITY: string = "priority";
 
 // Canvas and font variables
 let _Canvas: HTMLCanvasElement;             // Initialized in Control.hostInit().

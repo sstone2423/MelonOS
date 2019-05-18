@@ -2,7 +2,6 @@
 ///<reference path="shellCommand.ts" />
 ///<reference path="userCommand.ts" />
 ///<reference path="../utils.ts" />
-
 /* ------------
    Shell.ts
 
@@ -13,20 +12,20 @@
           write your own Operating System.
    ------------ */
 
-// TODO: Write a base class / prototype for system services and let Shell inherit from it.
-
 module TSOS {
     export class Shell {
         // Properties
         public promptStr: string = ">";
-        public commandList = [];
+        public commandList: Array<ShellCommand> = [];
         public curses: string = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
         public apologies: string = "[sorry]";
         public commandsUsedList: Array<string> = [];
 
+        /**
+         * Load the command list.
+         */
         public init(): void {
             let sc;      
-            // Load the command list.
             // v
             sc = new ShellCommand(this.shellVer,
                                   "v",
@@ -207,15 +206,20 @@ module TSOS {
             this.putPrompt();
         }
 
+        /**
+         * Outputs the initial prompt >
+         */
         public putPrompt(): void {
             _StdOut.putText(this.promptStr);
         }
 
-        public handleInput(buffer): void {
+        /**
+         * Parses the input buffer, determines the command, and executes it
+         * @param buffer is the input buffer string coming from the user
+         */
+        public handleInput(buffer: string): void {
             _Kernel.krnTrace("Shell Command~" + buffer);
-
             // Parse the input...
-
             const userCommand = this.parseInput(buffer);
             // ... and assign the command and args to local letiables.
             const cmd = userCommand.command;
@@ -251,13 +255,17 @@ module TSOS {
                     this.execute(this.shellCurse);
                 } else if (this.apologies.indexOf("[" + cmd + "]") >= 0) {        // Check for apologies.
                     this.execute(this.shellApology);
-                } else { // It's just a bad command. {
+                } else { // It's just a bad command.
                     this.execute(this.shellInvalidCommand);
                 }
             }
         }
 
-        // Note: args is an option parameter, ergo the ? which allows TypeScript to understand that.
+        /**
+         * Execute the command's function along with any arguments
+         * @param fn the command's function
+         * @param args optional arguments
+         */
         public execute(fn, args?): void {
             // We just got a command, so advance the line...
             _StdOut.advanceLine();
@@ -271,28 +279,27 @@ module TSOS {
             this.putPrompt();
         }
 
-        public parseInput(buffer): UserCommand {
+        /**
+         * Parses input for arguments
+         * @param buffer the input buffer
+         */
+        public parseInput(buffer: string): UserCommand {
             const retVal = new UserCommand();
-
             // 1. Remove leading and trailing spaces.
-            buffer = Utils.trim(buffer);
-
+            buffer = buffer.trim();
             // 2. Lower-case it.
             buffer = buffer.toLowerCase();
-
             // 3. Separate on spaces so we can determine the command and command-line args, if any.
-            const tempList = buffer.split(" ");
-
+            const tempList: Array<string> = buffer.split(" ");
             // 4. Take the first (zeroth) element and use that as the command.
-            let cmd = tempList.shift();  // Yes, you can do that to an array in JavaScript.  See the Queue class.
+            let cmd: string = tempList.shift();  // Yes, you can do that to an array in JavaScript.  See the Queue class.
             // 4.1 Remove any left-over spaces.
-            cmd = Utils.trim(cmd);
+            cmd = cmd.trim();
             // 4.2 Record it in the return value.
             retVal.command = cmd;
-
             // 5. Now create the args array from what's left.
             for (const i in tempList) {
-                const arg = Utils.trim(tempList[i]);
+                const arg = tempList[i].trim();
                 if (arg !== "") {
                     retVal.args[retVal.args.length] = tempList[i];
                 }
@@ -303,17 +310,23 @@ module TSOS {
         // Shell Command Functions.  Kinda not part of Shell() class exactly, but
         // called from here, so kept here to avoid violating the law of least astonishment.
 
+        /**
+         * Invalid Command that says horrible things to the user
+         */
         public shellInvalidCommand(): void {
             _StdOut.putText("Invalid Command. ");
             if (_SarcasticMode) {
-                _StdOut.putText("Unbelievable. You, [subject name here],");
+                _StdOut.putText("Unbelievable. You, idiot,");
                 _StdOut.advanceLine();
-                _StdOut.putText("must be the pride of [subject hometown here].");
+                _StdOut.putText("must be the pride of Jacksonville.");
             } else {
                 _StdOut.putText("Type 'help' for, well... help.");
             }
         }
 
+        /**
+         * Displays a curse
+         */
         public shellCurse(): void {
             _StdOut.putText("Oh, so that's how it's going to be, eh? Fine.");
             _StdOut.advanceLine();
@@ -321,6 +334,9 @@ module TSOS {
             _SarcasticMode = true;
         }
 
+        /**
+         * Displays an apology
+         */
         public shellApology(): void {
            if (_SarcasticMode) {
               _StdOut.putText("I think we can put our differences behind us.");
@@ -332,10 +348,16 @@ module TSOS {
            }
         }
 
+        /**
+         * Displays the version
+         */
         public shellVer(): void {
             _StdOut.putText(APP_NAME + " version " + APP_VERSION);
         }
 
+        /**
+         * Displays the descriptions of each command
+         */
         public shellHelp(): void {
             _StdOut.putText("Commands:");
             for (const i in _OsShell.commandList) {
@@ -344,6 +366,9 @@ module TSOS {
             }
         }
 
+        /**
+         * Shutsdown the kernel
+         */
         public shellShutdown(): void {
             _StdOut.putText("Shutting down...");
             // Call Kernel shutdown routine.
@@ -351,14 +376,21 @@ module TSOS {
             // TODO: Stop the final prompt from being displayed.  If possible.  Not a high priority.  (Damn OCD!)
         }
 
-        public shellCls(args): void {
+        /**
+         * Clears the CLI
+         */
+        public shellCls(): void {
             _StdOut.clearScreen();
             _StdOut.resetXY();
         }
 
-        public shellMan(args): void {
+        /**
+         * Gives instructions and details on each command
+         * @param args the command
+         */
+        public shellMan(args: Array<string>): void {
             if (args.length > 0) {
-                const topic = args[0];
+                const topic: string = args[0];
                 switch (topic) {
                     case "help":
                         _StdOut.putText("help displays a list of (hopefully) valid commands.");
@@ -464,9 +496,13 @@ module TSOS {
             }
         }
 
-        public shellTrace(args): void {
-            if (args.length == 1) {
-                const setting = args[0];
+        /**
+         * Starts or ends trace mode
+         * @param args on or off
+         */
+        public shellTrace(args: Array<string>): void {
+            if (args.length === 1) {
+                const setting: string = args[0];
                 switch (setting) {
                     case "on":
                         if (_Trace && _SarcasticMode) {
@@ -481,14 +517,18 @@ module TSOS {
                         _StdOut.putText("Trace OFF");
                         break;
                     default:
-                        _StdOut.putText("Invalid arguement.  Usage: trace <on | off>.");
+                        _StdOut.putText("Invalid argument.  Usage: trace <on | off>.");
                 }
             } else {
                 _StdOut.putText("Usage: trace <on | off>");
             }
         }
 
-        public shellRot13(args): void {
+        /**
+         * Performs the rot13 utility
+         * @param args the string being obfuscated
+         */
+        public shellRot13(args: Array<string>): void {
             if (args.length > 0) {
                 // Requires Utils.ts for rot13() function.
                 _StdOut.putText(args.join(" ") + " = '" + Utils.rot13(args.join(" ")) + "'");
@@ -497,7 +537,11 @@ module TSOS {
             }
         }
 
-        public shellPrompt(args): void {
+        /**
+         * Changes the prompt to the args
+         * @param args the desired prompt
+         */
+        public shellPrompt(args: Array<string>): void {
             if (args.length > 0) {
                 _OsShell.promptStr = args[0];
             } else {
@@ -505,19 +549,27 @@ module TSOS {
             }
         }
 
+        /**
+         * Displays the date
+         */
         public shellDate(): void {
             const currentDate = new Date();
             _StdOut.putText("Current date is " + currentDate);
         }
 
+        /**
+         * Displays the current location
+         */
         public shellWhereami(): void {
             _StdOut.putText("Current location: Melon Country");
         }
 
+        /**
+         * Random melon pun generator that displays puns
+         */
         public shellMelon(): void {
             // Get a random number between 1 and 8
-            const randomPun = Math.floor(Math.random() * 8);
-
+            const randomPun: number = Math.floor(Math.random() * 8);
             // Find an excellent pun for our melonicious users
             switch (randomPun) {
                 case 0:
@@ -547,17 +599,24 @@ module TSOS {
             }
         }
 
-        public shellStatus(args): void {
+        /**
+         * Changes the Status to the args
+         * @param args the desired status
+         */
+        public shellStatus(args: Array<string>): void {
             if (args.length > 0) {
                 const htmlStatus = document.getElementById("status");
-                htmlStatus.innerHTML = "Status: " + args;
+                htmlStatus.innerHTML = "Status: " + args.join(" ");
             } else {
                 _StdOut.putText("Usage: status <string> Please supply a string.");
             }
         }
 
-        // Create a process from the user input in HTML with an optional priority. Default is 1
-        public shellLoad(args): void {
+        /**
+         * Create a process from the user input in HTML with an optional priority. Default is 1
+         * @param args the priority
+         */
+        public shellLoad(args: Array<string>): void {
             // Get value inside program input (the program)
             const userInputProgram = (<HTMLInputElement>document.getElementById("taProgramInput")).value;
             // Create regex pattern
@@ -567,11 +626,11 @@ module TSOS {
                 // Split the program into 2-bit hex
                 let splitProgram = userInputProgram.split(" ");
                 // If priority arg is a number
-                if (args.length == 1 && args[0].match(/^[0-9]\d*$/)) {
+                if (args.length === 1 && args[0].match(/^[0-9]\d*$/)) {
                     // Create a process using the process manager
                     _MemoryManager.createProcess(splitProgram, args);
                 // Use default priority
-                } else if (args.length == 0) {
+                } else if (args.length === 0) {
                     _MemoryManager.createProcess(splitProgram, args);
                 // Invalid args
                 } else {
@@ -582,21 +641,27 @@ module TSOS {
             }
         }
         
-        // Display BSOD....
+        /**
+         * Crashes the OS in classic Blue Screen of Death fashion
+         * ... with melons?
+         */
         public shellDropit(): void {
             const oops = "Who dropped those?";
             // Trigger the kernel trap error
             _Kernel.krnTrapError(oops);
         }
 
-        // Add the process to the ready queue - Arg will be the processId
-        public shellRun(args): void {
-            if (args.length == 1 && isNaN(parseInt(args[0]))) {
-                let found = false;
+        /**
+         * Run a loaded process by adding the process to the ready queue
+         * @param args the loaded processId
+         */
+        public shellRun(args: Array<string>): void {
+            if (args.length === 1 && !isNaN(parseInt(args[0]))) {
+                let found: boolean = false;
                 let waitQueueLength = _MemoryManager.residentQueue.getSize();
                 // Check to see if CPU is already executing
                 if (_CPU.isExecuting) {
-                    _StdOut.putText("Process is already in execution");
+                    _StdOut.putText("CPU is already in execution. Please wait until the current process is completed.");
                 } else {
                     // Find the correct processId by looping through the waiting queue
                     for (let i = 0; i < waitQueueLength; i++) {
@@ -619,12 +684,16 @@ module TSOS {
             }
         }
 
-        // Clear all memory partitions
+        /**
+         * Clear all memory partitions
+         */
         public shellClearmem(): void {
             _Memory.clearAllMemory();
         }
 
-        // Run all processes in memory
+        /**
+         * Run all processes loaded in memory and HDD
+         */
         public shellRunall(): void {
             let waitQueueLength = _MemoryManager.residentQueue.getSize();
             // Check if there is any programs loaded
@@ -639,7 +708,9 @@ module TSOS {
             }
         }
 
-        // List all processes and pIDs
+        /**
+         * List all processes and pIDs
+         */
         public shellPs(): void {
             let waitQueueLength = _MemoryManager.residentQueue.getSize();
             // Check if any programs are loaded
@@ -668,22 +739,28 @@ module TSOS {
             }
         }
 
-        // Kill process according to given <pid>
-        public shellKill(args): void {
+        /**
+         * Kill the specified process
+         * @param args specified processId
+         */
+        public shellKill(args: Array<string>): void {
             // Check if there is an arg and its an integer
-            if (args.length == 1 && isNaN(parseInt(args[0]))) {
-                _MemoryManager.killProcess(args[0]);
+            if (args.length === 1 && isNaN(parseInt(args[0]))) {
+                _MemoryManager.killProcess(parseInt(args[0]));
             } else {
                 _StdOut.putText("Usage: kill <pid> Please supply a process ID.");
             }
         }
 
-        // Change the round robin scheduling according to given <int>
-        public shellQuantum(args): void {
+        /**
+         * Change the round robin scheduling according to given <int>
+         * @param args desired round robin schedule
+         */
+        public shellQuantum(args: Array<string>): void {
             // Check if there is an argument and if the argument is an integer
-            if (args.length == 1 && isNaN(parseInt(args[0]))) {
+            if (args.length === 1 && isNaN(parseInt(args[0]))) {
                 // Make sure the number is above 0. 0 will make melons enter the black hole
-                if (args[0] > 0) {
+                if (parseInt(args[0]) > 0) {
                     // Notify the user that the quantum has been changed
                     _StdOut.putText("Quantum has been changed from " + _Scheduler.quantum + " to " + args[0]);
                     // Change the quantum
@@ -696,10 +773,13 @@ module TSOS {
             }
         }
 
-        // List all non-hidden files on disk
-        public shellLs(args): void {
+        /**
+         * List all non-hidden files on disk
+         * @param args optional -l will list hidden files as well
+         */
+        public shellLs(args: Array<string>): void {
             // If they use -l, show all files including hidden
-            if (args.length == 1 && args[0] == "-l") {
+            if (args.length === 1 && args[0] === "-l") {
                 // Get the list of files
                 let filenames = _DiskDriver.listFiles();
                 // Check if there is any files
@@ -718,7 +798,7 @@ module TSOS {
                         _StdOut.advanceLine();
                     }
                     // Let them know there's only swaps
-                    if (numOfSwaps == filenames.length) {
+                    if (numOfSwaps === filenames.length) {
                         _StdOut.putText("There are only swap files in the filesystem.");
                     }
                 // Let them know theres no files
@@ -726,7 +806,7 @@ module TSOS {
                     _StdOut.putText("There are no files in the filesystem.");
                 }
             // Only display files that are not hidden and not swapped
-            } else if (args.length == 0) {
+            } else if (args.length === 0) {
                 // Get the list of files
                 let filenames = _DiskDriver.listFiles();
                 // Check if there is any files
@@ -751,7 +831,7 @@ module TSOS {
                         }
                     }
                     // Let them know theres only 'other' files
-                    if (numOfOtherFiles == filenames.length) {
+                    if (numOfOtherFiles === filenames.length) {
                         _StdOut.putText("There are only swap/hidden files in the filesystem.");
                     }
                 // Let them know theres no files
@@ -765,12 +845,15 @@ module TSOS {
 
         }
 
-        // Format/Initialize all blocks on disk
-        public shellFormat(args): void {
+        /**
+         * Format/Initialize all blocks on disk. Defaults to full format
+         * @param args optional quick or full format
+         */
+        public shellFormat(args: Array<string>): void {
             // Check if there is only 1 arg
-            if (args.length == 1) {
+            if (args.length === 1) {
                 // Perform quick format
-                if (args[0] == "-quick") {
+                if (args[0] === "-quick") {
                     if (_DiskDriver.format(QUICK_FORMAT)) {
                         _StdOut.putText("Disk formatted successfully!");
                     }
@@ -778,7 +861,7 @@ module TSOS {
                         _StdOut.putText("CPU is executing. Cannot format disk.");
                     }
                 // Perform full format
-                } else if (args[0] == "-full") {
+                } else if (args[0] === "-full") {
                     if (_DiskDriver.format(FULL_FORMAT)) {
                         _StdOut.putText("Disk formatted successfully!");
                     }
@@ -804,10 +887,13 @@ module TSOS {
             }
         }
 
-        // Delete <filename> from disk
-        public shellDeleteFile(args): void {
+        /**
+         * Delete <filename> from disk
+         * @param args filename
+         */
+        public shellDeleteFile(args: Array<string>): void {
             // Check if there is only 1 arg
-            if (args.length == 1) {
+            if (args.length === 1) {
                 // Check if it is a swap file
                 if (args[0].includes("$")) {
                     _StdOut.putText("Swap files cannot be deleted.");
@@ -816,9 +902,9 @@ module TSOS {
                 }
                 // Return the status of the file deletion
                 let status = _DiskDriver.deleteFile(args[0]);
-                if (status == SUCCESS) {
+                if (status === SUCCESS) {
                     _StdOut.putText("The file: " + args[0] + " has been successfully deleted.");
-                } else if( status == FILENAME_DOESNT_EXIST) {
+                } else if( status === FILENAME_DOESNT_EXIST) {
                     _StdOut.putText("The file: " + args[0] + " does not exist.");
                 }
             } else {
@@ -827,8 +913,11 @@ module TSOS {
 
         }
 
-        // Write <filename> "data" to disk
-        public shellWriteFile(args): void {
+        /**
+         * Write <filename> "data" to disk
+         * @param args filename
+         */
+        public shellWriteFile(args: Array<string>): void {
             if (args.length >= 2) {
                 // Avoid swap files
                 if (args[0].includes("$")) {
@@ -852,11 +941,11 @@ module TSOS {
                     return;
                 }
                 let info = _DiskDriver.writeFile(args[0], string);
-                if (info == SUCCESS) {
+                if (info === SUCCESS) {
                     _StdOut.putText("The file " + args[0] + " has been successfully written to.");
-                } else if (info == FILENAME_DOESNT_EXIST) {
+                } else if (info === FILENAME_DOESNT_EXIST) {
                     _StdOut.putText("The file " + args[0] + " does not exist.");
-                } else if (info == DISK_IS_FULL) {
+                } else if (info === DISK_IS_FULL) {
                     _StdOut.putText("Unable to write to the file: " + args[0] + ". Not enough disk space to write.");
                 }
             } else {
@@ -864,10 +953,13 @@ module TSOS {
             }
         }
 
-        // Read <filename> from disk
-        public shellReadFile(args): void {
+        /**
+         * Read <filename> from disk
+         * @param args filename
+         */
+        public shellReadFile(args: Array<string>): void {
             // Check if there is only 1 arg
-            if (args.length == 1) {
+            if (args.length === 1) {
                 // Avoid swap files
                 if (args[0].includes("$")) {
                     _StdOut.putText("Cannot read a swapped file.");
@@ -875,7 +967,7 @@ module TSOS {
                 }
                 let info = _DiskDriver.readFile(args[0]);
                 // If it exists, print out file
-                if (info.status == SUCCESS) {
+                if (info.status === SUCCESS) {
                     _StdOut.putText(info.fileData.join(""));
                 // If it doesn't exist, let them know
                 } else {
@@ -886,10 +978,13 @@ module TSOS {
             }
         }
 
-        // Create <filename> on disk
-        public shellCreateFile(args): void {
+        /**
+         * Create <filename> on disk
+         * @param args filename
+         */
+        public shellCreateFile(args: Array<string>): void {
             // Check if there is only 1 arg
-            if (args.length == 1) {
+            if (args.length === 1) {
                 // Filenames must be 60 characters or less
                 if(args[0].length > 60){
                     _StdOut.putText("File name is too long. It must be 60 characters or less.");
@@ -898,9 +993,9 @@ module TSOS {
                 }
                 // Return the status of the file creation
                 let status = _DiskDriver.createFile(args[0]);
-                if (status == SUCCESS) {
+                if (status === SUCCESS) {
                     _StdOut.putText("File successfully created: " + args[0]);
-                } else if (status == FILENAME_EXISTS) {
+                } else if (status === FILENAME_EXISTS) {
                     _StdOut.putText("File name already exists. Please use another file name.");
                 }
                 // DISK_IS_FULL
@@ -913,11 +1008,13 @@ module TSOS {
             }
         }
 
-        // Get the current scheduling algorithm
+        /**
+         * Display the current scheduling algorithm
+         */
         public shellGetSchedule(): void {
-            if (_Scheduler.algorithm == "rr") {
+            if (_Scheduler.algorithm === RR) {
                 _StdOut.putText("Current CPU scheduling algorithm is Round Robin and the quantum is " + _Scheduler.quantum + ".");
-            } else if (_Scheduler.algorithm == "fcfs") {
+            } else if (_Scheduler.algorithm === FCFS) {
                 _StdOut.putText("Current CPU scheduling algorithm is First Come First Serve and the quantum is " + _Scheduler.quantum + ".");
             // Priority
             } else {
@@ -925,10 +1022,13 @@ module TSOS {
             }
         }
 
-        // Set the scheduling algorithm to rr, fcfs, priority
+        /**
+         * Set the scheduling algorithm
+         * @param args rr, fcfs, priority
+         */
         public shellSetSchedule(args): void {
             // Check if there is args and that they match one of the allowed algorithms
-            if (args.length == 1 && (args[0] == "rr" || args[0] == "fcfs" || args[0] == "priority")) {
+            if (args.length === 1 && (args[0] === RR || args[0] === FCFS || args[0] === PRIORITY)) {
                 _Scheduler.changeAlgorithm(args[0]);
                 _StdOut.putText("CPU Scheduling algorithm set to " + args[0]);
             } else {

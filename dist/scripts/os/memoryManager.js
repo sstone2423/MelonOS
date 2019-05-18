@@ -15,7 +15,11 @@ var TSOS;
             this.residentQueue = new TSOS.Queue;
             this.runningProcess = null;
         }
-        // Create a process for the loaded program (called from shellLoad command)
+        /**
+         * Create a process for the loaded program (called from shellLoad command)
+         * @param opCodes provided by the user
+         * @param args optional priority
+         */
         MemoryManager.prototype.createProcess = function (opCodes, args) {
             // Check to see if the program is greater than the partition size
             if (opCodes.length > PARTITION_SIZE) {
@@ -83,7 +87,9 @@ var TSOS;
                 }
             }
         };
-        // Execute a process from the ready queue or by highest priority
+        /**
+         * Execute a process from the ready queue or by highest priority
+         */
         MemoryManager.prototype.executeProcess = function () {
             // Call the scheduler to reorder the ready queue if the scheduling scheme is Priority
             if (_Scheduler.algorithm == "priority") {
@@ -91,11 +97,11 @@ var TSOS;
             }
             else {
                 this.runningProcess = _MemoryManager.readyQueue.dequeue();
-                _CPU.PC = this.runningProcess.PC;
-                _CPU.Acc = this.runningProcess.acc;
-                _CPU.Xreg = this.runningProcess.xReg;
-                _CPU.Yreg = this.runningProcess.yReg;
-                _CPU.Zflag = this.runningProcess.zFlag;
+                _CPU.pc = this.runningProcess.PC;
+                _CPU.acc = this.runningProcess.acc;
+                _CPU.xReg = this.runningProcess.xReg;
+                _CPU.yReg = this.runningProcess.yReg;
+                _CPU.zFlag = this.runningProcess.zFlag;
                 // We need to check if the process is stored in disk. If so, we need to have the swapper roll in from disk, and 
                 // roll out a process in memory if there is not enough space in memory for the rolled-in process.
                 if (this.runningProcess.swapped) {
@@ -109,13 +115,17 @@ var TSOS;
                 this.runningProcess.state = "Executing";
             }
         };
-        // Gets called when the CPU is not executing
+        /**
+         * Gets called when the CPU is not executing
+         */
         MemoryManager.prototype.checkReadyQueue = function () {
             if (!this.readyQueue.isEmpty()) {
                 this.executeProcess();
             }
         };
-        // Exit a process from the CPU, reset CPU values, reset memory partition
+        /**
+         * Exit a process from the CPU, reset CPU values, reset memory partition
+         */
         MemoryManager.prototype.exitProcess = function () {
             // Init the CPU to reset registers and isExecuting
             _CPU.init();
@@ -141,14 +151,17 @@ var TSOS;
             // Reset the runningProcess to null
             this.runningProcess = null;
         };
-        // Kill a specific process specified by processID
-        // TODO: make this more efficient?
+        /**
+         * Kill a specific process specified by processID
+         * @param processID
+         * TODO: make this more efficient?
+         */
         MemoryManager.prototype.killProcess = function (processID) {
             var found = false;
             // Check if a process is running
             if (this.runningProcess !== null) {
                 // Check if the process is executing
-                if (this.runningProcess.pId == processID) {
+                if (this.runningProcess.pId === processID) {
                     this.exitProcess();
                     found = true;
                 }
@@ -190,7 +203,11 @@ var TSOS;
                 _StdOut.putText("Process " + processID + " does not exist..");
             }
         };
-        // Checks to make sure the memory being accessed is within the range specified by the base/limit
+        /**
+         * Checks to make sure the memory being accessed is within the
+         * range specified by the base/limit
+         * @param address the memory address being checked
+         */
         MemoryManager.prototype.inBounds = function (address) {
             var partition = this.runningProcess.partition;
             if (address + _Memory.partitions[partition].base < _Memory.partitions[partition].base + _Memory.partitions[partition].limit
@@ -201,7 +218,10 @@ var TSOS;
                 return false;
             }
         };
-        // Clear a partition and delete the swap file of the pcb if applicable
+        /**
+         * Clear a partition and delete the swap file of the pcb if applicable
+         * @param pcb
+         */
         MemoryManager.prototype.clearPartitionCheckSwap = function (pcb) {
             _Memory.clearPartition(pcb.partition);
             _StdOut.putText("Exiting process " + pcb.pId);
@@ -212,7 +232,9 @@ var TSOS;
                 _DiskDriver.deleteFile(filename);
             }
         };
-        // Update turnaround times and wait times for all processes
+        /**
+         * Update turnaround times and wait times for all processes
+         */
         MemoryManager.prototype.processStats = function () {
             // Increment the turnaround times for all processes
             // Increment the wait times for all processes in the ready queue

@@ -15,7 +15,9 @@ var TSOS;
         function Kernel() {
             this.timer = 0;
         }
-        // OS Startup and Shutdown Routines
+        /**
+         * OS Startup and Shutdown Routines
+         */
         Kernel.prototype.krnBootstrap = function () {
             TSOS.Control.hostLog("bootstrap", "host"); // Use hostLog because we ALWAYS want this, even if _Trace is off.
             // Initialize our global queues.
@@ -56,7 +58,9 @@ var TSOS;
                 _GLaDOS.afterStartup();
             }
         };
-        // Shutdowns the kernel
+        /**
+         * Shutdowns the kernel
+         */
         Kernel.prototype.krnShutdown = function () {
             this.krnTrace("begin shutdown OS");
             // Check for running processes.  If there are some, alert and stop. Else...
@@ -73,11 +77,14 @@ var TSOS;
             this.krnTrace("end shutdown OS");
         };
         /*
-            This gets called from the host hardware simulation every time there is a hardware clock pulse.
-            This is NOT the same as a TIMER, which causes an interrupt and is handled like other interrupts.
-            This, on the other hand, is the clock pulse from the hardware / VM / host that tells the kernel
-            that it has to look for interrupts and process them if it finds any.
+                                      
         */
+        /**
+         * This gets called from the host hardware simulation every time there is a hardware clock pulse.
+         * This is NOT the same as a TIMER, which causes an interrupt and is handled like other interrupts.
+         * This, on the other hand, is the clock pulse from the hardware / VM / host that tells the kernel
+         * that it has to look for interrupts and process them if it finds any.
+         */
         Kernel.prototype.krnOnCPUClockPulse = function () {
             // Check if timer has reached the quantum
             if (_MemoryManager.readyQueue.getSize() > 0 && _CPU.isExecuting) {
@@ -149,17 +156,27 @@ var TSOS;
             }
         };
         // Interrupt Handling
+        /**
+         * Enables interrupts
+         */
         Kernel.prototype.krnEnableInterrupts = function () {
             // Keyboard
             TSOS.Devices.hostEnableKeyboardInterrupt();
             // Put more here.
         };
+        /**
+         * Disables interrupts
+         */
         Kernel.prototype.krnDisableInterrupts = function () {
             // Keyboard
             TSOS.Devices.hostDisableKeyboardInterrupt();
             // Put more here.
         };
-        // This is the Interrupt Handler Routine.  See pages 8 and 560.
+        /**
+         * This is the Interrupt Handler Routine.  See pages 8 and 560.
+         * @param irq
+         * @param params
+         */
         Kernel.prototype.krnInterruptHandler = function (irq, params) {
             // Trace our entrance here so we can compute Interrupt Latency by analyzing the log file later on. Page 766.
             this.krnTrace("Handling IRQ~" + irq);
@@ -205,13 +222,20 @@ var TSOS;
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }
         };
-        /* The built-in TIMER (not clock) Interrupt Service Routine (as opposed to an ISR coming from
-            a device driver).*/
+        /* */
+        /**
+         * The built-in TIMER (not clock) Interrupt Service Routine
+         * (as opposed to an ISR coming froma device driver).
+         */
         Kernel.prototype.krnTimerISR = function () {
             // Check multiprogramming parameters and enforce quanta here.
             _Scheduler.contextSwitch();
         };
         // OS Utility Routines */
+        /**
+         * Displays trace debugging information
+         * @param msg the debug message
+         */
         Kernel.prototype.krnTrace = function (msg) {
             // Check globals to see if trace is set ON.  If so, then (maybe) log the message.
             if (_Trace) {
@@ -220,15 +244,18 @@ var TSOS;
                     if (_OSclock % 10 === 0) {
                         // Check the CPU_CLOCK_INTERVAL in globals.ts for an
                         // idea of the tick rate and adjust this line accordingly.
-                        TSOS.Control.hostLog(msg, "OS");
+                        TSOS.Control.hostLog(msg, OS);
                     }
                 }
                 else {
-                    TSOS.Control.hostLog(msg, "OS");
+                    TSOS.Control.hostLog(msg, OS);
                 }
             }
         };
-        // When everything breaks, shut everything down and throw melons out the window
+        /**
+         * When everything breaks, shut everything down and throw melons out the window
+         * @param msg error message
+         */
         Kernel.prototype.krnTrapError = function (msg) {
             // Display error
             TSOS.Control.hostLog("OS ERROR - TRAP: " + msg);
@@ -237,7 +264,9 @@ var TSOS;
             // Issue melon drop
             TSOS.Control.melonDrop();
         };
-        // When timer is up, throw timer IRQ and reset timer to 0
+        /**
+         * When timer is up, throw timer IRQ and reset timer to 0
+         */
         Kernel.prototype.krnTimerIRQ = function () {
             // Throw the TIMER_IRQ
             _KernelInterruptQueue.enqueue(new TSOS.Interrupt(TIMER_IRQ, false));

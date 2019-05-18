@@ -4,6 +4,12 @@
 
 module TSOS {
     export class Interrupt {
-        constructor(public irq, public params) { }
+        irq: number;
+        params: any;
+
+        constructor(irq: number, params: any) {
+            this.irq = irq;
+            this.params = params;
+        }
     }
 }

@@ -6,7 +6,6 @@
    This code references page numbers in the text book:
    Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 978-0-470-12872-5
    ------------ */
-// Global CONSTANTS (TypeScript 1.5 introduced const. Very cool.)
 var APP_NAME = "TSOS"; // 'cause Bob and I were at a loss for a better name.
 var APP_VERSION = "0.07"; // What did you expect?
 // CPU Constants
@@ -30,6 +29,7 @@ var DISK_IS_FULL = 2;
 var QUICK_FORMAT = 0;
 var FULL_FORMAT = 1;
 var DATA_SIZE = 60;
+var SWAP = "$SWAP";
 // Global variables
 var _CPU; // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
 var _OSclock = 0; // Page 23.
@@ -37,6 +37,7 @@ var _Mode = 0; // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 
 var _Disk;
 var _DiskDriver;
 var _Swapper;
+var OS = "OS";
 // Memory related global variables
 var _Memory;
 var _MemoryManager;
@@ -45,6 +46,9 @@ var _PCB;
 var _ProcessCount = 0;
 var _PCBList = [];
 var _Scheduler;
+var RR = "rr";
+var FCFS = "fcfs";
+var PRIORITY = "priority";
 // Canvas and font variables
 var _Canvas; // Initialized in Control.hostInit().
 var _DrawingContext; // = _Canvas.getContext("2d");  // Assigned here for type safety, but re-initialized in

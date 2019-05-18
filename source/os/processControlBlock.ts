@@ -5,22 +5,22 @@
 
 module TSOS {
     export class ProcessControlBlock {
-        public pId: number;
-        public state: string;
-        public PC: number; // 4 bytes in length
-        public IR: string; //
-        public priority: number;
-        public acc: number; 
-        public xReg: number;
-        public yReg: number;
-        public zFlag: number;
-        public partition: number;
-        public swapped: boolean;
-        public TSB: string;
-        public turnAroundTime: number;
-        public waitTime: number;
+        pId: number;
+        state: string;
+        PC: number; // 4 bytes in length
+        IR: string; //
+        priority: number;
+        acc: number; 
+        xReg: number;
+        yReg: number;
+        zFlag: number;
+        partition: number;
+        swapped: boolean;
+        TSB: string;
+        turnAroundTime: number;
+        waitTime: number;
     
-        constructor(public processId) {
+        constructor(processId: number) {
             this.pId = processId;
         }
         

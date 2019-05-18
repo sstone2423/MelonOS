@@ -6,7 +6,6 @@ var TSOS;
 (function (TSOS) {
     var ProcessControlBlock = /** @class */ (function () {
         function ProcessControlBlock(processId) {
-            this.processId = processId;
             this.pId = processId;
         }
         ProcessControlBlock.prototype.init = function (partition) {

@@ -5,7 +5,6 @@
 
 module TSOS {
     export class UserCommand {
-        constructor(public command: string = "",
-                    public args: Array<string> = []) { }
+        constructor(public command: string = "", public args: Array<string> = []) { }
     }
 }

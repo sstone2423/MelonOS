@@ -15,17 +15,20 @@ var TSOS;
         function Cpu() {
         }
         Cpu.prototype.init = function () {
-            this.PC = 0;
-            this.Acc = 0;
-            this.Xreg = 0;
-            this.Yreg = 0;
-            this.Zflag = 0;
+            this.pc = 0;
+            this.acc = 0;
+            this.xReg = 0;
+            this.yReg = 0;
+            this.zFlag = 0;
             this.isExecuting = false;
         };
+        /**
+         * Cycles through one opcode and executes it
+         * TODO: Accumulate CPU usage and profiling statistics here.
+         */
         Cpu.prototype.cycle = function () {
-            // TODO: Accumulate CPU usage and profiling statistics here.
             // Check if the current opcode/pc is out of memory bounds based on partition base/limit
-            if (!_MemoryManager.inBounds(this.PC)) {
+            if (!_MemoryManager.inBounds(this.pc)) {
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(BOUNDS_ERROR_IRQ, 0));
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_EXIT_IRQ, false));
             }
@@ -37,88 +40,88 @@ var TSOS;
                     var address = void 0;
                     var value = void 0;
                     // Get the next opCode
-                    var opCode = _Memory.readMemory(this.PC);
+                    var opCode = _Memory.readMemory(this.pc);
                     // Update console log with current execution
                     _Kernel.krnTrace('CPU cycle: executing: ' + opCode);
                     switch (opCode) {
                         case "A9": // Load the accumulator with a constant
                             // Change the value to hex
-                            this.Acc = parseInt(_Memory.readMemory(this.PC + 1), 16);
+                            this.acc = parseInt(_Memory.readMemory(this.pc + 1), 16);
                             // Increment the PC
-                            this.PC += 2;
+                            this.pc += 2;
                             break;
                         case "AD": /* Load the accumulator from memory
                             Get the hex memory address by looking at next 2 values in memory
                             and swapping because of little-endian */
-                            hexString = _Memory.readMemory(this.PC + 1);
-                            fullHexString = _Memory.readMemory(this.PC + 2) + hexString;
+                            hexString = _Memory.readMemory(this.pc + 1);
+                            fullHexString = _Memory.readMemory(this.pc + 2) + hexString;
                             // Convert the 2 back to decimal
                             address = parseInt(fullHexString, 16);
                             // Store in accumulator
-                            this.Acc = parseInt(_Memory.readMemory(address), 16);
-                            this.PC += 3;
+                            this.acc = parseInt(_Memory.readMemory(address), 16);
+                            this.pc += 3;
                             break;
                         case "8D": /* Store the accumulator in memory
                             Get the hex memory address by looking at next 2 values in memory
                             and swapping because of little-endian */
-                            hexString = _Memory.readMemory(this.PC + 1);
-                            fullHexString = _Memory.readMemory(this.PC + 2) + hexString;
+                            hexString = _Memory.readMemory(this.pc + 1);
+                            fullHexString = _Memory.readMemory(this.pc + 2) + hexString;
                             // Convert the 2 back to decimal
                             address = parseInt(fullHexString, 16);
                             // Convert the ACC to hex
-                            value = this.Acc.toString(16);
+                            value = this.acc.toString(16);
                             // Write to memory
                             _Memory.writeMemory(address, value);
-                            this.PC += 3;
+                            this.pc += 3;
                             break;
                         case "6D": /* Add with carry: Adds contents of an address to the contents of
                                     the accumulator and keeps the result in the accumulator
                             Get the hex memory address by looking at next 2 values in memory
                             and swapping because of little-endian */
-                            hexString = _Memory.readMemory(this.PC + 1);
-                            fullHexString = _Memory.readMemory(this.PC + 2) + hexString;
+                            hexString = _Memory.readMemory(this.pc + 1);
+                            fullHexString = _Memory.readMemory(this.pc + 2) + hexString;
                             // Convert the 2 back to decimal
                             address = parseInt(fullHexString, 16);
                             // Get the value stored at address of memory
                             value = _Memory.readMemory(address);
                             // Add the value to the accumulator
-                            this.Acc += parseInt(value, 16);
-                            this.PC += 3;
+                            this.acc += parseInt(value, 16);
+                            this.pc += 3;
                             break;
                         case "A2": // Load the X register with a constant
                             // Change the value to hex
-                            this.Xreg = parseInt(_Memory.readMemory(this.PC + 1), 16);
-                            this.PC += 2;
+                            this.xReg = parseInt(_Memory.readMemory(this.pc + 1), 16);
+                            this.pc += 2;
                             break;
                         case "AE": /* Load the X register from memory
                             Get the hex memory address by looking at next 2 values in memory
                             and swapping because of little-endian */
-                            hexString = _Memory.readMemory(this.PC + 1);
-                            fullHexString = _Memory.readMemory(this.PC + 2) + hexString;
+                            hexString = _Memory.readMemory(this.pc + 1);
+                            fullHexString = _Memory.readMemory(this.pc + 2) + hexString;
                             // Convert the 2 back to decimal
                             address = parseInt(fullHexString, 16);
                             // Store in x register
-                            this.Xreg = parseInt(_Memory.readMemory(address), 16);
-                            this.PC += 3;
+                            this.xReg = parseInt(_Memory.readMemory(address), 16);
+                            this.pc += 3;
                             break;
                         case "A0": // Load the Y register with a constant
                             // Change the value to hex
-                            this.Yreg = parseInt(_Memory.readMemory(this.PC + 1), 16);
-                            this.PC += 2;
+                            this.yReg = parseInt(_Memory.readMemory(this.pc + 1), 16);
+                            this.pc += 2;
                             break;
                         case "AC": /* Load the Y register from memory
                             Get the hex memory address by looking at next 2 values in memory
                             and swapping because of little-endian */
-                            hexString = _Memory.readMemory(this.PC + 1);
-                            fullHexString = _Memory.readMemory(this.PC + 2) + hexString;
+                            hexString = _Memory.readMemory(this.pc + 1);
+                            fullHexString = _Memory.readMemory(this.pc + 2) + hexString;
                             // Convert the 2 back to decimal
                             address = parseInt(fullHexString, 16);
                             // Store in y register
-                            this.Yreg = parseInt(_Memory.readMemory(address), 16);
-                            this.PC += 3;
+                            this.yReg = parseInt(_Memory.readMemory(address), 16);
+                            this.pc += 3;
                             break;
                         case "EA": // No operation.. Just increment
-                            this.PC++;
+                            this.pc++;
                             break;
                         case "00": // Break (system call)
                             _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_EXIT_IRQ, true));
@@ -126,36 +129,36 @@ var TSOS;
                         case "EC": /* Compare a byte in memory to the X reg: Sets the Z (zero) flag if equal
                             Get the hex memory address by looking at next 2 values in memory
                             and swapping because of little-endian */
-                            hexString = _Memory.readMemory(this.PC + 1);
-                            fullHexString = _Memory.readMemory(this.PC + 2) + hexString;
+                            hexString = _Memory.readMemory(this.pc + 1);
+                            fullHexString = _Memory.readMemory(this.pc + 2) + hexString;
                             // Convert the 2 back to decimal
                             address = parseInt(fullHexString, 16);
                             // Get the byte from memory
                             var byte = _Memory.readMemory(address);
                             // Compare the decimal value of byte to Xreg. If true, set to 1. Else, set to 0
-                            if (parseInt(byte.toString(), 16) == this.Xreg) {
-                                this.Zflag = 1;
+                            if (parseInt(byte.toString(), 16) == this.xReg) {
+                                this.zFlag = 1;
                             }
                             else {
-                                this.Zflag = 0;
+                                this.zFlag = 0;
                             }
-                            this.PC += 3;
+                            this.pc += 3;
                             break;
                         case "D0": // Branch n bytes if Z flag = 0
-                            if (this.Zflag == 0) {
+                            if (this.zFlag == 0) {
                                 // Get the number of bytes to branch
-                                var branch = parseInt(_Memory.readMemory(this.PC + 1), 16);
-                                this.PC = _Memory.branchLoop(this.PC, branch, _MemoryManager.runningProcess.partition);
+                                var branch = parseInt(_Memory.readMemory(this.pc + 1), 16);
+                                this.pc = _Memory.branchLoop(this.pc, branch, _MemoryManager.runningProcess.partition);
                             }
                             else {
-                                this.PC += 2;
+                                this.pc += 2;
                             }
                             break;
                         case "EE": /* Increment the value of a byte
                             Get the hex memory address by looking at next 2 values in memory
                             and swapping because of little-endian */
-                            hexString = _Memory.readMemory(this.PC + 1);
-                            fullHexString = _Memory.readMemory(this.PC + 2) + hexString;
+                            hexString = _Memory.readMemory(this.pc + 1);
+                            fullHexString = _Memory.readMemory(this.pc + 2) + hexString;
                             // Convert the 2 back to decimal
                             address = parseInt(fullHexString, 16);
                             // Convert the byte to decimal
@@ -165,17 +168,17 @@ var TSOS;
                             var hexByteValue = byteValue.toString(16);
                             // Write the variable back to memory
                             _Memory.writeMemory(address, hexByteValue);
-                            this.PC += 3;
+                            this.pc += 3;
                             break;
                         case "FF": /* System call
                                     #$01 in X reg = print the integer stored in the Y register
                                     #$02 in X reg = print the 00-terminated string stored at the address
                                     in the Y register */
-                            if (this.Xreg === 1) {
-                                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CONSOLE_WRITE_IRQ, this.Yreg));
+                            if (this.xReg === 1) {
+                                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CONSOLE_WRITE_IRQ, this.yReg));
                             }
-                            else if (this.Xreg === 2) {
-                                address = this.Yreg;
+                            else if (this.xReg === 2) {
+                                address = this.yReg;
                                 // Initialize variables for while loop
                                 var printString = "";
                                 // Get the value of the memory address
@@ -195,7 +198,7 @@ var TSOS;
                                 }
                                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CONSOLE_WRITE_IRQ, printString));
                             }
-                            this.PC++;
+                            this.pc++;
                             break;
                         // If opCode is invalid, exit process
                         default:

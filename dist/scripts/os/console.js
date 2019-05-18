@@ -20,18 +20,22 @@ var TSOS;
             this.currentYPosition = currentYPosition;
             this.buffer = buffer;
         }
-        // Clear the canvas and reset x, y to 0
+        /**
+         * Clear the canvas and reset x, y to 0
+         */
         Console.prototype.init = function () {
             this.clearScreen();
             this.resetXY();
         };
-        // Handle keyboard inputs
+        /**
+         * Handle keyboard inputs
+         */
         Console.prototype.handleInput = function () {
             while (_KernelInputQueue.getSize() > 0) {
                 // Get the next character from the kernel input queue.
                 var chr = _KernelInputQueue.dequeue();
                 // Check to see if it's "special" (enter or ctrl-c) or "normal"
-                if (chr === String.fromCharCode(13)) { //     Enter key
+                if (chr === String.fromCharCode(13 /* Enter */)) { //     Enter key
                     // The enter key marks the end of a console command, so tell the shell
                     _OsShell.handleInput(this.buffer);
                     // ... and reset our buffer.
@@ -46,7 +50,10 @@ var TSOS;
                 // TODO: Write a case for Ctrl-C.
             }
         };
-        // Draw text on canvas
+        /**
+         * Draw text on canvas
+         * @param text
+         */
         Console.prototype.putText = function (text) {
             // TODO: Make distinct cases for Char and String
             if (text !== "") {
@@ -66,7 +73,9 @@ var TSOS;
                 }
             }
         };
-        // Advance the x and y position to the next line
+        /**
+         * Advance the x and y position to the next line
+         */
         Console.prototype.advanceLine = function () {
             this.currentXPosition = 0;
             /*
@@ -78,11 +87,16 @@ var TSOS;
                 _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
                 _FontHeightMargin;
         };
-        // Clear the canvas
+        /**
+         * Clear the canvas
+         */
         Console.prototype.clearScreen = function () {
             _DrawingContext.clearRect(0, 0, _Canvas.width, _Canvas.height);
         };
-        // Delete the previous character when backspace is pressed
+        /**
+         * Delete the previous character when backspace is pressed
+         * @param character the previous character
+         */
         Console.prototype.backspaceClear = function (character) {
             // Find the width of the previous character
             var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, character);
@@ -91,7 +105,9 @@ var TSOS;
             // Clear the previous character's space
             _DrawingContext.clearRect(this.currentXPosition, (this.currentYPosition - 12), 20, 20);
         };
-        // Reset the x, y coordinates on the canvas
+        /**
+         * Reset the x, y coordinates on the canvas
+         */
         Console.prototype.resetXY = function () {
             this.currentXPosition = 0;
             this.currentYPosition = this.currentFontSize;

@@ -6,24 +6,13 @@
 
 module TSOS {
     export class Utils {
-        public static trim(str): string {
-            // Use a regular expression to remove leading and trailing spaces.
-            return str.replace(/^\s+ | \s+$/g, "");
-            /*
-            - The "|" separates this into two expressions, as in A or B.
-            - "^\s+" matches a sequence of one or more whitespace characters at the beginning of a string.
-            - "\s+$" is the same thing, but at the end of the string.
-            - "g" makes is global, so we get all the whitespace.
-            - "" is nothing, which is what we replace the whitespace with.
-            */
-        }
-
+        /**
+         * This is an easy-to understand implementation of the famous and common Rot13 obfuscator.
+         * You can do this in three lines with a complex regular expression, but I'd have
+         * trouble explaining it in the future.  There's a lot to be said for obvious code.
+         * @param str is the string being obfuscated
+         */
         public static rot13(str: string): string {
-            /*
-               This is an easy-to understand implementation of the famous and common Rot13 obfuscator.
-               You can do this in three lines with a complex regular expression, but I'd have
-               trouble explaining it in the future.  There's a lot to be said for obvious code.
-            */
             let retVal: string = "";
             for (const i of str as any) {    // We need to cast the string to any for use in the for...in construct.
                 const ch: string = str[i];
@@ -42,9 +31,12 @@ module TSOS {
             return retVal;
         }
 
-        // Convert string to ASCII to hex
+        /**
+         * Convert string to ASCII to hex
+         * @param string is the string being converted
+         */
         public static stringToASCIItoHex(string: String): Array<string> {
-            let hexArray = [];
+            let hexArray: Array<string> = [];
             // Look at each character's ASCII value and convert it to a hex string
             for (let i = 0; i < string.length; i++){
                 let hexChar = string.charCodeAt(i).toString(16);

@@ -1,5 +1,4 @@
 ///<reference path="../globals.ts" />
-
 /* ------------
      Devices.ts
 
@@ -14,14 +13,14 @@
      ------------ */
 
 module TSOS {
-
     export class Devices {
-
         constructor() {
             _hardwareClockID = -1;
         }
 
-        // Hardware/Host Clock Pulse
+        /**
+         * Hardware/Host Clock Pulse
+         */
         public static hostClockPulse(): void {
             // Increment the hardware (host) clock.
             _OSclock++;
@@ -29,7 +28,9 @@ module TSOS {
             _Kernel.krnOnCPUClockPulse();
         }
 
-        // Keyboard Interrupt, a HARDWARE Interrupt Request. (See pages 560-561 in our text book.)
+        /**
+         * 
+         */
         public static hostEnableKeyboardInterrupt(): void {
             // Listen for key press (keydown, actually) events in the Document
             // and call the simulation processor, which will in turn call the
@@ -37,13 +38,20 @@ module TSOS {
             document.addEventListener("keydown", Devices.hostOnKeypress, false);
         }
 
+        /**
+         * Disable Keyboard Interrupt, a HARDWARE Interrupt Request. 
+         * (See pages 560-561 in our text book.)
+         */
         public static hostDisableKeyboardInterrupt(): void {
             document.removeEventListener("keydown", Devices.hostOnKeypress, false);
         }
 
+        /**
+         * The canvas element CAN receive focus if you give it a tab index, which we have.
+         * Check that we are processing keystrokes only from the canvas's id (as set in index.html).
+         * @param event 
+         */
         public static hostOnKeypress(event): void {
-            // The canvas element CAN receive focus if you give it a tab index, which we have.
-            // Check that we are processing keystrokes only from the canvas's id (as set in index.html).
             if (event.target.id === "display") {
                 event.preventDefault();
                 // Note the pressed key code in the params (Mozilla-specific).

@@ -1,3 +1,4 @@
+///<reference path="../globals.ts" />
 /* ------------
    swapper.ts
    This is the client OS implementation of a swapper.
@@ -9,12 +10,12 @@ var TSOS;
         function Swapper() {
         }
         Swapper.prototype.putProcessToDisk = function (opCodes, pId) {
-            // Create file name for process... make it $SWAPpId
-            var filename = "$SWAP" + pId;
+            // Create file name for process
+            var filename = SWAP + pId;
             _DiskDriver.createFile(filename);
             var length = opCodes.length;
             while (length < PARTITION_SIZE) {
-                opCodes.push("00");
+                opCodes.push("00" /* TERMINATOR */);
                 length++;
             }
             var status = _DiskDriver.writeSwap(filename, opCodes);
@@ -32,7 +33,7 @@ var TSOS;
         };
         Swapper.prototype.rollIn = function (pcb) {
             // Find swap file in directory structure
-            var filename = "$SWAP" + pcb.pId;
+            var filename = SWAP + pcb.pId;
             // Get the TSB of the program stored in disk
             var data = _DiskDriver.readFile(filename);
             if (data.status === SUCCESS) {
@@ -60,7 +61,7 @@ var TSOS;
                     TSOS.Control.hostMemory();
                 }
                 else {
-                    // If there is no room, then we must roll out a process from memory into the disk, then put the new process in that place in memory
+                    // If there is no room, roll out the process
                     this.rollOut(pcb);
                 }
             }
@@ -68,25 +69,13 @@ var TSOS;
                 _StdOut.putText("Uh oh.. File name does not exist.");
             }
         };
+        // Roll out a process from memory into the disk, then put the new process in that place in memory
         Swapper.prototype.rollOut = function (pcb) {
             // Find swap file in directory structure
-            var filename = "$SWAP" + pcb.pId;
-            // Get random partition from memory
-            var swappedPartition = Math.floor(Math.random() * _Memory.partitions.length);
+            var filename = SWAP + pcb.pId;
             // Look for the PCB with that partition
-            var swappedPcb;
-            // Look in ready queue
-            for (var i = 0; i < _MemoryManager.readyQueue.q.length; i++) {
-                if (_MemoryManager.readyQueue.q[i].partition == swappedPartition) {
-                    swappedPcb = _MemoryManager.readyQueue.q[i];
-                }
-            }
-            // Look in resident queue
-            for (var i = 0; i < _MemoryManager.residentQueue.q.length; i++) {
-                if (_MemoryManager.residentQueue.q[i].partition == swappedPartition) {
-                    swappedPcb = _MemoryManager.residentQueue.q[i];
-                }
-            }
+            var swappedPcb = _Scheduler.findLowestPriority();
+            var swappedPartition = swappedPcb.partition;
             if (swappedPcb != null) {
                 // Get data from memory
                 var memoryData = _Memory.getPartitionData(swappedPartition);

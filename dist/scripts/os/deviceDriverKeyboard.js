@@ -1,5 +1,9 @@
 ///<reference path="../globals.ts" />
 ///<reference path="deviceDriver.ts" />
+/* ----------------------------------
+   DeviceDriverKeyboard.ts
+   The Kernel Keyboard Device Driver.
+   ---------------------------------- */
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -13,21 +17,14 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-/* ----------------------------------
-   DeviceDriverKeyboard.ts
-   The Kernel Keyboard Device Driver.
-   ---------------------------------- */
 var TSOS;
 (function (TSOS) {
     // Extends DeviceDriver
     var DeviceDriverKeyboard = /** @class */ (function (_super) {
         __extends(DeviceDriverKeyboard, _super);
         function DeviceDriverKeyboard() {
-            // Override the base method pointers.
             var _this = 
-            // The code below cannot run because "this" can only be
-            // accessed after calling super.
-            // super(this.krnKbdDriverEntry, this.krnKbdDispatchKeyPress);
+            // Override the base method pointers.
             _super.call(this) || this;
             // Instantiate the characterArray to keep track of all characters being input
             _this.characterArray = [];
@@ -38,12 +35,17 @@ var TSOS;
             _this.isr = _this.krnKbdDispatchKeyPress;
             return _this;
         }
-        // Initialization routine for this, the kernel-mode Keyboard Device Driver.
+        /**
+         * Initialization routine for this, the kernel-mode Keyboard Device Driver.
+         */
         DeviceDriverKeyboard.prototype.krnKbdDriverEntry = function () {
             this.status = "loaded";
             // More?
         };
-        // Parse keypress keyCodes
+        /**
+         * Parse keypress keyCodes
+         * @param params keyCode: number, isShifted: boolean
+         */
         DeviceDriverKeyboard.prototype.krnKbdDispatchKeyPress = function (params) {
             // Parse the params.    
             // TODO: Check that the params are valid and osTrapError if not.
@@ -53,8 +55,8 @@ var TSOS;
             _Kernel.krnTrace("Key code:" + keyCode + " shifted:" + isShifted);
             var chr = "";
             // Check to see if we even want to deal with the key that was pressed.
-            if (((keyCode >= 65) && (keyCode <= 90)) || // A..Z
-                ((keyCode >= 97) && (keyCode <= 123))) { // a..z {
+            if (((keyCode >= 65 /* A */) && (keyCode <= 90 /* Z */)) || // A..Z
+                ((keyCode >= 97 /* a */) && (keyCode <= 123 /* z */))) { // a..z {
                 // Determine the character we want to display. Assume its lowercase
                 chr = String.fromCharCode(keyCode + 32);
                 // then check the shift key and re-adjust if necessary.
@@ -65,10 +67,10 @@ var TSOS;
                 _KernelInputQueue.enqueue(chr);
                 this.characterArray.push(chr);
             }
-            else if (((keyCode >= 48) && (keyCode <= 57) && !isShifted) || // digits
-                (keyCode === 32) || // space
-                (keyCode === 13)) { // enter
-                if (keyCode === 13) {
+            else if (((keyCode >= 48 /* Zero */) && (keyCode <= 57 /* Nine */) && !isShifted) || // digits
+                (keyCode === 32 /* Space */) ||
+                (keyCode === 13 /* Enter */)) {
+                if (keyCode === 13 /* Enter */) {
                     this.isScrollingCommands = false;
                     chr = String.fromCharCode(keyCode);
                     _KernelInputQueue.enqueue(chr);
@@ -78,69 +80,69 @@ var TSOS;
                     this.basicKeyPress(keyCode);
                 }
             }
-            else if (isShifted && (keyCode === 48)) { // )
+            else if (isShifted && (keyCode === 48 /* Zero */)) { // )
                 this.basicKeyPress((keyCode - 7));
             }
-            else if ((((isShifted && (keyCode === 49)) || // !
-                (isShifted && (keyCode === 51)) || // #
-                (isShifted && (keyCode === 52)) || // $
-                (isShifted && (keyCode === 53))))) { // %        
+            else if ((((isShifted && (keyCode === 49 /* One */)) || // !
+                (isShifted && (keyCode === 51 /* Three */)) || // #
+                (isShifted && (keyCode === 52 /* Four */)) || // $
+                (isShifted && (keyCode === 53 /* Five */))))) { // %        
                 this.basicKeyPress((keyCode - 16));
             }
-            else if (isShifted && (keyCode === 50)) { // @
+            else if (isShifted && (keyCode === 50 /* Two */)) { // @
                 this.basicKeyPress((keyCode + 14));
             }
-            else if (isShifted && (keyCode === 54)) { // ^
+            else if (isShifted && (keyCode === 54 /* Six */)) { // ^
                 this.basicKeyPress((keyCode + 40));
             }
-            else if ((isShifted && (keyCode === 55)) || // &
-                (isShifted && (keyCode === 57))) { // )
+            else if ((isShifted && (keyCode === 55 /* Seven */)) || // &
+                (isShifted && (keyCode === 57 /* Nine */))) { // (
                 this.basicKeyPress((keyCode - 17));
             }
-            else if (isShifted && (keyCode === 56)) { // *
+            else if (isShifted && (keyCode === 56 /* Eight */)) { // *
                 this.basicKeyPress((keyCode - 14));
             }
-            else if (isShifted && (keyCode === 192)) { // ~
+            else if (isShifted && (keyCode === 192 /* Backquote */)) { // ~
                 this.basicKeyPress((keyCode - 66));
             }
-            else if ((keyCode === 192) || // `
-                (isShifted && (keyCode === 219)) || // {
-                (isShifted && (keyCode === 221)) || // }
-                (isShifted && (keyCode === 220))) { // |
+            else if ((keyCode === 192 /* Backquote */) || // `
+                (isShifted && (keyCode === 219 /* LBracket */)) || // {
+                (isShifted && (keyCode === 221 /* RBracket */)) || // }
+                (isShifted && (keyCode === 220 /* Backslash */))) { // |
                 this.basicKeyPress((keyCode - 96));
             }
-            else if (isShifted && (keyCode === 189)) { // _
+            else if (isShifted && (keyCode === 189 /* Dash */)) { // _
                 this.basicKeyPress((keyCode - 94));
             }
-            else if ((keyCode === 219) || // [
-                (keyCode === 221) || // ]
-                (keyCode === 220) || // \
-                (isShifted && (keyCode === 188)) || // <
-                (isShifted && (keyCode === 190)) || // >
-                (isShifted && (keyCode === 186)) || // :
-                (isShifted && (keyCode === 191))) { // ?
+            else if ((keyCode === 219 /* LBracket */) ||
+                (keyCode === 221 /* RBracket */) ||
+                (keyCode === 220 /* Backslash */) ||
+                (isShifted && (keyCode === 188 /* Comma */)) || // <
+                (isShifted && (keyCode === 190 /* Period */)) || // >
+                (isShifted && (keyCode === 186 /* Colon */)) || // :
+                (isShifted && (keyCode === 191 /* Slash */))) { // ?
                 this.basicKeyPress((keyCode - 128));
             }
-            else if (isShifted && (keyCode === 222)) { // "
+            else if (isShifted && (keyCode === 222 /* SingleQuote */)) { // "
                 this.basicKeyPress((keyCode - 188));
             }
-            else if (keyCode === 222) { // '
+            else if (keyCode === 222 /* SingleQuote */) {
                 this.basicKeyPress((keyCode - 183));
             }
-            else if ((keyCode === 188) || // ,
-                (keyCode === 189) || // -
-                (keyCode === 190) || // .
-                (isShifted && (keyCode === 187)) || // +
-                (keyCode === 191)) { // /
+            else if ((keyCode === 188 /* Comma */) ||
+                (keyCode === 189 /* Dash */) ||
+                (keyCode === 190 /* Period */) ||
+                (isShifted && (keyCode === 187 /* Equals */)) || // +
+                (keyCode === 191 /* Slash */)) {
                 this.basicKeyPress(keyCode - 144);
             }
-            else if (keyCode === 187) { // =
+            else if (keyCode === 187 /* Equals */) {
                 this.basicKeyPress((keyCode - 126));
             }
-            else if (keyCode === 186) { // -
+            else if (keyCode === 186 /* Colon */) {
                 this.basicKeyPress((keyCode - 127));
             }
-            else if (keyCode == 8) { // backspace
+            else if (keyCode === 8 /* Backspace */) {
                 if (this.characterArray.length > 0) {
                     // Initialize the previous character
                     var previousChar = this.characterArray[this.characterArray.length - 1];
@@ -151,7 +153,7 @@ var TSOS;
                     _StdOut.backspaceClear(previousChar);
                 }
             }
-            else if (keyCode === 9) { // tab
+            else if (keyCode === 9 /* Tab */) {
                 if (_Console.buffer.length != 0) {
                     // Instantiate the tabIndex and match boolean
                     var tabIndex = 0;
@@ -182,7 +184,7 @@ var TSOS;
                     }
                 }
             }
-            else if (keyCode === 38) { // up arrow
+            else if (keyCode === 38 /* Up */) {
                 // Check to see if user is already scrolling commands
                 if (!this.isScrollingCommands) {
                     // If not, set the commandIndex of the commandsUsedList
@@ -217,7 +219,7 @@ var TSOS;
                     _KernelInputQueue.enqueue(chr);
                 }
             }
-            else if (keyCode === 40) { // down arrow
+            else if (keyCode === 40 /* Down */) {
                 // Check to see if user is already scrolling
                 if (this.isScrollingCommands) {
                     // If so, check to see if the index is already at the end of the list 
@@ -244,8 +246,11 @@ var TSOS;
                 }
             }
         };
-        // This function gets the character from the keyCode, pushes into the InputQueue,
-        // then pushes the character into the characterArray
+        /**
+         * This function gets the character from the keyCode, pushes into the InputQueue,
+         * then pushes the character into the characterArray
+         * @param keyCode
+         */
         DeviceDriverKeyboard.prototype.basicKeyPress = function (keyCode) {
             var chr = String.fromCharCode(keyCode);
             _KernelInputQueue.enqueue(chr);

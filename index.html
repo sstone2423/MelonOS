@@ -5,41 +5,10 @@
         <meta name="author"             content="Stephen Stone" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <title>MelonOS - a browser-based virtual Operating System in TypeScript</title>
-   
         <!-- Enable bootstrap -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" />
-        <link rel="stylesheet" href="tsos.css" type="text/css" media="screen" />
-        <link rel="shortcut icon" href="favicon.ico" /> 
-
-        <!-- Globals CONSTANTS and _Variables. Must included be first. -->
-        <script type="text/javascript" src="distrib/globals.js"></script>
-        <!-- Host (Virtual Machine / Hardware Simulation) Routines -->
-        <script type="text/javascript" src="distrib/host/control.js"></script>
-        <script type="text/javascript" src="distrib/host/devices.js"></script>
-        <script type="text/javascript" src="distrib/host/cpu.js"></script>
-        <script type="text/javascript" src="distrib/host/memory.js"></script>
-        <script type="text/javascript" src="distrib/host/disk.js"></script>
-        <!-- Virtual OS Routines: Make sure Kernel code is last, since it needs those above it. -->
-        <script type="text/javascript" src="distrib/os/interrupt.js"></script>
-        <script type="text/javascript" src="distrib/os/canvastext.js"></script>
-        <script type="text/javascript" src="distrib/os/console.js"></script>
-        <script type="text/javascript" src="distrib/os/deviceDriver.js"></script>
-        <script type="text/javascript" src="distrib/os/deviceDriverKeyboard.js"></script>
-        <script type="text/javascript" src="distrib/os/deviceDriverDisk.js"></script>
-        <script type="text/javascript" src="distrib/os/queue.js"></script>
-        <script type="text/javascript" src="distrib/os/scheduler.js"></script>
-        <script type="text/javascript" src="distrib/os/shell.js"></script>
-        <script type="text/javascript" src="distrib/os/shellCommand.js"></script>
-        <script type="text/javascript" src="distrib/os/swapper.js"></script>
-        <script type="text/javascript" src="distrib/os/userCommand.js"></script>
-        <script type="text/javascript" src="distrib/os/memoryManager.js"></script>
-        <script type="text/javascript" src="distrib/os/processControlBlock.js"></script>
-        <script type="text/javascript" src="distrib/os/kernel.js"></script>
-        <!-- Other Routines -->
-        <script type="text/javascript" src="distrib/utils.js"></script>
-        <!-- Uncomment the line below to enable GLaDOS testing. -->
-        <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip4.js"></script>
-        
+        <link rel="stylesheet" href="dist/styles/melonos.css" type="text/css" media="screen" />
+        <link rel="shortcut icon" href="dist/images/favicon.ico" />
 </head>
 <body onload="onDocumentLoad()">
         <div id="divMain" class="container-fluid">
@@ -108,7 +77,7 @@
                         <!--Melon logo column-->
                         <div class="col-sm topRow">
                                 <div class="text-center">
-                                        <img id ="melonImage" src="melonOS.gif" alt="MelonOS" height="110" width="350"/>
+                                        <img id ="melonImage" src="dist/images/melonOS.gif" alt="MelonOS" height="110" width="350"/>
                                 </div>
                         </div>
                         <!--CPU/Contact Column-->
@@ -154,10 +123,10 @@
                                                                                 <li class="list-group-item text-center">By Stephen Stone</li>
                                                                                 <li class="list-group-item">
                                                                                         <a href="https://github.com/sstone2423/MelonOS">
-                                                                                                <img src="GitHub_Logo.png" alt="Stephen's Github" height="18px" width="50px" />
+                                                                                                <img src="dist/images/GitHub_Logo.png" alt="Stephen's Github" height="18px" width="50px" />
                                                                                         </a>
                                                                                         <a href="https://www.linkedin.com/in/stephen-stone/">
-                                                                                                <img id="linkedIn" src="LinkedIn_Logo.svg.png" alt="Stephen's LinkedIn" height="16px" width="60px" />
+                                                                                                <img id="linkedIn" src="dist/images/LinkedIn_Logo.svg.png" alt="Stephen's LinkedIn" height="16px" width="60px" />
                                                                                         </a>
                                                                                 </li>   
                                                                         </ul>
@@ -344,18 +313,43 @@
                         </div>
                 </div>
         </div>
-
-        <img id ="melonFall" src="melon.png" alt="MelonOS" height="15" width="15"/>
-
+        <img id ="melonFall" src="dist/images/melon.png" alt="MelonOS" height="15" width="15"/>
         <footer class="footerText">
                 <br>
                 Copyright &copy; 2018 Stephen Stone
                 <br>
         </footer>
-
 <!-- Enable bootstrap -->
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<!-- Globals CONSTANTS and _Variables. Must be included first. -->
+<script type="text/javascript" src="dist/scripts/globals.js"></script>
+<!-- Host (Virtual Machine / Hardware Simulation) Routines -->
+<script type="text/javascript" src="dist/scripts/host/control.js"></script>
+<script type="text/javascript" src="dist/scripts/host/devices.js"></script>
+<script type="text/javascript" src="dist/scripts/host/cpu.js"></script>
+<script type="text/javascript" src="dist/scripts/host/memory.js"></script>
+<script type="text/javascript" src="dist/scripts/host/disk.js"></script>
+<!-- Virtual OS Routines: Make sure Kernel code is last, since it needs those above it. -->
+<script type="text/javascript" src="dist/scripts/os/interrupt.js"></script>
+<script type="text/javascript" src="dist/scripts/os/canvastext.js"></script>
+<script type="text/javascript" src="dist/scripts/os/console.js"></script>
+<script type="text/javascript" src="dist/scripts/os/deviceDriver.js"></script>
+<script type="text/javascript" src="dist/scripts/os/deviceDriverKeyboard.js"></script>
+<script type="text/javascript" src="dist/scripts/os/deviceDriverDisk.js"></script>
+<script type="text/javascript" src="dist/scripts/os/queue.js"></script>
+<script type="text/javascript" src="dist/scripts/os/scheduler.js"></script>
+<script type="text/javascript" src="dist/scripts/os/shell.js"></script>
+<script type="text/javascript" src="dist/scripts/os/shellCommand.js"></script>
+<script type="text/javascript" src="dist/scripts/os/swapper.js"></script>
+<script type="text/javascript" src="dist/scripts/os/userCommand.js"></script>
+<script type="text/javascript" src="dist/scripts/os/memoryManager.js"></script>
+<script type="text/javascript" src="dist/scripts/os/processControlBlock.js"></script>
+<script type="text/javascript" src="dist/scripts/os/kernel.js"></script>
+<!-- Other Routines -->
+<script type="text/javascript" src="dist/scripts/utils.js"></script>
+<!-- Uncomment the line below to enable GLaDOS testing. -->
+<!--<script type="text/javascript" src="test/glados-ip4.js"></script>-->
 </body>
 </html>

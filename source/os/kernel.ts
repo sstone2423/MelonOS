@@ -2,7 +2,6 @@
 ///<reference path="queue.ts" />
 ///<reference path="../host/memory.ts" />
 ///<reference path="scheduler.ts" />
-
 /* ------------
      Kernel.ts
 
@@ -12,13 +11,13 @@
      ------------ */
 
 module TSOS {
-
     export class Kernel {
-        public timer: number = 0;
-        // OS Startup and Shutdown Routines
+        timer: number = 0;
+        /**
+         * OS Startup and Shutdown Routines
+         */
         public krnBootstrap(): void {      // Page 8. {
             Control.hostLog("bootstrap", "host");  // Use hostLog because we ALWAYS want this, even if _Trace is off.
-
             // Initialize our global queues.
             _KernelInterruptQueue = new Queue();  // A (currently) non-priority queue for interrupt requests (IRQs).
             _KernelBuffers = new Array();         // Buffers... for the kernel.
@@ -35,35 +34,32 @@ module TSOS {
             _Scheduler = new Scheduler();
             // Load the swapper
             _Swapper = new Swapper();
-
             // Load the Keyboard Device Driver
             this.krnTrace("Loading the keyboard device driver.");
             _krnKeyboardDriver = new DeviceDriverKeyboard();     // Construct it.
             _krnKeyboardDriver.driverEntry();                    // Call the driverEntry() initialization routine.
             this.krnTrace(_krnKeyboardDriver.status);
-
             // Load the Disk Device Driver
             this.krnTrace("Loading the disk device driver");
             _DiskDriver = new DeviceDriverDisk();
             _DiskDriver.driverEntry();
             this.krnTrace(_DiskDriver.status);
-
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
             this.krnEnableInterrupts();
-
             // Launch the shell.
             this.krnTrace("Creating and Launching the shell.");
             _OsShell = new Shell();
             _OsShell.init();
-
             // Finally, initiate student testing protocol.
             if (_GLaDOS) {
                 _GLaDOS.afterStartup();
             }
         }
 
-        // Shutdowns the kernel
+        /**
+         * Shutdowns the kernel
+         */
         public krnShutdown(): void {
             this.krnTrace("begin shutdown OS");
             // Check for running processes.  If there are some, alert and stop. Else...
@@ -73,7 +69,6 @@ module TSOS {
             // ... Disable the Interrupts.
             this.krnTrace("Disabling the interrupts.");
             this.krnDisableInterrupts();
-
             // Unload the Device Drivers
             _DiskDriver.driverEntry = "unloaded";
             _krnKeyboardDriver = "unloaded";
@@ -82,10 +77,13 @@ module TSOS {
         }
 
         /*  
-            This gets called from the host hardware simulation every time there is a hardware clock pulse.
-            This is NOT the same as a TIMER, which causes an interrupt and is handled like other interrupts.
-            This, on the other hand, is the clock pulse from the hardware / VM / host that tells the kernel
-            that it has to look for interrupts and process them if it finds any.                           
+                                      
+        */
+       /**
+        * This gets called from the host hardware simulation every time there is a hardware clock pulse.
+        * This is NOT the same as a TIMER, which causes an interrupt and is handled like other interrupts.
+        * This, on the other hand, is the clock pulse from the hardware / VM / host that tells the kernel
+        * that it has to look for interrupts and process them if it finds any. 
         */
         public krnOnCPUClockPulse(): void {
             // Check if timer has reached the quantum
@@ -155,20 +153,30 @@ module TSOS {
 
         // Interrupt Handling
 
+        /**
+         * Enables interrupts
+         */
         public krnEnableInterrupts(): void {
             // Keyboard
             Devices.hostEnableKeyboardInterrupt();
             // Put more here.
         }
 
+        /**
+         * Disables interrupts
+         */
         public krnDisableInterrupts(): void {
             // Keyboard
             Devices.hostDisableKeyboardInterrupt();
             // Put more here.
         }
 
-        // This is the Interrupt Handler Routine.  See pages 8 and 560.
-        public krnInterruptHandler(irq, params): void {
+        /**
+         * This is the Interrupt Handler Routine.  See pages 8 and 560.
+         * @param irq 
+         * @param params 
+         */
+        public krnInterruptHandler(irq: number, params): void {
             // Trace our entrance here so we can compute Interrupt Latency by analyzing the log file later on. Page 766.
             this.krnTrace("Handling IRQ~" + irq);
 
@@ -220,8 +228,11 @@ module TSOS {
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }
         }
-        /* The built-in TIMER (not clock) Interrupt Service Routine (as opposed to an ISR coming from
-            a device driver).*/
+        /* */
+            /**
+             * The built-in TIMER (not clock) Interrupt Service Routine 
+             * (as opposed to an ISR coming froma device driver).
+             */
         public krnTimerISR(): void {
             // Check multiprogramming parameters and enforce quanta here.
             _Scheduler.contextSwitch();
@@ -229,6 +240,10 @@ module TSOS {
 
         // OS Utility Routines */
 
+        /**
+         * Displays trace debugging information
+         * @param msg the debug message
+         */
         public krnTrace(msg: string): void {
             // Check globals to see if trace is set ON.  If so, then (maybe) log the message.
             if (_Trace) {
@@ -237,16 +252,19 @@ module TSOS {
                     if (_OSclock % 10 === 0) {
                         // Check the CPU_CLOCK_INTERVAL in globals.ts for an
                         // idea of the tick rate and adjust this line accordingly.
-                        Control.hostLog(msg, "OS");
+                        Control.hostLog(msg, OS);
                     }
                 } else {
-                    Control.hostLog(msg, "OS");
+                    Control.hostLog(msg, OS);
                 }
             }
         }
 
-        // When everything breaks, shut everything down and throw melons out the window
-        public krnTrapError(msg): void {
+        /**
+         * When everything breaks, shut everything down and throw melons out the window
+         * @param msg error message
+         */
+        public krnTrapError(msg: string): void {
             // Display error
             Control.hostLog("OS ERROR - TRAP: " + msg);
             // Shutdown the kernel
@@ -255,7 +273,9 @@ module TSOS {
             Control.melonDrop();
         }
 
-        // When timer is up, throw timer IRQ and reset timer to 0
+        /**
+         * When timer is up, throw timer IRQ and reset timer to 0
+         */
         public krnTimerIRQ(): void {
             // Throw the TIMER_IRQ
             _KernelInterruptQueue.enqueue(new Interrupt(TIMER_IRQ, false));

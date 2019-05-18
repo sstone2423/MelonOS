@@ -5,10 +5,10 @@
 
 module TSOS {
     export class DeviceDriver {
-        public version: string = "0.07";
-        public status: string = "unloaded";
-        public preemptable: boolean = false;
-        public driverEntry = null;
-        public isr = null;
+        version: string = "0.07";
+        status: string = "unloaded";
+        preemptable: boolean = false;
+        driverEntry = null;
+        isr = null;
     }
 }

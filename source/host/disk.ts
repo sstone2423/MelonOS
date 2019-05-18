@@ -1,5 +1,4 @@
 ///<reference path="../globals.ts" />
-
 /* ------------
      disk.ts
      Requires global.ts.
@@ -12,15 +11,17 @@
      ------------ */
 
      module TSOS {
-
         export class Disk {
-            public totalTracks: number = 4;
-            public totalSectors: number = 8;
-            public totalBlocks: number = 8;
-            public dataSize: number = 60;
+            totalTracks: number = 4;
+            totalSectors: number = 8;
+            totalBlocks: number = 8;
+            dataSize: number = 60;
             
             constructor() { }
     
+            /**
+             * Initialize storage and set session storage key
+             */
             public init(): void {
                 // Initialize storage
                 for (let i = 0; i < this.totalTracks; i++) {

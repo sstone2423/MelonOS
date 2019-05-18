@@ -14,9 +14,7 @@
  * ----------------- */
 
 module TSOS {
-
     export class CanvasTextFunctions {
-
         public static symbols = {
             " " : { width: 16, points: [] },
             "!": { width: 10, points: [[5, 21], [5, 7], [-1, -1], [5, 2], [4, 1], [5, 0], [6, 1], [5, 2]] },

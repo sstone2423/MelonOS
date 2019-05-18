@@ -2,20 +2,18 @@
 ///<reference path="processControlBlock.ts" />
 ///<reference path="queue.ts" />
 ///<reference path="shell.ts" />
-
 /* ------------
    memoryManager.ts
    This is the client OS implementation of the Memory Manager
    ------------ */
 
-   module TSOS {
-
+module TSOS {
     export class MemoryManager {
         // Initialize variables
-        public processIncrementor: number;
-        public residentQueue: TSOS.Queue;
-        public readyQueue: TSOS.Queue;
-        public runningProcess: TSOS.ProcessControlBlock;
+        processIncrementor: number;
+        residentQueue: TSOS.Queue;
+        readyQueue: TSOS.Queue;
+        runningProcess: TSOS.ProcessControlBlock;
 
         constructor() {
             this.processIncrementor = 0;
@@ -24,7 +22,11 @@
             this.runningProcess = null;
         }
         
-        // Create a process for the loaded program (called from shellLoad command)
+        /**
+         * Create a process for the loaded program (called from shellLoad command)
+         * @param opCodes provided by the user
+         * @param args optional priority
+         */
         public createProcess(opCodes: Array<string>, args: Array<string>): void {
             // Check to see if the program is greater than the partition size
             if (opCodes.length > PARTITION_SIZE) {
@@ -87,18 +89,20 @@
             }
         }
     
-        // Execute a process from the ready queue or by highest priority
+        /**
+         * Execute a process from the ready queue or by highest priority
+         */
         public executeProcess(): void {
             // Call the scheduler to reorder the ready queue if the scheduling scheme is Priority
             if (_Scheduler.algorithm == "priority") {
                 this.runningProcess = _Scheduler.findHighestPriority();
             } else {
                 this.runningProcess = _MemoryManager.readyQueue.dequeue();
-                _CPU.PC = this.runningProcess.PC;
-                _CPU.Acc = this.runningProcess.acc;
-                _CPU.Xreg = this.runningProcess.xReg;
-                _CPU.Yreg = this.runningProcess.yReg;
-                _CPU.Zflag = this.runningProcess.zFlag;
+                _CPU.pc = this.runningProcess.PC;
+                _CPU.acc = this.runningProcess.acc;
+                _CPU.xReg = this.runningProcess.xReg;
+                _CPU.yReg = this.runningProcess.yReg;
+                _CPU.zFlag = this.runningProcess.zFlag;
                 // We need to check if the process is stored in disk. If so, we need to have the swapper roll in from disk, and 
                 // roll out a process in memory if there is not enough space in memory for the rolled-in process.
                 if (this.runningProcess.swapped) {
@@ -110,18 +114,21 @@
                 }
                 _CPU.isExecuting = true;
                 this.runningProcess.state = "Executing";
-                
             }
         }
 
-        // Gets called when the CPU is not executing
+        /**
+         * Gets called when the CPU is not executing
+         */
         public checkReadyQueue(): void {
             if (!this.readyQueue.isEmpty()) {
                 this.executeProcess();
             }
         }
         
-        // Exit a process from the CPU, reset CPU values, reset memory partition
+        /**
+         * Exit a process from the CPU, reset CPU values, reset memory partition
+         */
         public exitProcess(): void {
             // Init the CPU to reset registers and isExecuting
             _CPU.init();
@@ -148,14 +155,17 @@
             this.runningProcess = null;
         }
 
-        // Kill a specific process specified by processID
-        // TODO: make this more efficient?
-        public killProcess(processID): void {
+        /**
+         * Kill a specific process specified by processID
+         * @param processID 
+         * TODO: make this more efficient?
+         */
+        public killProcess(processID: number): void {
             let found = false;
             // Check if a process is running
             if (this.runningProcess !== null) {
                 // Check if the process is executing
-                if (this.runningProcess.pId == processID) {
+                if (this.runningProcess.pId === processID) {
                     this.exitProcess();
                     found = true;
                 } 
@@ -196,7 +206,11 @@
             }
         }
 
-        // Checks to make sure the memory being accessed is within the range specified by the base/limit
+        /**
+         * Checks to make sure the memory being accessed is within the 
+         * range specified by the base/limit
+         * @param address the memory address being checked
+         */
         public inBounds(address): boolean {
             let partition = this.runningProcess.partition;
             if (address + _Memory.partitions[partition].base < _Memory.partitions[partition].base + _Memory.partitions[partition].limit 
@@ -208,8 +222,11 @@
             }
         }
 
-        // Clear a partition and delete the swap file of the pcb if applicable
-        public clearPartitionCheckSwap(pcb) {
+        /**
+         * Clear a partition and delete the swap file of the pcb if applicable
+         * @param pcb 
+         */
+        public clearPartitionCheckSwap(pcb): void {
             _Memory.clearPartition(pcb.partition);
             _StdOut.putText("Exiting process " + pcb.pId);
             if (pcb.swapped) {
@@ -220,7 +237,9 @@
             }
         }
 
-        // Update turnaround times and wait times for all processes
+        /**
+         * Update turnaround times and wait times for all processes
+         */
         public processStats(): void {
             // Increment the turnaround times for all processes
             // Increment the wait times for all processes in the ready queue

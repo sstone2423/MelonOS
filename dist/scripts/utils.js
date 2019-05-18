@@ -8,23 +8,13 @@ var TSOS;
     var Utils = /** @class */ (function () {
         function Utils() {
         }
-        Utils.trim = function (str) {
-            // Use a regular expression to remove leading and trailing spaces.
-            return str.replace(/^\s+ | \s+$/g, "");
-            /*
-            - The "|" separates this into two expressions, as in A or B.
-            - "^\s+" matches a sequence of one or more whitespace characters at the beginning of a string.
-            - "\s+$" is the same thing, but at the end of the string.
-            - "g" makes is global, so we get all the whitespace.
-            - "" is nothing, which is what we replace the whitespace with.
-            */
-        };
+        /**
+         * This is an easy-to understand implementation of the famous and common Rot13 obfuscator.
+         * You can do this in three lines with a complex regular expression, but I'd have
+         * trouble explaining it in the future.  There's a lot to be said for obvious code.
+         * @param str is the string being obfuscated
+         */
         Utils.rot13 = function (str) {
-            /*
-               This is an easy-to understand implementation of the famous and common Rot13 obfuscator.
-               You can do this in three lines with a complex regular expression, but I'd have
-               trouble explaining it in the future.  There's a lot to be said for obvious code.
-            */
             var retVal = "";
             for (var _i = 0, _a = str; _i < _a.length; _i++) { // We need to cast the string to any for use in the for...in construct.
                 var i = _a[_i];
@@ -45,7 +35,10 @@ var TSOS;
             }
             return retVal;
         };
-        // Convert string to ASCII to hex
+        /**
+         * Convert string to ASCII to hex
+         * @param string is the string being converted
+         */
         Utils.stringToASCIItoHex = function (string) {
             var hexArray = [];
             // Look at each character's ASCII value and convert it to a hex string

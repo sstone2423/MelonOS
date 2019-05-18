@@ -1,32 +1,33 @@
 ///<reference path="../globals.ts" />
 ///<reference path="deviceDriver.ts" />
 ///<reference path="../utils.ts" />
-
 /* ----------------------------------
    DeviceDriverDisk.ts
    Requires deviceDriver.ts
    The Hard Drive Disk Device Driver.
    ---------------------------------- */
 
-   module TSOS {
-    
+module TSOS {
     // Extends DeviceDriver
     export class DeviceDriverDisk extends DeviceDriver {
-
         constructor() {
             // Override the base method pointers.
-            // The code below cannot run because "this" can only be accessed after calling super.
             super();
             this.driverEntry = this.krnDiskDriverEntry;
         }
 
-        // Initialization routine for this, the kernel-mode Disk Device Driver.
+        /**
+         * Initialization routine for this, the kernel-mode Disk Device Driver.
+         */
         public krnDiskDriverEntry(): void {
             this.status = "loaded";
             // More?
         }
 
-        // Creates a new file with specified filename
+        /**
+         * Creates a new file with specified filename
+         * @param filename 
+         */
         public createFile(filename: String): number {
             let check = this.checkForExistingFile(filename);
             // Check for existing filename
@@ -97,7 +98,10 @@
             return DISK_IS_FULL;
         }
 
-        // Checks for an existing filename on disk. Returns a status object
+        /**
+         * Checks for an existing filename on disk. Returns a status object
+         * @param filename 
+         */
         public checkForExistingFile(filename: String) {
             let check;
             let hexArray = Utils.stringToASCIItoHex(filename);
@@ -136,7 +140,9 @@
             return check;
         }
 
-        // Return the TSB of the next free data block. If it can't find one, return null.
+        /**
+         * Return the TSB of the next free data block. If it can't find one, return null.
+         */
         public findFreeDataBlock() {
             // Generate tsbId
             for (let trackNum = 1; trackNum < _Disk.totalTracks; trackNum++) {
@@ -154,7 +160,10 @@
             return null;
         }
 
-        // Sets a block's bytes to all zeroes and returns the initialized block
+        /**
+         * Sets a block's bytes to all zeroes and returns the initialized block
+         * @param block 
+         */
         public clearData(block) {
             for (let i = 0; i < _Disk.dataSize; i++) {
                 block.data[i] = "00";
@@ -162,7 +171,10 @@
             return block;
         }
 
-        // Delete a file with the specified filename
+        /**
+         * Delete a file with the specified filename
+         * @param filename 
+         */
         public deleteFile(filename: string): number {
             // Look for the filename in the directory structure
             let hexArray = Utils.stringToASCIItoHex(filename);
@@ -207,7 +219,10 @@
             return FILENAME_DOESNT_EXIST;
         }
 
-        // Recursively deletes from a given TSB
+        /**
+         * Recursively deletes from a given TSB
+         * @param pointer_tsb 
+         */
         public deleteData(pointer_tsb): void {
             // Block that belongs to the TSB
             let ptrBlock = JSON.parse(sessionStorage.getItem(pointer_tsb)); 
@@ -224,7 +239,10 @@
             return;
         }
 
-        // Format the disk with the specified format
+        /**
+         * Format the disk with the specified format
+         * @param formatType 
+         */
         public format(formatType: number): boolean {
             // If CPU is executing, return false
             if (_CPU.isExecuting) {
@@ -272,7 +290,9 @@
             return true;
         }
 
-        // Returns an array of filenames currently on disk
+        /**
+         * Returns an array of filenames currently on disk
+         */
         public listFiles(): Array<String> {
             let filenames = [];
             // Look for first free block in directory data structure (first track)
@@ -320,7 +340,10 @@
             return filenames;
         }
 
-        // Read a file from disk
+        /**
+         * Read a file from disk by filename
+         * @param filename 
+         */
         public readFile(filename: String) {
             let check = this.checkForExistingFile(filename);
             let info;
@@ -359,6 +382,10 @@
             }
         }
 
+        /**
+         * Reads data from a specified TSB
+         * @param tsb 
+         */
         public readData(tsb: string): Array<string> {
             let dataBlock = JSON.parse(sessionStorage.getItem(tsb));
             let dataPtr: number = 0;
@@ -379,11 +406,14 @@
                     }
                 }
             }
-
             return data;
         }
 
-        // Write to a file on disk. Returns status number
+        /**
+         * Write to a file on disk. Returns status number
+         * @param filename 
+         * @param data 
+         */
         public writeFile(filename: string, data: string): number {
             let check = this.checkForExistingFile(filename);
             // If name is found
@@ -405,7 +435,11 @@
             }
         }
 
-        // Write data to a file on disk
+        /**
+         * Write data to a file on disk
+         * @param tsb 
+         * @param dataHexArray 
+         */
         public writeDataToFile(tsb: string, dataHexArray: Array<String>): void {
             let dataPtr: number = 0;
             let currentTSB: string = tsb;
@@ -425,8 +459,8 @@
                     dataPtr = 0;
                 }
             }
-            // If we're done writing, but the pointer in the current block is still pointing to something, it means the old file was longer
-            // so delete it all.
+            // If we're done writing, but the pointer in the current block is still 
+            // pointing to something, it means the old file was longer so delete it all.
             this.deleteData(currentBlock.pointer);
             currentBlock.pointer = "0:0:0";
             // Update session storage
@@ -435,12 +469,19 @@
             Control.hostDisk();
         }
 
-        // Get and return the size of a TSB
+        /**
+         * Get and return the size of a TSB 
+         * @param tsb 
+         */
         public getTsbSize(tsb: string): number {
             return this.readData(tsb).length;
         }
 
-        // Allocate disk space
+        /**
+         * Allocate disk space for a file
+         * @param file 
+         * @param tsb 
+         */
         public allocateDiskSpace(file: Array<String>, tsb: string): boolean {
             // Check size of text. If it is longer than 60, then we need to have enough datablocks
             let stringLength = file.length;
@@ -489,7 +530,10 @@
             return true;
         }
 
-        // Find enough free data blocks, if can't, return null
+        /**
+         * Find enough free data blocks, if can't, return null
+         * @param numBlocksNeeded 
+         */
         public findFreeDataBlocks(numBlocksNeeded: number) {
             let blocks = [];
             // Generate proper tsbId
@@ -515,7 +559,11 @@
             }
         }
         
-        // Write swap file to Disk
+        /**
+         * Write swap file to Disk
+         * @param filename 
+         * @param opCodes 
+         */
         public writeSwap(filename: String, opCodes: Array<String>): number {
             // Check if the file exists
             let check = this.checkForExistingFile(filename);

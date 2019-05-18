@@ -18,6 +18,9 @@ var TSOS;
             this.totalBlocks = 8;
             this.dataSize = 60;
         }
+        /**
+         * Initialize storage and set session storage key
+         */
         Disk.prototype.init = function () {
             // Initialize storage
             for (var i = 0; i < this.totalTracks; i++) {

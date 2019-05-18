@@ -1,5 +1,4 @@
 ///<reference path="../globals.ts" />
-
 /* ------------
      Console.ts
 
@@ -8,28 +7,30 @@
      ------------ */
 
 module TSOS {
-
     export class Console {
-
         constructor(public currentFont: string = _DefaultFontFamily,
                     public currentFontSize: number = _DefaultFontSize,
                     public currentXPosition: number = 0,
                     public currentYPosition: number = _DefaultFontSize,
                     public buffer: string = "") { }
 
-        // Clear the canvas and reset x, y to 0
+        /**
+         * Clear the canvas and reset x, y to 0
+         */
         public init(): void {
             this.clearScreen();
             this.resetXY();
         }
 
-        // Handle keyboard inputs
+        /**
+         * Handle keyboard inputs
+         */
         public handleInput(): void {
             while (_KernelInputQueue.getSize() > 0) {
                 // Get the next character from the kernel input queue.
-                const chr = _KernelInputQueue.dequeue();
+                const chr: string = _KernelInputQueue.dequeue();
                 // Check to see if it's "special" (enter or ctrl-c) or "normal"
-                if (chr === String.fromCharCode(13)) { //     Enter key
+                if (chr === String.fromCharCode(CharCode.Enter)) { //     Enter key
                     // The enter key marks the end of a console command, so tell the shell
                     _OsShell.handleInput(this.buffer);
                     // ... and reset our buffer.
@@ -44,7 +45,10 @@ module TSOS {
             }
         }
 
-        // Draw text on canvas
+        /**
+         * Draw text on canvas
+         * @param text 
+         */
         public putText(text: string): void {
             // TODO: Make distinct cases for Char and String
             if (text !== "") {
@@ -66,7 +70,9 @@ module TSOS {
             }
          }
 
-        // Advance the x and y position to the next line
+        /**
+         * Advance the x and y position to the next line
+         */
         public advanceLine(): void {
             this.currentXPosition = 0;
             /*
@@ -79,12 +85,17 @@ module TSOS {
                                      _FontHeightMargin;
         }
 
-        // Clear the canvas
+        /**
+         * Clear the canvas
+         */
         private clearScreen(): void {
             _DrawingContext.clearRect(0, 0, _Canvas.width, _Canvas.height);
         }
 
-        // Delete the previous character when backspace is pressed
+        /**
+         * Delete the previous character when backspace is pressed
+         * @param character the previous character
+         */
         public backspaceClear(character: string): void {
             // Find the width of the previous character
             let offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, character);
@@ -94,7 +105,9 @@ module TSOS {
             _DrawingContext.clearRect(this.currentXPosition, (this.currentYPosition - 12), 20, 20);
         }
 
-        // Reset the x, y coordinates on the canvas
+        /**
+         * Reset the x, y coordinates on the canvas
+         */
         private resetXY(): void {
             this.currentXPosition = 0;
             this.currentYPosition = this.currentFontSize;

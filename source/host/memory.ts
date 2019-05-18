@@ -1,5 +1,4 @@
 ///<reference path="../globals.ts" />
-
 /* ------------
      memory.ts
      Requires global.ts.
@@ -12,13 +11,14 @@
      ------------ */
 
      module TSOS {
-
         export class Memory {
-            public memoryArray: Array<string>;
-            public partitions: Array<any>;
+            memoryArray: Array<string>;
+            partitions: Array<any>;
                     
+            /**
+             * Each partition has a base, limit of 256, and boolean to check if empty
+             */
             constructor() {
-                // Each partition has a base, limit of 256, and boolean to check if empty
                 this.partitions = [
                     {"base": 0, "limit": PARTITION_SIZE, "isEmpty": true},
                     {"base": 256, "limit": PARTITION_SIZE, "isEmpty": true},
@@ -26,7 +26,9 @@
                 ];
             }
 
-            // Initialize the memory with 768 bytes
+            /**
+             * Initialize the memory with 768 bytes of 00s
+             */
             public init(): void {
                 this.memoryArray = new Array<string>(TOTAL_MEMORY_SIZE);
                 // Initialize memory with 00's
@@ -35,7 +37,10 @@
                 }
             }
 
-            // Clear memory partition
+            /**
+             * Clear specified memory partition
+             * @param partition 
+             */
             public clearPartition(partition: number): void {
                 // Clear from the memoryArray[base] to memoryArray[limit]
                 for (let i = this.partitions[partition].base; i < this.partitions[partition].base + this.partitions[partition].limit; i++) {
@@ -44,7 +49,9 @@
                 }
             }
 
-            // Check the isEmpty booleans to see if there is any open partitions
+            /**
+             * Check the isEmpty booleans to see if there is any open partitions
+             */
             public checkMemorySpace(): boolean {
                 // Loop through each partition to find an empty partition.
                 for (let i = 0; i < this.partitions.length; i++) {
@@ -55,7 +62,9 @@
                 return false;
             }
 
-            // Find the first empty partition -- First one served
+            /**
+             * Find the first empty partition -- First one served
+             */
             public getEmptyPartition(): number {
                 for (let i = 0; i < this.partitions.length; i++) {
                     if (this.partitions[i].isEmpty) {
@@ -64,8 +73,12 @@
                 }
             }
 
-            // Load the program into memory
-            public loadIntoMemory(opCodes, partition): void {
+            /**
+             * Load the specified program into memory
+             * @param opCodes 
+             * @param partition 
+             */
+            public loadIntoMemory(opCodes: Array<string>, partition: number): void {
                 // Copy the textsplit program to the memoryArray
                 for (let i = 0; i < opCodes.length; i++) {
                     // Check partition
@@ -90,14 +103,21 @@
                 }
             }
 
-            // Get the opCode out of memory and into CPU
+            /**
+             * Get the opCode out of memory and into CPU
+             * @param programCounter 
+             */
             public readMemory(programCounter): string {
                 // Ensure to add the current partitions base to the PC
                 return this.memoryArray[this.partitions[_MemoryManager.runningProcess.partition].base + programCounter].toString();
             }
 
-            // Write to memory with a given address and value
-            public writeMemory(address, value): void {
+            /**
+             * Write to memory with a given address and value
+             * @param address 
+             * @param value 
+             */
+            public writeMemory(address, value: string): void {
                 // Check if this is in bounds
                 if (_MemoryManager.inBounds(address)) {
                     // Check to see if leading 0 needs to be added
@@ -113,13 +133,21 @@
                 
             }
 
-            // Loops address to a new PC
-            public branchLoop(PC, branch, partition) {
+            /**
+             * Loops address to a new PC
+             * @param PC 
+             * @param branch 
+             * @param partition 
+             */
+            public branchLoop(PC, branch, partition: number): number {
                 return (PC + branch + 2) % this.partitions[partition].limit;
             }
 
-            // Get data from a specified partition
-            public getPartitionData(partition) {
+            /**
+             * Get data from a specified partition
+             * @param partition 
+             */
+            public getPartitionData(partition: number): Array<string> {
                 let data = [];
                 let base = this.partitions[partition].base;
                 let limit = this.partitions[partition].limit + this.partitions[partition].base;
@@ -129,7 +157,9 @@
                 return data;
             }
 
-            // Empty each partition of memory
+            /**
+             * Empty each partition of memory
+             */
             public clearAllMemory(): void {
                 // Check if CPU is executing
                 if (!_CPU.isExecuting) {

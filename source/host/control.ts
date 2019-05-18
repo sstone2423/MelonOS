@@ -1,6 +1,5 @@
 ///<reference path="../globals.ts" />
 ///<reference path="../os/canvastext.ts" />
-
 /* ------------
      Control.ts
 
@@ -13,12 +12,12 @@
      ------------ */
 
 module TSOS {
-    
     export class Control {
-
-        // This is called from index.html's onLoad event via the onDocumentLoad function pointer.
+        /**
+         * This is called from index.html's onLoad event via the onDocumentLoad function pointer.
+         * TODO: Should we move this stuff into a Display Device Driver?
+         */
         public static hostInit(): void {
-            // TODO: Should we move this stuff into a Display Device Driver?
             // Get a global reference to the canvas.
             _Canvas = document.getElementById("display") as HTMLCanvasElement;
             // Get a global reference to the drawing context.
@@ -49,7 +48,11 @@ module TSOS {
             displayTime();
         }
 
-        // Updates the taHostLog with OS clock
+        /**
+         * Updates the taHostLog with OS clock
+         * @param msg 
+         * @param source 
+         */
         public static hostLog(msg: string, source: string = "?"): void {
             // Note the OS CLOCK.
             const clock: number = _OSclock;
@@ -63,7 +66,10 @@ module TSOS {
             taLog.value = str + taLog.value;
         }
 
-        // Activated when user clicks start button. Will start the OS.
+        /**
+         * Activated when user clicks start button. Will start the OS.
+         * @param btn 
+         */
         public static hostBtnStartOS_click(btn): void {
             // Disable the (passed-in) start button...
             btn.disabled = true;
@@ -94,7 +100,10 @@ module TSOS {
             _Kernel.krnBootstrap();  // _GLaDOS.afterStartup() will get called in there, if configured.
         }
 
-        // When user clicks halt, the OS attempts to shutdown
+        /**
+         * When user clicks halt, the OS attempts to shutdown
+         * @param btn 
+         */
         public static hostBtnHaltOS_click(btn): void {
             this.hostLog("Emergency halt", "host");
             this.hostLog("Attempting Kernel shutdown.", "host");
@@ -105,7 +114,10 @@ module TSOS {
             // TODO: Is there anything else we need to do here?
         }
 
-        // When user clicks reset, reload the browser
+        /**
+         * When user clicks reset, reload the browser
+         * @param btn 
+         */
         public static hostBtnReset_click(btn): void {
             // The easiest and most thorough way to do this is to reload (not refresh) the document.
             location.reload(true);
@@ -115,8 +127,10 @@ module TSOS {
             */
         }
 
-        // When user clicks single step, enable the next step button
-        public static hostBtnSingleStep_click(btn): void {
+        /**
+         * When user clicks single step, enable the next step button
+         */
+        public static hostBtnSingleStep_click(): void {
             if (!_SingleStep) {
                 // Enable the NextStep button
                 (document.getElementById("btnNextStep") as HTMLButtonElement).disabled = false;
@@ -130,12 +144,16 @@ module TSOS {
             }
         }
 
-        // When user clicks next step, set to true for CPU clock
-        public static hostBtnNextStep_click(btn): void {
+        /**
+         * When user clicks next step, set to true for CPU clock
+         */
+        public static hostBtnNextStep_click(): void {
             _NextStep = true;
         }
 
-        // Update the CPU display table
+        /**
+         * Update the CPU display table
+         */
         public static hostCPU(): void {
             let table = (<HTMLTableElement>document.getElementById('tableCPU'));
             // Delete the placeholder row
@@ -144,32 +162,34 @@ module TSOS {
             let row = table.insertRow(-1);
             // PC
             let cell = row.insertCell();
-            cell.innerHTML = _CPU.PC.toString(16).toUpperCase();
+            cell.innerHTML = _CPU.pc.toString(16).toUpperCase();
             // IR
             cell = row.insertCell();
             if (_CPU.isExecuting) {
-                cell.innerHTML = _Memory.memoryArray[_CPU.PC].toString(); 
+                cell.innerHTML = _Memory.memoryArray[_CPU.pc].toString(); 
             } else {
                 cell.innerHTML = "0";
             }
             // Acc
             cell = row.insertCell();
-            cell.innerHTML = _CPU.Acc.toString(16).toUpperCase();
+            cell.innerHTML = _CPU.acc.toString(16).toUpperCase();
             // Xreg
             cell = row.insertCell();
-            cell.innerHTML = _CPU.Xreg.toString(16).toUpperCase();
+            cell.innerHTML = _CPU.xReg.toString(16).toUpperCase();
             // Yreg
             cell = row.insertCell();
-            cell.innerHTML = _CPU.Yreg.toString(16).toUpperCase();
+            cell.innerHTML = _CPU.yReg.toString(16).toUpperCase();
             // Zflag
             cell = row.insertCell();
-            cell.innerHTML = _CPU.Zflag.toString(16).toUpperCase();
+            cell.innerHTML = _CPU.zFlag.toString(16).toUpperCase();
         }
 
-        // Update the Memory table
+        /**
+         * Update the Memory table
+         */
         public static hostMemory(): void {
             let table = (<HTMLTableElement>document.getElementById('tableMemory'));
-            // Start at PC 0
+            // Start at pc 0
             let memoryPC = 0;
             for (let i = 0; i < table.rows.length; i++) {
                 for (let j = 1; j < 9; j++) {
@@ -184,7 +204,9 @@ module TSOS {
             }
         }
         
-        // Update the resident queue table
+        /**
+         * Update the resident queue table
+         */
         public static hostProcesses(): void {
             let table = (<HTMLTableElement>document.getElementById('tableProcesses'));
             // Initialize an array of PCBs
@@ -233,7 +255,9 @@ module TSOS {
             }
         }
 
-        // Update the ready queue table
+        /**
+         * Update the ready queue table
+         */
         public static hostReady(): void {
             let table = (<HTMLTableElement>document.getElementById('tableReady'));
             // Initialize an array of PCBs
@@ -284,7 +308,9 @@ module TSOS {
             }
         }
 
-        // Initialize memory display
+        /**
+         * Initialize memory display
+         */
         public static initMemoryDisplay(): void {
             let table = (<HTMLTableElement>document.getElementById('tableMemory'));
             // Delete the initial dash placeholders
@@ -310,7 +336,9 @@ module TSOS {
             }
         }
 
-        // BSOD effect
+        /**
+         * BSOD effect
+         */
         public static melonDrop(): void {
             // Initialize Canvas and melon variables
             let ctx;
@@ -366,7 +394,9 @@ module TSOS {
             setInterval(draw, 30);
         }
 
-        // This will update the disk display with contents of session storage
+        /**
+         * This will update the disk display with contents of session storage
+         */
         public static hostDisk(): void {
             let table = (<HTMLTableElement>document.getElementById('tableDisk'));
             let rowNum = 1;
@@ -392,7 +422,9 @@ module TSOS {
             }
         }
 
-        // Initialize HDD display
+        /**
+         * Initialize HDD display
+         */
         public static initDiskDisplay(): void {
             this.hostDisk();
         }

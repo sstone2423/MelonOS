@@ -15,9 +15,11 @@ var TSOS;
     var Control = /** @class */ (function () {
         function Control() {
         }
-        // This is called from index.html's onLoad event via the onDocumentLoad function pointer.
+        /**
+         * This is called from index.html's onLoad event via the onDocumentLoad function pointer.
+         * TODO: Should we move this stuff into a Display Device Driver?
+         */
         Control.hostInit = function () {
-            // TODO: Should we move this stuff into a Display Device Driver?
             // Get a global reference to the canvas.
             _Canvas = document.getElementById("display");
             // Get a global reference to the drawing context.
@@ -45,7 +47,11 @@ var TSOS;
             }
             displayTime();
         };
-        // Updates the taHostLog with OS clock
+        /**
+         * Updates the taHostLog with OS clock
+         * @param msg
+         * @param source
+         */
         Control.hostLog = function (msg, source) {
             if (source === void 0) { source = "?"; }
             // Note the OS CLOCK.
@@ -59,7 +65,10 @@ var TSOS;
             var taLog = document.getElementById("taHostLog");
             taLog.value = str + taLog.value;
         };
-        // Activated when user clicks start button. Will start the OS.
+        /**
+         * Activated when user clicks start button. Will start the OS.
+         * @param btn
+         */
         Control.hostBtnStartOS_click = function (btn) {
             // Disable the (passed-in) start button...
             btn.disabled = true;
@@ -89,7 +98,10 @@ var TSOS;
             _Kernel = new TSOS.Kernel();
             _Kernel.krnBootstrap(); // _GLaDOS.afterStartup() will get called in there, if configured.
         };
-        // When user clicks halt, the OS attempts to shutdown
+        /**
+         * When user clicks halt, the OS attempts to shutdown
+         * @param btn
+         */
         Control.hostBtnHaltOS_click = function (btn) {
             this.hostLog("Emergency halt", "host");
             this.hostLog("Attempting Kernel shutdown.", "host");
@@ -99,7 +111,10 @@ var TSOS;
             clearInterval(_hardwareClockID);
             // TODO: Is there anything else we need to do here?
         };
-        // When user clicks reset, reload the browser
+        /**
+         * When user clicks reset, reload the browser
+         * @param btn
+         */
         Control.hostBtnReset_click = function (btn) {
             // The easiest and most thorough way to do this is to reload (not refresh) the document.
             location.reload(true);
@@ -108,8 +123,10 @@ var TSOS;
                page from its cache, which is not what we want.
             */
         };
-        // When user clicks single step, enable the next step button
-        Control.hostBtnSingleStep_click = function (btn) {
+        /**
+         * When user clicks single step, enable the next step button
+         */
+        Control.hostBtnSingleStep_click = function () {
             if (!_SingleStep) {
                 // Enable the NextStep button
                 document.getElementById("btnNextStep").disabled = false;
@@ -123,11 +140,15 @@ var TSOS;
                 document.getElementById("btnSingleStep").style.backgroundColor = "red";
             }
         };
-        // When user clicks next step, set to true for CPU clock
-        Control.hostBtnNextStep_click = function (btn) {
+        /**
+         * When user clicks next step, set to true for CPU clock
+         */
+        Control.hostBtnNextStep_click = function () {
             _NextStep = true;
         };
-        // Update the CPU display table
+        /**
+         * Update the CPU display table
+         */
         Control.hostCPU = function () {
             var table = document.getElementById('tableCPU');
             // Delete the placeholder row
@@ -136,32 +157,34 @@ var TSOS;
             var row = table.insertRow(-1);
             // PC
             var cell = row.insertCell();
-            cell.innerHTML = _CPU.PC.toString(16).toUpperCase();
+            cell.innerHTML = _CPU.pc.toString(16).toUpperCase();
             // IR
             cell = row.insertCell();
             if (_CPU.isExecuting) {
-                cell.innerHTML = _Memory.memoryArray[_CPU.PC].toString();
+                cell.innerHTML = _Memory.memoryArray[_CPU.pc].toString();
             }
             else {
                 cell.innerHTML = "0";
             }
             // Acc
             cell = row.insertCell();
-            cell.innerHTML = _CPU.Acc.toString(16).toUpperCase();
+            cell.innerHTML = _CPU.acc.toString(16).toUpperCase();
             // Xreg
             cell = row.insertCell();
-            cell.innerHTML = _CPU.Xreg.toString(16).toUpperCase();
+            cell.innerHTML = _CPU.xReg.toString(16).toUpperCase();
             // Yreg
             cell = row.insertCell();
-            cell.innerHTML = _CPU.Yreg.toString(16).toUpperCase();
+            cell.innerHTML = _CPU.yReg.toString(16).toUpperCase();
             // Zflag
             cell = row.insertCell();
-            cell.innerHTML = _CPU.Zflag.toString(16).toUpperCase();
+            cell.innerHTML = _CPU.zFlag.toString(16).toUpperCase();
         };
-        // Update the Memory table
+        /**
+         * Update the Memory table
+         */
         Control.hostMemory = function () {
             var table = document.getElementById('tableMemory');
-            // Start at PC 0
+            // Start at pc 0
             var memoryPC = 0;
             for (var i = 0; i < table.rows.length; i++) {
                 for (var j = 1; j < 9; j++) {
@@ -175,7 +198,9 @@ var TSOS;
                 }
             }
         };
-        // Update the resident queue table
+        /**
+         * Update the resident queue table
+         */
         Control.hostProcesses = function () {
             var table = document.getElementById('tableProcesses');
             // Initialize an array of PCBs
@@ -223,7 +248,9 @@ var TSOS;
                 cell.innerHTML = displayPcb.priority.toString();
             }
         };
-        // Update the ready queue table
+        /**
+         * Update the ready queue table
+         */
         Control.hostReady = function () {
             var table = document.getElementById('tableReady');
             // Initialize an array of PCBs
@@ -273,7 +300,9 @@ var TSOS;
                 cell.innerHTML = displayPcb.priority.toString();
             }
         };
-        // Initialize memory display
+        /**
+         * Initialize memory display
+         */
         Control.initMemoryDisplay = function () {
             var table = document.getElementById('tableMemory');
             // Delete the initial dash placeholders
@@ -298,7 +327,9 @@ var TSOS;
                 }
             }
         };
-        // BSOD effect
+        /**
+         * BSOD effect
+         */
         Control.melonDrop = function () {
             // Initialize Canvas and melon variables
             var ctx;
@@ -350,7 +381,9 @@ var TSOS;
             // Set the interval in which to draw the melons
             setInterval(draw, 30);
         };
-        // This will update the disk display with contents of session storage
+        /**
+         * This will update the disk display with contents of session storage
+         */
         Control.hostDisk = function () {
             var table = document.getElementById('tableDisk');
             var rowNum = 1;
@@ -375,7 +408,9 @@ var TSOS;
                 }
             }
         };
-        // Initialize HDD display
+        /**
+         * Initialize HDD display
+         */
         Control.initDiskDisplay = function () {
             this.hostDisk();
         };

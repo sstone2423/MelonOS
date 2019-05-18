@@ -1,6 +1,11 @@
 ///<reference path="../globals.ts" />
 ///<reference path="deviceDriver.ts" />
 ///<reference path="../utils.ts" />
+/* ----------------------------------
+   DeviceDriverDisk.ts
+   Requires deviceDriver.ts
+   The Hard Drive Disk Device Driver.
+   ---------------------------------- */
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -14,11 +19,6 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-/* ----------------------------------
-   DeviceDriverDisk.ts
-   Requires deviceDriver.ts
-   The Hard Drive Disk Device Driver.
-   ---------------------------------- */
 var TSOS;
 (function (TSOS) {
     // Extends DeviceDriver
@@ -27,17 +27,21 @@ var TSOS;
         function DeviceDriverDisk() {
             var _this = 
             // Override the base method pointers.
-            // The code below cannot run because "this" can only be accessed after calling super.
             _super.call(this) || this;
             _this.driverEntry = _this.krnDiskDriverEntry;
             return _this;
         }
-        // Initialization routine for this, the kernel-mode Disk Device Driver.
+        /**
+         * Initialization routine for this, the kernel-mode Disk Device Driver.
+         */
         DeviceDriverDisk.prototype.krnDiskDriverEntry = function () {
             this.status = "loaded";
             // More?
         };
-        // Creates a new file with specified filename
+        /**
+         * Creates a new file with specified filename
+         * @param filename
+         */
         DeviceDriverDisk.prototype.createFile = function (filename) {
             var check = this.checkForExistingFile(filename);
             // Check for existing filename
@@ -106,7 +110,10 @@ var TSOS;
             // We ran through the data structure but there were no free blocks, meaning no more space on disk
             return DISK_IS_FULL;
         };
-        // Checks for an existing filename on disk. Returns a status object
+        /**
+         * Checks for an existing filename on disk. Returns a status object
+         * @param filename
+         */
         DeviceDriverDisk.prototype.checkForExistingFile = function (filename) {
             var check;
             var hexArray = TSOS.Utils.stringToASCIItoHex(filename);
@@ -144,7 +151,9 @@ var TSOS;
             check.matchingFileName = false;
             return check;
         };
-        // Return the TSB of the next free data block. If it can't find one, return null.
+        /**
+         * Return the TSB of the next free data block. If it can't find one, return null.
+         */
         DeviceDriverDisk.prototype.findFreeDataBlock = function () {
             // Generate tsbId
             for (var trackNum = 1; trackNum < _Disk.totalTracks; trackNum++) {
@@ -161,14 +170,20 @@ var TSOS;
             }
             return null;
         };
-        // Sets a block's bytes to all zeroes and returns the initialized block
+        /**
+         * Sets a block's bytes to all zeroes and returns the initialized block
+         * @param block
+         */
         DeviceDriverDisk.prototype.clearData = function (block) {
             for (var i = 0; i < _Disk.dataSize; i++) {
                 block.data[i] = "00";
             }
             return block;
         };
-        // Delete a file with the specified filename
+        /**
+         * Delete a file with the specified filename
+         * @param filename
+         */
         DeviceDriverDisk.prototype.deleteFile = function (filename) {
             // Look for the filename in the directory structure
             var hexArray = TSOS.Utils.stringToASCIItoHex(filename);
@@ -211,7 +226,10 @@ var TSOS;
             }
             return FILENAME_DOESNT_EXIST;
         };
-        // Recursively deletes from a given TSB
+        /**
+         * Recursively deletes from a given TSB
+         * @param pointer_tsb
+         */
         DeviceDriverDisk.prototype.deleteData = function (pointer_tsb) {
             // Block that belongs to the TSB
             var ptrBlock = JSON.parse(sessionStorage.getItem(pointer_tsb));
@@ -226,7 +244,10 @@ var TSOS;
             sessionStorage.setItem(pointer_tsb, JSON.stringify(ptrBlock));
             return;
         };
-        // Format the disk with the specified format
+        /**
+         * Format the disk with the specified format
+         * @param formatType
+         */
         DeviceDriverDisk.prototype.format = function (formatType) {
             // If CPU is executing, return false
             if (_CPU.isExecuting) {
@@ -274,7 +295,9 @@ var TSOS;
             TSOS.Control.hostDisk();
             return true;
         };
-        // Returns an array of filenames currently on disk
+        /**
+         * Returns an array of filenames currently on disk
+         */
         DeviceDriverDisk.prototype.listFiles = function () {
             var filenames = [];
             // Look for first free block in directory data structure (first track)
@@ -321,7 +344,10 @@ var TSOS;
             // Return array of filenames
             return filenames;
         };
-        // Read a file from disk
+        /**
+         * Read a file from disk by filename
+         * @param filename
+         */
         DeviceDriverDisk.prototype.readFile = function (filename) {
             var check = this.checkForExistingFile(filename);
             var info;
@@ -361,6 +387,10 @@ var TSOS;
                 return info;
             }
         };
+        /**
+         * Reads data from a specified TSB
+         * @param tsb
+         */
         DeviceDriverDisk.prototype.readData = function (tsb) {
             var dataBlock = JSON.parse(sessionStorage.getItem(tsb));
             var dataPtr = 0;
@@ -384,7 +414,11 @@ var TSOS;
             }
             return data;
         };
-        // Write to a file on disk. Returns status number
+        /**
+         * Write to a file on disk. Returns status number
+         * @param filename
+         * @param data
+         */
         DeviceDriverDisk.prototype.writeFile = function (filename, data) {
             var check = this.checkForExistingFile(filename);
             // If name is found
@@ -405,7 +439,11 @@ var TSOS;
                 return FILENAME_DOESNT_EXIST;
             }
         };
-        // Write data to a file on disk
+        /**
+         * Write data to a file on disk
+         * @param tsb
+         * @param dataHexArray
+         */
         DeviceDriverDisk.prototype.writeDataToFile = function (tsb, dataHexArray) {
             var dataPtr = 0;
             var currentTSB = tsb;
@@ -425,8 +463,8 @@ var TSOS;
                     dataPtr = 0;
                 }
             }
-            // If we're done writing, but the pointer in the current block is still pointing to something, it means the old file was longer
-            // so delete it all.
+            // If we're done writing, but the pointer in the current block is still 
+            // pointing to something, it means the old file was longer so delete it all.
             this.deleteData(currentBlock.pointer);
             currentBlock.pointer = "0:0:0";
             // Update session storage
@@ -434,11 +472,18 @@ var TSOS;
             // Update disk display
             TSOS.Control.hostDisk();
         };
-        // Get and return the size of a TSB
+        /**
+         * Get and return the size of a TSB
+         * @param tsb
+         */
         DeviceDriverDisk.prototype.getTsbSize = function (tsb) {
             return this.readData(tsb).length;
         };
-        // Allocate disk space
+        /**
+         * Allocate disk space for a file
+         * @param file
+         * @param tsb
+         */
         DeviceDriverDisk.prototype.allocateDiskSpace = function (file, tsb) {
             // Check size of text. If it is longer than 60, then we need to have enough datablocks
             var stringLength = file.length;
@@ -489,7 +534,10 @@ var TSOS;
             sessionStorage.setItem(dataBlockTSB, JSON.stringify(dataBlock));
             return true;
         };
-        // Find enough free data blocks, if can't, return null
+        /**
+         * Find enough free data blocks, if can't, return null
+         * @param numBlocksNeeded
+         */
         DeviceDriverDisk.prototype.findFreeDataBlocks = function (numBlocksNeeded) {
             var blocks = [];
             // Generate proper tsbId
@@ -514,7 +562,11 @@ var TSOS;
                 return null;
             }
         };
-        // Write swap file to Disk
+        /**
+         * Write swap file to Disk
+         * @param filename
+         * @param opCodes
+         */
         DeviceDriverDisk.prototype.writeSwap = function (filename, opCodes) {
             // Check if the file exists
             var check = this.checkForExistingFile(filename);

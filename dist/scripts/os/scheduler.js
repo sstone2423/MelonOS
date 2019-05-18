@@ -12,7 +12,7 @@ var TSOS;
             // Set default quantum of 6
             this.quantum = 6;
             // Set default algorithm to RR
-            this.algorithm = "rr";
+            this.algorithm = RR;
         }
         // ShellQuantum calls this function
         Scheduler.prototype.changeQuantum = function (userQuantum) {
@@ -29,12 +29,12 @@ var TSOS;
                 // Set CPU to !isExecuting
                 _CPU.isExecuting = false;
                 // Save CPU info to PCB
-                _MemoryManager.runningProcess.acc = _CPU.Acc;
-                _MemoryManager.runningProcess.PC = _CPU.PC;
-                _MemoryManager.runningProcess.IR = _Memory.memoryArray[_CPU.PC];
-                _MemoryManager.runningProcess.xReg = _CPU.Xreg;
-                _MemoryManager.runningProcess.yReg = _CPU.Yreg;
-                _MemoryManager.runningProcess.zFlag = _CPU.Zflag;
+                _MemoryManager.runningProcess.acc = _CPU.acc;
+                _MemoryManager.runningProcess.PC = _CPU.pc;
+                _MemoryManager.runningProcess.IR = _Memory.memoryArray[_CPU.pc];
+                _MemoryManager.runningProcess.xReg = _CPU.xReg;
+                _MemoryManager.runningProcess.yReg = _CPU.yReg;
+                _MemoryManager.runningProcess.zFlag = _CPU.zFlag;
                 // Change state to ready
                 _MemoryManager.runningProcess.state = "Ready";
                 // Reset the CPU
@@ -62,6 +62,28 @@ var TSOS;
                 else {
                     if (pcb.Priority < priorityPcb.Priority) {
                         // Put the process back into the ready queue
+                        _MemoryManager.readyQueue.enqueue(priorityPcb);
+                        priorityPcb = pcb;
+                    }
+                    else {
+                        _MemoryManager.readyQueue.enqueue(pcb);
+                    }
+                }
+            }
+            return priorityPcb;
+        };
+        // Find the lowest priority PCB by comparing/sorting each PCB's priorities
+        Scheduler.prototype.findLowestPriority = function () {
+            var priorityPcb;
+            var size = _MemoryManager.readyQueue.getSize();
+            for (var i = 0; i < size; i++) {
+                var pcb = _MemoryManager.readyQueue.dequeue();
+                if (priorityPcb == null) {
+                    priorityPcb = pcb;
+                }
+                else {
+                    // If priority is higher, Put the process back into the ready queue
+                    if (pcb.Priority > priorityPcb.Priority) {
                         _MemoryManager.readyQueue.enqueue(priorityPcb);
                         priorityPcb = pcb;
                     }

@@ -1,3 +1,4 @@
+///<reference path="../globals.ts" />
 /* ------------
    swapper.ts
    This is the client OS implementation of a swapper.
@@ -6,16 +7,15 @@
 
    module TSOS {
     export class Swapper {
-        
         constructor() { }
 
         public putProcessToDisk(opCodes, pId): String {
-            // Create file name for process... make it $SWAPpId
-            let filename = "$SWAP" + pId;
+            // Create file name for process
+            let filename = SWAP + pId;
             _DiskDriver.createFile(filename);
             let length = opCodes.length;
             while (length < PARTITION_SIZE) {
-                opCodes.push("00");
+                opCodes.push(OpCode.TERMINATOR);
                 length++;
             }
             let status = _DiskDriver.writeSwap(filename, opCodes);
@@ -32,7 +32,7 @@
 
         public rollIn(pcb) {
             // Find swap file in directory structure
-            let filename = "$SWAP" + pcb.pId;
+            let filename = SWAP + pcb.pId;
             // Get the TSB of the program stored in disk
             let data = _DiskDriver.readFile(filename);
             if (data.status === SUCCESS) {
@@ -58,7 +58,7 @@
                     // Update memory display 
                     Control.hostMemory();
                 } else {
-                    // If there is no room, then we must roll out a process from memory into the disk, then put the new process in that place in memory
+                    // If there is no room, roll out the process
                     this.rollOut(pcb);
                 }
             } else {
@@ -67,25 +67,13 @@
             
         }
 
+        // Roll out a process from memory into the disk, then put the new process in that place in memory
         public rollOut(pcb) {
             // Find swap file in directory structure
-            let filename = "$SWAP" + pcb.pId;
-            // Get random partition from memory
-            let swappedPartition = Math.floor(Math.random() * _Memory.partitions.length);
+            let filename = SWAP + pcb.pId;
             // Look for the PCB with that partition
-            let swappedPcb;
-            // Look in ready queue
-            for (let i = 0; i < _MemoryManager.readyQueue.q.length; i++) {
-                if (_MemoryManager.readyQueue.q[i].partition == swappedPartition) {
-                    swappedPcb = _MemoryManager.readyQueue.q[i];
-                }
-            }
-            // Look in resident queue
-            for (let i = 0; i < _MemoryManager.residentQueue.q.length; i++) {
-                if (_MemoryManager.residentQueue.q[i].partition == swappedPartition) {
-                    swappedPcb = _MemoryManager.residentQueue.q[i];
-                }
-            }
+            let swappedPcb = _Scheduler.findLowestPriority();
+            let swappedPartition = swappedPcb.partition;
 
             if (swappedPcb != null) {
                 // Get data from memory

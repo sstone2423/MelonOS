@@ -12,15 +12,19 @@
 var TSOS;
 (function (TSOS) {
     var Memory = /** @class */ (function () {
+        /**
+         * Each partition has a base, limit of 256, and boolean to check if empty
+         */
         function Memory() {
-            // Each partition has a base, limit of 256, and boolean to check if empty
             this.partitions = [
                 { "base": 0, "limit": PARTITION_SIZE, "isEmpty": true },
                 { "base": 256, "limit": PARTITION_SIZE, "isEmpty": true },
                 { "base": 512, "limit": PARTITION_SIZE, "isEmpty": true }
             ];
         }
-        // Initialize the memory with 768 bytes
+        /**
+         * Initialize the memory with 768 bytes of 00s
+         */
         Memory.prototype.init = function () {
             this.memoryArray = new Array(TOTAL_MEMORY_SIZE);
             // Initialize memory with 00's
@@ -28,7 +32,10 @@ var TSOS;
                 this.memoryArray[i] = "00";
             }
         };
-        // Clear memory partition
+        /**
+         * Clear specified memory partition
+         * @param partition
+         */
         Memory.prototype.clearPartition = function (partition) {
             // Clear from the memoryArray[base] to memoryArray[limit]
             for (var i = this.partitions[partition].base; i < this.partitions[partition].base + this.partitions[partition].limit; i++) {
@@ -36,7 +43,9 @@ var TSOS;
                 this.partitions[partition].isEmpty = true;
             }
         };
-        // Check the isEmpty booleans to see if there is any open partitions
+        /**
+         * Check the isEmpty booleans to see if there is any open partitions
+         */
         Memory.prototype.checkMemorySpace = function () {
             // Loop through each partition to find an empty partition.
             for (var i = 0; i < this.partitions.length; i++) {
@@ -46,7 +55,9 @@ var TSOS;
             }
             return false;
         };
-        // Find the first empty partition -- First one served
+        /**
+         * Find the first empty partition -- First one served
+         */
         Memory.prototype.getEmptyPartition = function () {
             for (var i = 0; i < this.partitions.length; i++) {
                 if (this.partitions[i].isEmpty) {
@@ -54,7 +65,11 @@ var TSOS;
                 }
             }
         };
-        // Load the program into memory
+        /**
+         * Load the specified program into memory
+         * @param opCodes
+         * @param partition
+         */
         Memory.prototype.loadIntoMemory = function (opCodes, partition) {
             // Copy the textsplit program to the memoryArray
             for (var i = 0; i < opCodes.length; i++) {
@@ -81,12 +96,19 @@ var TSOS;
                 }
             }
         };
-        // Get the opCode out of memory and into CPU
+        /**
+         * Get the opCode out of memory and into CPU
+         * @param programCounter
+         */
         Memory.prototype.readMemory = function (programCounter) {
             // Ensure to add the current partitions base to the PC
             return this.memoryArray[this.partitions[_MemoryManager.runningProcess.partition].base + programCounter].toString();
         };
-        // Write to memory with a given address and value
+        /**
+         * Write to memory with a given address and value
+         * @param address
+         * @param value
+         */
         Memory.prototype.writeMemory = function (address, value) {
             // Check if this is in bounds
             if (_MemoryManager.inBounds(address)) {
@@ -102,11 +124,19 @@ var TSOS;
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_EXIT_IRQ, false));
             }
         };
-        // Loops address to a new PC
+        /**
+         * Loops address to a new PC
+         * @param PC
+         * @param branch
+         * @param partition
+         */
         Memory.prototype.branchLoop = function (PC, branch, partition) {
             return (PC + branch + 2) % this.partitions[partition].limit;
         };
-        // Get data from a specified partition
+        /**
+         * Get data from a specified partition
+         * @param partition
+         */
         Memory.prototype.getPartitionData = function (partition) {
             var data = [];
             var base = this.partitions[partition].base;
@@ -116,7 +146,9 @@ var TSOS;
             }
             return data;
         };
-        // Empty each partition of memory
+        /**
+         * Empty each partition of memory
+         */
         Memory.prototype.clearAllMemory = function () {
             // Check if CPU is executing
             if (!_CPU.isExecuting) {

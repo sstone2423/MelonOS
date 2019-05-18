@@ -559,7 +559,11 @@ var TSOS;
          * @param args the loaded processId
          */
         Shell.prototype.shellRun = function (args) {
+<<<<<<< HEAD:dist/scripts/os/shell.js
             if (args.length === 1 && !isNaN(parseInt(args[0]))) {
+=======
+            if (args.length == 1 && !isNaN(parseInt(args[0]))) {
+>>>>>>> e2d99ff0c73008a06dbf4346644019b7d52dcb9e:distrib/os/shell.js
                 var found = false;
                 var waitQueueLength = _MemoryManager.residentQueue.getSize();
                 // Check to see if CPU is already executing
@@ -650,8 +654,13 @@ var TSOS;
          */
         Shell.prototype.shellKill = function (args) {
             // Check if there is an arg and its an integer
+<<<<<<< HEAD:dist/scripts/os/shell.js
             if (args.length === 1 && isNaN(parseInt(args[0]))) {
                 _MemoryManager.killProcess(parseInt(args[0]));
+=======
+            if (args.length == 1 && !isNaN(parseInt(args[0]))) {
+                _MemoryManager.killProcess(args[0]);
+>>>>>>> e2d99ff0c73008a06dbf4346644019b7d52dcb9e:distrib/os/shell.js
             }
             else {
                 _StdOut.putText("Usage: kill <pid> Please supply a process ID.");
@@ -663,7 +672,11 @@ var TSOS;
          */
         Shell.prototype.shellQuantum = function (args) {
             // Check if there is an argument and if the argument is an integer
+<<<<<<< HEAD:dist/scripts/os/shell.js
             if (args.length === 1 && isNaN(parseInt(args[0]))) {
+=======
+            if (args.length == 1 && !isNaN(parseInt(args[0]))) {
+>>>>>>> e2d99ff0c73008a06dbf4346644019b7d52dcb9e:distrib/os/shell.js
                 // Make sure the number is above 0. 0 will make melons enter the black hole
                 if (parseInt(args[0]) > 0) {
                     // Notify the user that the quantum has been changed

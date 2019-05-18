@@ -51,14 +51,16 @@ canvas {
 }
 
 .tableDisplay {
-  height: 125px; 
-  overflow: scroll; 
-  display: block;
+  height: 130px;
+  width: 415px;
+  overflow-y: scroll; 
+  display: inline-block;
 }
 
 #tableDisk {
-  height: 250px; 
-  overflow: scroll; 
+  height: 250px;
+  width: 1200px;
+  overflow-y: scroll; 
   display: block;
 }
 

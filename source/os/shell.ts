@@ -745,7 +745,7 @@ module TSOS {
          */
         public shellKill(args: Array<string>): void {
             // Check if there is an arg and its an integer
-            if (args.length === 1 && isNaN(parseInt(args[0]))) {
+            if (args.length === 1 && !isNaN(parseInt(args[0]))) {
                 _MemoryManager.killProcess(parseInt(args[0]));
             } else {
                 _StdOut.putText("Usage: kill <pid> Please supply a process ID.");
@@ -758,7 +758,7 @@ module TSOS {
          */
         public shellQuantum(args: Array<string>): void {
             // Check if there is an argument and if the argument is an integer
-            if (args.length === 1 && isNaN(parseInt(args[0]))) {
+            if (args.length === 1 && !isNaN(parseInt(args[0]))) {
                 // Make sure the number is above 0. 0 will make melons enter the black hole
                 if (parseInt(args[0]) > 0) {
                     // Notify the user that the quantum has been changed

@@ -28,6 +28,7 @@ module TSOS {
          * @param args optional priority
          */
         public createProcess(opCodes: Array<string>, args: Array<string>): void {
+            console.log(opCodes);
             // Check to see if the program is greater than the partition size
             if (opCodes.length > PARTITION_SIZE) {
                 _StdOut.putText("Program load failed. Program is over 256 bytes in length.");

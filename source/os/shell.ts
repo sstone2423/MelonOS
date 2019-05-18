@@ -15,11 +15,11 @@
 module TSOS {
     export class Shell {
         // Properties
-        public promptStr: string = ">";
-        public commandList: Array<ShellCommand> = [];
-        public curses: string = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
-        public apologies: string = "[sorry]";
-        public commandsUsedList: Array<string> = [];
+        promptStr: string = ">";
+        commandList: Array<ShellCommand> = [];
+        curses: string = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
+        apologies: string = "[sorry]";
+        commandsUsedList: Array<string> = [];
 
         /**
          * Load the command list.
@@ -618,11 +618,15 @@ module TSOS {
          */
         public shellLoad(args: Array<string>): void {
             // Get value inside program input (the program)
-            const userInputProgram = (<HTMLInputElement>document.getElementById("taProgramInput")).value;
+            let userInputProgram = (<HTMLInputElement>document.getElementById("taProgramInput")).value;
             // Create regex pattern
             const hexRegex = new RegExp(/[0-9A-Fa-f]{2}/i);
             // Check for anything besides hex or spaces (A-Fa-f0-9)
             if (hexRegex.test(userInputProgram)) {
+                // Remove white space, new lines
+                userInputProgram = userInputProgram.replace(/\r?\n|\r/g, " "); //removes newlines
+                userInputProgram = userInputProgram.replace(/\s+/g, " ").trim(); //removes sequential spaces
+                userInputProgram = userInputProgram.trim(); //remove leading and trailing spaces
                 // Split the program into 2-bit hex
                 let splitProgram = userInputProgram.split(" ");
                 // If priority arg is a number

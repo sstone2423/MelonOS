@@ -20,13 +20,13 @@ var TSOS;
         CanvasTextFunctions.letter = function (ch) {
             return CanvasTextFunctions.symbols[ch];
         };
-        CanvasTextFunctions.ascent = function (font, size) {
+        CanvasTextFunctions.ascent = function (size) {
             return size;
         };
-        CanvasTextFunctions.descent = function (font, size) {
-            return 7.0 * size / 25.0;
+        CanvasTextFunctions.descent = function (size) {
+            return size * 7.0 / 25.0;
         };
-        CanvasTextFunctions.measure = function (font, size, str) {
+        CanvasTextFunctions.measure = function (size, str) {
             var total = 0;
             var len = str.length;
             for (var i = 0; i < len; i++) {
@@ -37,13 +37,13 @@ var TSOS;
             }
             return total;
         };
-        CanvasTextFunctions.draw = function (ctx, font, size, x, y, str) {
+        CanvasTextFunctions.draw = function (ctx, size, x, y, str) {
             var total = 0;
             var len = str.length;
             var mag = size / 25.0;
             ctx.save();
             ctx.lineCap = "round";
-            ctx.lineWidth = 2.0 * mag;
+            ctx.lineWidth = mag * 2.0;
             ctx.strokeStyle = "black";
             for (var i = 0; i < len; i++) {
                 var c = CanvasTextFunctions.letter(str.charAt(i));
@@ -52,7 +52,6 @@ var TSOS;
                 }
                 ctx.beginPath();
                 var penUp = true;
-                var needStroke = 0;
                 for (var j = 0; j < c.points.length; j++) {
                     var a = c.points[j];
                     if (a[0] === -1 && a[1] === -1) {
@@ -74,19 +73,19 @@ var TSOS;
             return total;
         };
         CanvasTextFunctions.enable = function (ctx) {
-            ctx.drawText = function (font, size, x, y, text) {
-                return CanvasTextFunctions.draw(ctx, font, size, x, y, text);
+            ctx.drawText = function (size, x, y, text) {
+                return CanvasTextFunctions.draw(ctx, size, x, y, text);
             };
-            ctx.measureText = function (font, size, text) { return CanvasTextFunctions.measure(font, size, text); };
-            ctx.fontAscent = function (font, size) { return CanvasTextFunctions.ascent(font, size); };
-            ctx.fontDescent = function (font, size) { return CanvasTextFunctions.descent(font, size); };
-            ctx.drawTextRight = function (font, size, x, y, text) {
-                var w = CanvasTextFunctions.measure(font, size, text);
-                return CanvasTextFunctions.draw(ctx, font, size, x - w, y, text);
+            ctx.measureText = function (size, text) { return CanvasTextFunctions.measure(size, text); };
+            ctx.fontAscent = function (size) { return CanvasTextFunctions.ascent(size); };
+            ctx.fontDescent = function (size) { return CanvasTextFunctions.descent(size); };
+            ctx.drawTextRight = function (size, x, y, text) {
+                var w = CanvasTextFunctions.measure(size, text);
+                return CanvasTextFunctions.draw(ctx, size, x - w, y, text);
             };
-            ctx.drawTextCenter = function (font, size, x, y, text) {
-                var w = CanvasTextFunctions.measure(font, size, text);
-                return CanvasTextFunctions.draw(ctx, font, size, x - w / 2, y, text);
+            ctx.drawTextCenter = function (size, x, y, text) {
+                var w = CanvasTextFunctions.measure(size, text);
+                return CanvasTextFunctions.draw(ctx, size, x - w / 2, y, text);
             };
         };
         CanvasTextFunctions.symbols = {

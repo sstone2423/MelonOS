@@ -14,16 +14,25 @@ var TSOS;
             // Set default algorithm to RR
             this.algorithm = RR;
         }
-        // ShellQuantum calls this function
+        /**
+         * Changes the scheduling quantum
+         * ShellQuantum calls this function
+         * @param userQuantum specified quantum
+         */
         Scheduler.prototype.changeQuantum = function (userQuantum) {
             // Change quantum to user given int
             this.quantum = userQuantum;
         };
-        // Change the algorithm
+        /**
+         * Change to the specified algorithm
+         * @param algorithm
+         */
         Scheduler.prototype.changeAlgorithm = function (algorithm) {
             this.algorithm = algorithm;
         };
-        // This gets called by the krnTimerISR
+        /**
+         * This gets called by the krnTimerISR
+         */
         Scheduler.prototype.contextSwitch = function () {
             if (_MemoryManager.runningProcess != null) {
                 // Set CPU to !isExecuting
@@ -50,7 +59,9 @@ var TSOS;
                 return;
             }
         };
-        // Find the highest priority PCB by comparing/sorting each PCB's priorities
+        /**
+         * Find the highest priority PCB by comparing/sorting each PCB's priorities
+         */
         Scheduler.prototype.findHighestPriority = function () {
             var priorityPcb;
             var size = _MemoryManager.readyQueue.getSize();
@@ -72,7 +83,9 @@ var TSOS;
             }
             return priorityPcb;
         };
-        // Find the lowest priority PCB by comparing/sorting each PCB's priorities
+        /**
+         * Find the lowest priority PCB by comparing/sorting each PCB's priorities
+         */
         Scheduler.prototype.findLowestPriority = function () {
             var priorityPcb;
             var size = _MemoryManager.readyQueue.getSize();

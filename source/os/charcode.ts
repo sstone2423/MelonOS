@@ -19,7 +19,7 @@
             Five = 53,
             Six = 54,
             Seven = 55,
-            Eight = 56, 
+            Eight = 56,
             Nine = 57,
             Enter = 13,
             // Symbols
@@ -44,4 +44,3 @@
             Down = 40
         }
     }
-    

@@ -4,11 +4,12 @@
      Control.ts
 
      Routines for the hardware simulation, NOT for our client OS itself.
-     These are static because we are never going to instantiate them, because they represent the hardware.
-     In this manner, it's A LITTLE BIT like a hypervisor, in that the Document environment inside a browser
-     is the "bare metal" (so to speak) for which we write code that hosts our client OS.
-     This code references page numbers in the text book:
-     Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 978-0-470-12872-5
+     These are static because we are never going to instantiate them, because
+     they represent the hardware. In this manner, it's A LITTLE BIT like a hypervisor,
+     in that the Document environment inside a browser is the "bare metal" (so to speak)
+     for which we write code that hosts our client OS. This code references page numbers
+     in the text book: Operating System Concepts 8th edition by Silberschatz, Galvin,
+     and Gagne.  ISBN 978-0-470-12872-5
      ------------ */
 var TSOS;
 (function (TSOS) {
@@ -24,7 +25,8 @@ var TSOS;
             _Canvas = document.getElementById("display");
             // Get a global reference to the drawing context.
             _DrawingContext = _Canvas.getContext("2d");
-            // Enable the added-in canvas text functions (see canvastext.ts for provenance and details).
+            // Enable the added-in canvas text functions (see canvastext.ts for 
+            // provenance and details).
             TSOS.CanvasTextFunctions.enable(_DrawingContext);
             // Clear the log text box. Use the TypeScript cast to HTMLInputElement
             document.getElementById("taHostLog").value = "";
@@ -59,8 +61,8 @@ var TSOS;
             // Note the REAL clock in milliseconds since January 1, 1970.
             var now = new Date().getTime();
             // Build the log string.
-            var str = "({ clock:" + clock + ", source:" + source + ", msg:" + msg + ", now:" + now
-                + " })" + "\n";
+            var str = "({ clock:" + clock + ", source:" + source
+                + ", msg:" + msg + ", now:" + now + " })" + "\n";
             // Update the log console.
             var taLog = document.getElementById("taHostLog");
             taLog.value = str + taLog.value;
@@ -81,8 +83,8 @@ var TSOS;
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
             // ... Create and initialize the CPU (because it's part of the hardware)  ...
-            _CPU = new TSOS.Cpu(); // Note: We could simulate multi-core systems by instantiating more than
-            // one instance of the CPU here.
+            _CPU = new TSOS.Cpu(); // Note: We could simulate multi-core systems by instantiating
+            // more than one instance of the CPU here.
             _CPU.init();
             // Initialize memory
             _Memory = new TSOS.Memory();
@@ -96,13 +98,13 @@ var TSOS;
             _hardwareClockID = setInterval(TSOS.Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
             // .. and call the OS Kernel Bootstrap routine.
             _Kernel = new TSOS.Kernel();
-            _Kernel.krnBootstrap(); // _GLaDOS.afterStartup() will get called in there, if configured.
+            // _GLaDOS.afterStartup() will get called in there, if configured.
+            _Kernel.krnBootstrap();
         };
         /**
          * When user clicks halt, the OS attempts to shutdown
-         * @param btn
          */
-        Control.hostBtnHaltOS_click = function (btn) {
+        Control.hostBtnHaltOS_click = function () {
             this.hostLog("Emergency halt", "host");
             this.hostLog("Attempting Kernel shutdown.", "host");
             // Call the OS shutdown routine.
@@ -113,14 +115,13 @@ var TSOS;
         };
         /**
          * When user clicks reset, reload the browser
-         * @param btn
          */
-        Control.hostBtnReset_click = function (btn) {
+        Control.hostBtnReset_click = function () {
             // The easiest and most thorough way to do this is to reload (not refresh) the document.
             location.reload(true);
-            /* That boolean parameter is the 'forceget' flag. When it is true it causes the page to always
-               be reloaded from the server. If it is false or not specified the browser may reload the
-               page from its cache, which is not what we want.
+            /* That boolean parameter is the 'forceget' flag. When it is true it causes
+               the page to always be reloaded from the server. If it is false or not
+               specified the browser may reload the page from its cache, which is not what we want.
             */
         };
         /**
@@ -189,7 +190,8 @@ var TSOS;
             for (var i = 0; i < table.rows.length; i++) {
                 for (var j = 1; j < 9; j++) {
                     table.rows[i].cells.item(j).innerHTML = _Memory.memoryArray[memoryPC].toString().toUpperCase();
-                    // Check to see if the hex needs a leading zero. Convert to decimal, then to hex, then add leading zero
+                    // Check to see if the hex needs a leading zero. Convert to decimal, 
+                    // then to hex, then add leading zero
                     var convert = parseInt(_Memory.memoryArray[memoryPC].toString(), 16);
                     if (convert < 16 && convert > 0) {
                         table.rows[i].cells.item(j).innerHTML = "0" + convert.toString(16).toUpperCase();
@@ -391,7 +393,6 @@ var TSOS;
             for (var trackNum = 0; trackNum < _Disk.totalTracks; trackNum++) {
                 for (var sectorNum = 0; sectorNum < _Disk.totalSectors; sectorNum++) {
                     for (var blockNum = 0; blockNum < _Disk.totalBlocks; blockNum++) {
-                        // generate proper tsb id since firefox sucks and doesn't keep session storage ordered
                         var tsbID = trackNum + ":" + sectorNum + ":" + blockNum;
                         var row = table.insertRow(rowNum);
                         rowNum++;

@@ -9,9 +9,9 @@
 
 module TSOS {
     export class Scheduler {
-        public quantum: number;
-        public algorithm: string;
-        
+        quantum: number;
+        algorithm: string;
+
         constructor() {
             // Set default quantum of 6
             this.quantum = 6;
@@ -19,19 +19,28 @@ module TSOS {
             this.algorithm = RR;
         }
 
-        // ShellQuantum calls this function
-        public changeQuantum(userQuantum): void {
+        /**
+         * Changes the scheduling quantum
+         * ShellQuantum calls this function
+         * @param userQuantum specified quantum
+         */
+        changeQuantum(userQuantum): void {
             // Change quantum to user given int
             this.quantum = userQuantum;
         }
 
-        // Change the algorithm
-        public changeAlgorithm(algorithm: string): void {
+        /**
+         * Change to the specified algorithm
+         * @param algorithm 
+         */
+        changeAlgorithm(algorithm: string): void {
             this.algorithm = algorithm;
         }
 
-        // This gets called by the krnTimerISR
-        public contextSwitch(): void {
+        /**
+         * This gets called by the krnTimerISR
+         */
+        contextSwitch(): void {
             if (_MemoryManager.runningProcess != null) {
                 // Set CPU to !isExecuting
                 _CPU.isExecuting = false;
@@ -57,45 +66,51 @@ module TSOS {
             }
         }
 
-        // Find the highest priority PCB by comparing/sorting each PCB's priorities
-        public findHighestPriority() {
+        /**
+         * Find the highest priority PCB by comparing/sorting each PCB's priorities
+         */
+        findHighestPriority(): ProcessControlBlock {
             let priorityPcb;
-            let size = _MemoryManager.readyQueue.getSize();
+            const size = _MemoryManager.readyQueue.getSize();
             for (let i = 0; i < size; i++) {
-                let pcb = _MemoryManager.readyQueue.dequeue();
+                const pcb = _MemoryManager.readyQueue.dequeue();
                 if (priorityPcb == null) {
                     priorityPcb = pcb;
                 } else {
                     if (pcb.Priority < priorityPcb.Priority) {
                         // Put the process back into the ready queue
-                        _MemoryManager.readyQueue.enqueue(priorityPcb); 
+                        _MemoryManager.readyQueue.enqueue(priorityPcb);
                         priorityPcb = pcb;
                     } else {
                         _MemoryManager.readyQueue.enqueue(pcb);
                     }
                 }
             }
+
             return priorityPcb;
         }
 
-        // Find the lowest priority PCB by comparing/sorting each PCB's priorities
-        public findLowestPriority() {
+        /**
+         * Find the lowest priority PCB by comparing/sorting each PCB's priorities
+         */
+        findLowestPriority(): ProcessControlBlock {
             let priorityPcb;
-            let size = _MemoryManager.readyQueue.getSize();
+            const size = _MemoryManager.readyQueue.getSize();
             for (let i = 0; i < size; i++) {
-                let pcb = _MemoryManager.readyQueue.dequeue();
+                const pcb = _MemoryManager.readyQueue.dequeue();
                 if (priorityPcb == null) {
                     priorityPcb = pcb;
                 } else {
                     // If priority is higher, Put the process back into the ready queue
                     if (pcb.Priority > priorityPcb.Priority) {
-                        _MemoryManager.readyQueue.enqueue(priorityPcb); 
+                        _MemoryManager.readyQueue.enqueue(priorityPcb);
                         priorityPcb = pcb;
                     } else {
                         _MemoryManager.readyQueue.enqueue(pcb);
                     }
                 }
             }
+
             return priorityPcb;
         }
     }

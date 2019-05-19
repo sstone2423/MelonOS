@@ -12,17 +12,29 @@ var TSOS;
             if (q === void 0) { q = new Array(); }
             this.q = q;
         }
+        /**
+         * Returns the queue's length
+         */
         Queue.prototype.getSize = function () {
             return this.q.length;
         };
+        /**
+         * Returns true is queue is empty
+         */
         Queue.prototype.isEmpty = function () {
             return (this.q.length === 0);
         };
+        /**
+         * Pushes element into the queue
+         * @param element
+         */
         Queue.prototype.enqueue = function (element) {
             this.q.push(element);
         };
-        // Dequeue returns the first element of the array and shifts the array.
-        // ex. [a, b, c, d].shift() = a
+        /**
+         * Dequeue returns the first element of the array and shifts the array.
+         * ex. [a, b, c, d].shift() = a
+         */
         Queue.prototype.dequeue = function () {
             var retVal = null;
             if (this.q.length > 0) {
@@ -30,6 +42,9 @@ var TSOS;
             }
             return retVal;
         };
+        /**
+         * Returns the queue as a concatenated string
+         */
         Queue.prototype.toString = function () {
             var retVal = "";
             for (var i in this.q) {

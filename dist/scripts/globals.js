@@ -11,7 +11,8 @@ var APP_VERSION = "0.07"; // What did you expect?
 // CPU Constants
 var CPU_CLOCK_INTERVAL = 100; // This is in ms (milliseconds) so 1000 = 1 second.
 var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
-// NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
+// NOTE: The timer is different from hardware/host clock pulses. 
+// Don't confuse these.
 var KEYBOARD_IRQ = 1;
 var PROCESS_EXIT_IRQ = 2;
 var CONSOLE_WRITE_IRQ = 3;
@@ -31,7 +32,8 @@ var FULL_FORMAT = 1;
 var DATA_SIZE = 60;
 var SWAP = "$SWAP";
 // Global variables
-var _CPU; // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
+var _CPU; // Utilize TypeScript's type annotation system to ensure that 
+// _CPU is an instance of the Cpu class.
 var _OSclock = 0; // Page 23.
 var _Mode = 0; // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
 var _Disk;
@@ -51,10 +53,7 @@ var FCFS = "fcfs";
 var PRIORITY = "priority";
 // Canvas and font variables
 var _Canvas; // Initialized in Control.hostInit().
-var _DrawingContext; // = _Canvas.getContext("2d");  // Assigned here for type safety, but re-initialized in
-// Control.hostInit() for OCD and logic.
-var _DefaultFontFamily = "sans"; // Ignored, I think. The was just a place-holder in 2008, but the HTML
-// canvas may have use for it.
+var _DrawingContext; // = _Canvas.getContext("2d");  
 var _DefaultFontSize = 13;
 var _FontHeightMargin = 4; // Additional space added to font size when advancing a line.
 // The OS Kernel and its queues.

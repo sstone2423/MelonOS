@@ -7,9 +7,12 @@
 
    module TSOS {
     export class Swapper {
-        constructor() { }
-
-        public putProcessToDisk(opCodes, pId): String {
+        /**
+         * 
+         * @param opCodes 
+         * @param pId 
+         */
+        putProcessToDisk(opCodes, pId): String {
             // Create file name for process
             let filename = SWAP + pId;
             _DiskDriver.createFile(filename);
@@ -18,42 +21,51 @@
                 opCodes.push(OpCode.TERMINATOR);
                 length++;
             }
-            let status = _DiskDriver.writeSwap(filename, opCodes);
+            const status = _DiskDriver.writeSwap(filename, opCodes);
             if (status === SUCCESS) {
                 return filename;
             } else if (status === DISK_IS_FULL) {
                 filename = "full";
+
                 return filename;
             } else {
                 filename = "doesn't exist";
+
                 return filename;
             }
         }
 
-        public rollIn(pcb) {
+        /**
+         * Roll in a process from disk into memory, then put 
+         * the new process in that place in disk
+         * @param pcb 
+         */
+        rollIn(pcb) {
             // Find swap file in directory structure
-            let filename = SWAP + pcb.pId;
+            const filename = SWAP + pcb.pId;
             // Get the TSB of the program stored in disk
-            let data = _DiskDriver.readFile(filename);
+            const data = _DiskDriver.readFile(filename);
             if (data.status === SUCCESS) {
-                // Trim off extra data since we now allocate 5 blocks (300 bytes) for a program, which is more than what a memory partition can hold
-                let extraData = Math.ceil(PARTITION_SIZE / _Disk.dataSize) * _Disk.dataSize;
+                // Trim off extra data since we now allocate 5 blocks (300 bytes) for a program, 
+                // which is more than what a memory partition can hold
+                const extraData = Math.ceil(PARTITION_SIZE / _Disk.dataSize) * _Disk.dataSize;
                 for (let i = 0; i < extraData - PARTITION_SIZE; i++) {
                     data.data.pop();
                 }
                 // Look for a space in main memory to put the process from disk
                 if (_Memory.checkMemorySpace()) {
-                    let partition = _Memory.getEmptyPartition();
+                    const partition = _Memory.getEmptyPartition();
                     _Memory.loadIntoMemory(data.data, partition);
                     // Update the PCB's partition to the one it got placed in
                     pcb.partition = partition;
                     // Remove the program from disk
-                    let status = _DiskDriver.deleteFile(filename);
+                    const status = _DiskDriver.deleteFile(filename);
                     if (status === SUCCESS) {
                         // Update disk display
                         Control.hostDisk();
                     } else {
-                        _StdOut.putText("Uh oh.. File name did not delete correctly. Considering formatting the disk.");
+                        _StdOut.putText("Uh oh.. File name did not delete correctly. "
+                            + "Considering formatting the disk.");
                     }
                     // Update memory display 
                     Control.hostMemory();
@@ -64,53 +76,59 @@
             } else {
                 _StdOut.putText("Uh oh.. File name does not exist.");
             }
-            
         }
 
-        // Roll out a process from memory into the disk, then put the new process in that place in memory
-        public rollOut(pcb) {
+        // 
+        /**
+         * Roll out a process from memory into the disk, then put 
+         * the new process in that place in memory
+         * @param pcb 
+         */
+        rollOut(pcb) {
             // Find swap file in directory structure
-            let filename = SWAP + pcb.pId;
+            const filename = SWAP + pcb.pId;
             // Look for the PCB with that partition
-            let swappedPcb = _Scheduler.findLowestPriority();
-            let swappedPartition = swappedPcb.partition;
+            const swappedPcb = _Scheduler.findLowestPriority();
+            const swappedPartition = swappedPcb.partition;
 
             if (swappedPcb != null) {
                 // Get data from memory
-                let memoryData = _Memory.getPartitionData(swappedPartition);
+                const memoryData = _Memory.getPartitionData(swappedPartition);
                 // Free the partition
                 _Memory.clearPartition(swappedPartition);
                 // Get data from disk
-                let data = _DiskDriver.readFile(filename);
+                const data = _DiskDriver.readFile(filename);
                 if (data.status === SUCCESS) {
                     // Trim off extra bytes
-                    let extraData = Math.ceil(PARTITION_SIZE / _Disk.dataSize) * _Disk.dataSize;
+                    const extraData = Math.ceil(PARTITION_SIZE / _Disk.dataSize) * _Disk.dataSize;
                     for (let i = 0; i < extraData - PARTITION_SIZE; i++){
                         data.data.pop();
                     }
                     // Put data from disk into the partition from memory
                     if (_Memory.checkMemorySpace()) {
-                        let partition = _Memory.getEmptyPartition();
+                        const partition = _Memory.getEmptyPartition();
                         _Memory.loadIntoMemory(data.data, partition);
                         // Update the PCB's partition to the one it got placed in
                         pcb.partition = partition;
                         pcb.swapped = false;
                         pcb.state = "Ready";
                         // Remove the program from disk by deleting the swap file
-                        let status = _DiskDriver.deleteFile(filename);
+                        const status = _DiskDriver.deleteFile(filename);
                         if (status === SUCCESS) {
                             // Update disk display
                             Control.hostDisk();
                         } else {
                             _StdOut.putText("Deletion of file failed. ");
+
                             return;
                         }
                     } else {
                         _StdOut.putText("Memory ran out of space even though I cleared it..");
+
                         return;
                     }
                     // Put the data from memory into disk and get the TSB of where it was written
-                    let memoryToDiskTSB = this.putProcessToDisk(memoryData, swappedPcb.pId);
+                    const memoryToDiskTSB = this.putProcessToDisk(memoryData, swappedPcb.pId);
                     if (memoryToDiskTSB != null) {
                         // Update the PCB to show that it is in disk
                         swappedPcb.partition = -1;
@@ -122,13 +140,15 @@
                         Control.hostProcesses();
 
                         return;
-                    // No more memory in disk even though we just cleared room for it. Raise the alarms.
+                    // No more memory in disk even though we just cleared room for it. 
+                    // Raise the alarms.
                     } else {
                         Control.hostLog("Not enough space for rollout", "os");
                         // Stop the CPU from executing, clear memory, and activate BSOD
                         _Memory.clearAllMemory();
                         _CPU.isExecuting = false;
-                        _StdOut.putText("Not enough space on disk for rollout. Please reformat your disk.");
+                        _StdOut.putText("Not enough space on disk for rollout. Please "
+                             + "reformat your disk.");
                         _Kernel.krnTrapError("AHHHHHH");
                     }
                 } else {

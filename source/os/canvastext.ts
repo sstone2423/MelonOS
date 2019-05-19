@@ -15,7 +15,7 @@
 
 module TSOS {
     export class CanvasTextFunctions {
-        public static symbols = {
+        static symbols = {
             " " : { width: 16, points: [] },
             "!": { width: 10, points: [[5, 21], [5, 7], [-1, -1], [5, 2], [4, 1], [5, 0], [6, 1], [5, 2]] },
             '"': { width: 16, points: [[4, 21], [4, 14], [-1, -1], [12, 21], [12, 14]] },
@@ -211,19 +211,19 @@ module TSOS {
                                         [21, 10], [21, 12]] },
         };
 
-        public static letter(ch) {
+        static letter(ch) {
             return CanvasTextFunctions.symbols[ch];
         }
 
-        public static ascent(font, size) {
+        static ascent(size) {
             return size;
         }
 
-        public static descent(font, size) {
-            return 7.0 * size / 25.0;
+        static descent(size): number {
+            return size * 7.0 / 25.0;
         }
 
-        public static measure(font, size, str) {
+        static measure(size, str): number {
             let total = 0;
             const len = str.length;
 
@@ -233,17 +233,18 @@ module TSOS {
                     total += c.width * size / 25.0;
                 }
             }
+
             return total;
         }
 
-        public static draw(ctx, font, size, x, y, str) {
+        static draw(ctx, size, x, y, str): number {
             const total = 0;
             const len = str.length;
             const mag = size / 25.0;
 
             ctx.save();
             ctx.lineCap = "round";
-            ctx.lineWidth = 2.0 * mag;
+            ctx.lineWidth = mag * 2.0;
             ctx.strokeStyle = "black";
 
             for (let i = 0; i < len; i++) {
@@ -253,7 +254,6 @@ module TSOS {
                 }
                 ctx.beginPath();
                 let penUp = true;
-                const needStroke = 0;
                 for (let j = 0; j < c.points.length; j++) {
                     const a = c.points[j];
                     if (a[0] === -1 && a[1] === -1) {
@@ -271,22 +271,25 @@ module TSOS {
                 x += c.width * mag;
             }
             ctx.restore();
+
             return total;
         }
 
-        public static enable(ctx) {
-            ctx.drawText = (font, size, x, y, text) => {
-                return CanvasTextFunctions.draw( ctx, font, size, x, y, text); };
-            ctx.measureText = (font, size, text) => CanvasTextFunctions.measure( font, size, text);
-            ctx.fontAscent = (font, size) => CanvasTextFunctions.ascent(font, size);
-            ctx.fontDescent = (font, size) => CanvasTextFunctions.descent(font, size);
-            ctx.drawTextRight = (font, size, x, y, text) => {
-                const w = CanvasTextFunctions.measure(font, size, text);
-                return CanvasTextFunctions.draw( ctx, font, size, x - w, y, text);
+        static enable(ctx) {
+            ctx.drawText = (size, x, y, text) => {
+                return CanvasTextFunctions.draw( ctx, size, x, y, text); };
+            ctx.measureText = (size, text) => CanvasTextFunctions.measure(size, text);
+            ctx.fontAscent = (size) => CanvasTextFunctions.ascent(size);
+            ctx.fontDescent = (size) => CanvasTextFunctions.descent(size);
+            ctx.drawTextRight = (size, x, y, text) => {
+                const w = CanvasTextFunctions.measure(size, text);
+
+                return CanvasTextFunctions.draw( ctx, size, x - w, y, text);
             };
-            ctx.drawTextCenter = (font, size, x, y, text) => {
-                const w = CanvasTextFunctions.measure(font, size, text);
-                return CanvasTextFunctions.draw( ctx, font, size, x - w / 2, y, text);
+            ctx.drawTextCenter = (size, x, y, text) => {
+                const w = CanvasTextFunctions.measure(size, text);
+
+                return CanvasTextFunctions.draw(ctx, size, x - w / 2, y, text);
             };
         }
     }

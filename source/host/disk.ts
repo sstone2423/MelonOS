@@ -10,40 +10,37 @@
      host and client environments.
      ------------ */
 
-     module TSOS {
-        export class Disk {
-            totalTracks: number = 4;
-            totalSectors: number = 8;
-            totalBlocks: number = 8;
-            dataSize: number = 60;
-            
-            constructor() { }
-    
-            /**
-             * Initialize storage and set session storage key
-             */
-            public init(): void {
-                // Initialize storage
-                for (let i = 0; i < this.totalTracks; i++) {
-                    for (let j = 0; j < this.totalSectors; j++) {
-                        for (let k = 0; k < this.totalBlocks; k++) {
-                            let key = i + ":" + j + ":" + k;
-                            let zeroes: Array<String> = [];
+module TSOS {
+    export class Disk {
+        totalTracks = 4;
+        totalSectors = 8;
+        totalBlocks = 8;
+        dataSize = 60;
 
-                            for (let l = 0; l < this.dataSize; l++) {
-                                zeroes.push("00");
-                            }
+        /**
+         * Initialize storage and set session storage key
+         */
+        init(): void {
+            // Initialize storage
+            for (let i = 0; i < this.totalTracks; i++) {
+                for (let j = 0; j < this.totalSectors; j++) {
+                    for (let k = 0; k < this.totalBlocks; k++) {
+                        const key = i + ":" + j + ":" + k;
+                        const zeroes: Array<String> = [];
 
-                            let block = {
-                                availableBit : "0", // Flags a block as available or not
-                                pointer: "0:0:0", // Pointer to next data block
-                                data: zeroes // Rest of 64 bytes is filled with data
-                            }
-                            // Set the session storage key
-                            sessionStorage.setItem(key, JSON.stringify(block));
+                        for (let l = 0; l < this.dataSize; l++) {
+                            zeroes.push("00");
                         }
+                        const block = {
+                            availableBit : "0", // Flags a block as available or not
+                            pointer: "0:0:0", // Pointer to next data block
+                            data: zeroes // Rest of 64 bytes is filled with data
+                        };
+                        // Set the session storage key
+                        sessionStorage.setItem(key, JSON.stringify(block));
                     }
                 }
             }
         }
     }
+}

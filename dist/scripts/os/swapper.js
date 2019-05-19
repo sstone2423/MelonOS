@@ -9,6 +9,11 @@ var TSOS;
     var Swapper = /** @class */ (function () {
         function Swapper() {
         }
+        /**
+         *
+         * @param opCodes
+         * @param pId
+         */
         Swapper.prototype.putProcessToDisk = function (opCodes, pId) {
             // Create file name for process
             var filename = SWAP + pId;
@@ -31,13 +36,19 @@ var TSOS;
                 return filename;
             }
         };
+        /**
+         * Roll in a process from disk into memory, then put
+         * the new process in that place in disk
+         * @param pcb
+         */
         Swapper.prototype.rollIn = function (pcb) {
             // Find swap file in directory structure
             var filename = SWAP + pcb.pId;
             // Get the TSB of the program stored in disk
             var data = _DiskDriver.readFile(filename);
             if (data.status === SUCCESS) {
-                // Trim off extra data since we now allocate 5 blocks (300 bytes) for a program, which is more than what a memory partition can hold
+                // Trim off extra data since we now allocate 5 blocks (300 bytes) for a program, 
+                // which is more than what a memory partition can hold
                 var extraData = Math.ceil(PARTITION_SIZE / _Disk.dataSize) * _Disk.dataSize;
                 for (var i = 0; i < extraData - PARTITION_SIZE; i++) {
                     data.data.pop();
@@ -55,7 +66,8 @@ var TSOS;
                         TSOS.Control.hostDisk();
                     }
                     else {
-                        _StdOut.putText("Uh oh.. File name did not delete correctly. Considering formatting the disk.");
+                        _StdOut.putText("Uh oh.. File name did not delete correctly. "
+                            + "Considering formatting the disk.");
                     }
                     // Update memory display 
                     TSOS.Control.hostMemory();
@@ -69,7 +81,12 @@ var TSOS;
                 _StdOut.putText("Uh oh.. File name does not exist.");
             }
         };
-        // Roll out a process from memory into the disk, then put the new process in that place in memory
+        // 
+        /**
+         * Roll out a process from memory into the disk, then put
+         * the new process in that place in memory
+         * @param pcb
+         */
         Swapper.prototype.rollOut = function (pcb) {
             // Find swap file in directory structure
             var filename = SWAP + pcb.pId;
@@ -124,14 +141,16 @@ var TSOS;
                         // Update processes display
                         TSOS.Control.hostProcesses();
                         return;
-                        // No more memory in disk even though we just cleared room for it. Raise the alarms.
+                        // No more memory in disk even though we just cleared room for it. 
+                        // Raise the alarms.
                     }
                     else {
                         TSOS.Control.hostLog("Not enough space for rollout", "os");
                         // Stop the CPU from executing, clear memory, and activate BSOD
                         _Memory.clearAllMemory();
                         _CPU.isExecuting = false;
-                        _StdOut.putText("Not enough space on disk for rollout. Please reformat your disk.");
+                        _StdOut.putText("Not enough space on disk for rollout. Please "
+                            + "reformat your disk.");
                         _Kernel.krnTrapError("AHHHHHH");
                     }
                 }

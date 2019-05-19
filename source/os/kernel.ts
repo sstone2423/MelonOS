@@ -7,21 +7,25 @@
 
      Routines for the Operating System, NOT the host.
      This code references page numbers in the text book:
-     Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 978-0-470-12872-5
+     Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne. 
+     ISBN 978-0-470-12872-5
      ------------ */
 
 module TSOS {
     export class Kernel {
-        timer: number = 0;
+        timer = 0;
         /**
          * OS Startup and Shutdown Routines
          */
-        public krnBootstrap(): void {      // Page 8. {
-            Control.hostLog("bootstrap", "host");  // Use hostLog because we ALWAYS want this, even if _Trace is off.
+        krnBootstrap(): void {      // Page 8. {
+            // Use hostLog because we ALWAYS want this, even if _Trace is off.
+            Control.hostLog("bootstrap", "host");
             // Initialize our global queues.
-            _KernelInterruptQueue = new Queue();  // A (currently) non-priority queue for interrupt requests (IRQs).
+            // A (currently) non-priority queue for interrupt requests (IRQs).
+            _KernelInterruptQueue = new Queue();
             _KernelBuffers = new Array();         // Buffers... for the kernel.
-            _KernelInputQueue = new Queue();      // Where device input lands before being processed out somewhere.
+            // Where device input lands before being processed out somewhere.
+            _KernelInputQueue = new Queue();
             // Initialize the console.
             _Console = new Console();          // The command line interface / console I/O device.
             _Console.init();
@@ -37,14 +41,15 @@ module TSOS {
             // Load the Keyboard Device Driver
             this.krnTrace("Loading the keyboard device driver.");
             _krnKeyboardDriver = new DeviceDriverKeyboard();     // Construct it.
-            _krnKeyboardDriver.driverEntry();                    // Call the driverEntry() initialization routine.
+            _krnKeyboardDriver.driverEntry(); // Call the driverEntry() initialization routine.
             this.krnTrace(_krnKeyboardDriver.status);
             // Load the Disk Device Driver
             this.krnTrace("Loading the disk device driver");
             _DiskDriver = new DeviceDriverDisk();
             _DiskDriver.driverEntry();
             this.krnTrace(_DiskDriver.status);
-            // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
+            // Enable the OS Interrupts. (Not the CPU clock interrupt, 
+            // as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
             this.krnEnableInterrupts();
             // Launch the shell.
@@ -60,10 +65,10 @@ module TSOS {
         /**
          * Shutdowns the kernel
          */
-        public krnShutdown(): void {
+        krnShutdown(): void {
             this.krnTrace("begin shutdown OS");
             // Check for running processes.  If there are some, alert and stop. Else...
-            if(_MemoryManager.runningProcess) {
+            if (_MemoryManager.runningProcess) {
                 _KernelInterruptQueue.enqueue(new Interrupt(PROCESS_EXIT_IRQ, false));
             }
             // ... Disable the Interrupts.
@@ -80,12 +85,13 @@ module TSOS {
                                       
         */
        /**
-        * This gets called from the host hardware simulation every time there is a hardware clock pulse.
-        * This is NOT the same as a TIMER, which causes an interrupt and is handled like other interrupts.
-        * This, on the other hand, is the clock pulse from the hardware / VM / host that tells the kernel
+        * This gets called from the host hardware simulation every time there is a 
+        * hardware clock pulse. This is NOT the same as a TIMER, which causes an 
+        * interrupt and is handled like other interrupts. This, on the other hand, 
+        * is the clock pulse from the hardware / VM / host that tells the kernel
         * that it has to look for interrupts and process them if it finds any. 
         */
-        public krnOnCPUClockPulse(): void {
+        krnOnCPUClockPulse(): void {
             // Check if timer has reached the quantum
             if (_MemoryManager.readyQueue.getSize() > 0 && _CPU.isExecuting) {
                 if (_Scheduler.algorithm == "rr" && this.timer > _Scheduler.quantum) {
@@ -106,12 +112,14 @@ module TSOS {
             // Check for an interrtsupt Page 560
             if (_KernelInterruptQueue.getSize() > 0) {
                 // Process the first interrupt on the interrupt queue.
-                // TODO: Implement a priority queue based on the IRQ number/id to enforce interrupt priority.
+                // TODO: Implement a priority queue based on the IRQ number/id to 
+                // enforce interrupt priority.
                 const interrupt = _KernelInterruptQueue.dequeue();
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
-            // If there are no interrupts then run one CPU cycle if there is anything being processed.
+            // If there are no interrupts, run one CPU cycle if there is anything being processed.
             } else if (_CPU.isExecuting) {
-                // Check if _SingleStep is enabled, then wait for the next step click before executing the next instruction
+                // Check if _SingleStep is enabled, then wait for the next step click before 
+                // executing the next instruction
                 if (_SingleStep) {
                     // If user clicked next step, execute one step
                     if (_NextStep) {
@@ -156,7 +164,7 @@ module TSOS {
         /**
          * Enables interrupts
          */
-        public krnEnableInterrupts(): void {
+        krnEnableInterrupts(): void {
             // Keyboard
             Devices.hostEnableKeyboardInterrupt();
             // Put more here.
@@ -165,7 +173,7 @@ module TSOS {
         /**
          * Disables interrupts
          */
-        public krnDisableInterrupts(): void {
+        krnDisableInterrupts(): void {
             // Keyboard
             Devices.hostDisableKeyboardInterrupt();
             // Put more here.
@@ -176,17 +184,19 @@ module TSOS {
          * @param irq 
          * @param params 
          */
-        public krnInterruptHandler(irq: number, params): void {
-            // Trace our entrance here so we can compute Interrupt Latency by analyzing the log file later on. Page 766.
+        krnInterruptHandler(irq: number, params): void {
+            // Trace our entrance here so we can compute Interrupt Latency by analyzing 
+            // the log file later on. Page 766.
             this.krnTrace("Handling IRQ~" + irq);
 
-            // Invoke the requested Interrupt Service Routine via Switch/Case rather than an Interrupt Vector.
-            // TODO: Consider using an Interrupt Vector in the future.
+            // Invoke the requested Interrupt Service Routine via Switch/Case rather 
+            // than an Interrupt Vector.
             // Note: There is no need to "dismiss" or acknowledge the interrupts in our design here.
+            // TODO: Consider using an Interrupt Vector in the future.
             switch (irq) {
                 // Triggers when timer has exceeded quantum
                 case TIMER_IRQ:
-                    this.krnTimerISR();              // Kernel built-in routine for timers (not the clock).
+                    this.krnTimerISR();  // Kernel built-in routine for timers (not the clock).
                     break;
 
                 // Triggers when the keyboard receives input
@@ -212,28 +222,33 @@ module TSOS {
 
                 // Triggers when there is an invalid op code
                 case INVALID_OP_IRQ:
-                    _StdOut.putText("Invalid op code in process " + _MemoryManager.runningProcess.pId + ". Exiting the process.")
+                    _StdOut.putText("Invalid op code in process "
+                        + _MemoryManager.runningProcess.pId + ". Exiting the process.");
                     _StdOut.advanceLine();
                     _OsShell.putPrompt();
                     break;
 
                 // Triggers when memory has gone out of bounds for a process
                 case BOUNDS_ERROR_IRQ:
-                    _StdOut.putText("Out of bounds error in process " + _MemoryManager.runningProcess.pId + ". Exiting the process.");
+                    _StdOut.putText("Out of bounds error in process "
+                        + _MemoryManager.runningProcess.pId + ". Exiting the process.");
                     _StdOut.advanceLine();
                     _OsShell.putPrompt();
                     break;
 
                 default:
-                    this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
+                    this.krnTrapError("Invalid Interrupt Request. irq=" + irq
+                        + " params=[" + params + "]");
             }
         }
-        /* */
             /**
-             * The built-in TIMER (not clock) Interrupt Service Routine 
-             * (as opposed to an ISR coming froma device driver).
+             * 
              */
-        public krnTimerISR(): void {
+        /**
+         * The built-in TIMER (not clock) Interrupt Service Routine 
+         * (as opposed to an ISR coming froma device driver).
+         */
+        krnTimerISR(): void {
             // Check multiprogramming parameters and enforce quanta here.
             _Scheduler.contextSwitch();
         }
@@ -244,11 +259,12 @@ module TSOS {
          * Displays trace debugging information
          * @param msg the debug message
          */
-        public krnTrace(msg: string): void {
+        krnTrace(msg: string): void {
             // Check globals to see if trace is set ON.  If so, then (maybe) log the message.
             if (_Trace) {
                 if (msg === "Idle") {
-                    // We can't log every idle clock pulse because it would lag the browser very quickly.
+                    // We can't log every idle clock pulse because it would 
+                    // lag the browser very quickly.
                     if (_OSclock % 10 === 0) {
                         // Check the CPU_CLOCK_INTERVAL in globals.ts for an
                         // idea of the tick rate and adjust this line accordingly.
@@ -264,7 +280,7 @@ module TSOS {
          * When everything breaks, shut everything down and throw melons out the window
          * @param msg error message
          */
-        public krnTrapError(msg: string): void {
+        krnTrapError(msg: string): void {
             // Display error
             Control.hostLog("OS ERROR - TRAP: " + msg);
             // Shutdown the kernel
@@ -276,7 +292,7 @@ module TSOS {
         /**
          * When timer is up, throw timer IRQ and reset timer to 0
          */
-        public krnTimerIRQ(): void {
+        krnTimerIRQ(): void {
             // Throw the TIMER_IRQ
             _KernelInterruptQueue.enqueue(new Interrupt(TIMER_IRQ, false));
             // Reset the timer

@@ -8,38 +8,57 @@
 
 module TSOS {
     export class Queue {
+        q;
 
-        constructor(public q = new Array()) { }
+        constructor(q = new Array()) {
+            this.q = q;
+        }
 
-        public getSize(): number {
+        /**
+         * Returns the queue's length
+         */
+        getSize(): number {
             return this.q.length;
         }
 
-        public isEmpty(): boolean {
+        /**
+         * Returns true is queue is empty
+         */
+        isEmpty(): boolean {
             return (this.q.length === 0);
         }
 
-        public enqueue(element): void {
+        /**
+         * Pushes element into the queue
+         * @param element 
+         */
+        enqueue(element): void {
             this.q.push(element);
         }
 
-        // Dequeue returns the first element of the array and shifts the array.
-        // ex. [a, b, c, d].shift() = a
-        public dequeue() {
+        /**
+         * Dequeue returns the first element of the array and shifts the array.
+         * ex. [a, b, c, d].shift() = a
+         */
+        dequeue() {
             let retVal = null;
             if (this.q.length > 0) {
                 retVal = this.q.shift();
             }
+
             return retVal;
         }
 
-        public toString() {
+        /**
+         * Returns the queue as a concatenated string
+         */
+        toString() {
             let retVal = "";
             for (const i in this.q) {
                 retVal += "[" + this.q[i] + "] ";
             }
+
             return retVal;
         }
     }
-
 }

@@ -38,7 +38,8 @@ var TSOS;
          */
         Memory.prototype.clearPartition = function (partition) {
             // Clear from the memoryArray[base] to memoryArray[limit]
-            for (var i = this.partitions[partition].base; i < this.partitions[partition].base + this.partitions[partition].limit; i++) {
+            for (var i = this.partitions[partition].base; i < this.partitions[partition].base
+                + this.partitions[partition].limit; i++) {
                 this.memoryArray[i] = "00";
                 this.partitions[partition].isEmpty = true;
             }
@@ -102,7 +103,8 @@ var TSOS;
          */
         Memory.prototype.readMemory = function (programCounter) {
             // Ensure to add the current partitions base to the PC
-            return this.memoryArray[this.partitions[_MemoryManager.runningProcess.partition].base + programCounter].toString();
+            return this.memoryArray[this.partitions[_MemoryManager.runningProcess.partition].base
+                + programCounter].toString();
         };
         /**
          * Write to memory with a given address and value
@@ -117,7 +119,8 @@ var TSOS;
                     value = "0" + value;
                 }
                 // Save value to the memoryArray[partition].base + address
-                this.memoryArray[this.partitions[_MemoryManager.runningProcess.partition].base + address] = value;
+                this.memoryArray[this.partitions[_MemoryManager.runningProcess.partition].base
+                    + address] = value;
             }
             else {
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(BOUNDS_ERROR_IRQ, 0));
@@ -156,11 +159,12 @@ var TSOS;
                 // Check ready queue first since these will be executing shortly
                 if (readyQueueLength > 0) {
                     for (var i = 0; i < readyQueueLength; i++) {
-                        // Kill the process
+                        // Kill the process by removing it from the queue
                         var pcb = _MemoryManager.readyQueue.dequeue();
                         // Clear the memory partition
                         _Memory.clearPartition(pcb.partition);
-                        _StdOut.putText("Clearing Process ID: " + pcb.pId + " from partition: " + pcb.partition);
+                        _StdOut.putText("Clearing Process ID: " + pcb.pId
+                            + " from partition: " + pcb.partition);
                         _StdOut.advanceLine();
                     }
                 }
@@ -172,7 +176,8 @@ var TSOS;
                         var pcb = _MemoryManager.residentQueue.dequeue();
                         // Clear the memory partition
                         _Memory.clearPartition(pcb.partition);
-                        _StdOut.putText("Clearing Process ID: " + pcb.pId + " from partition: " + pcb.partition);
+                        _StdOut.putText("Clearing Process ID: " + pcb.pId
+                            + " from partition: " + pcb.partition);
                         _StdOut.advanceLine();
                     }
                 }

@@ -4,11 +4,12 @@
      Control.ts
 
      Routines for the hardware simulation, NOT for our client OS itself.
-     These are static because we are never going to instantiate them, because they represent the hardware.
-     In this manner, it's A LITTLE BIT like a hypervisor, in that the Document environment inside a browser
-     is the "bare metal" (so to speak) for which we write code that hosts our client OS.
-     This code references page numbers in the text book:
-     Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 978-0-470-12872-5
+     These are static because we are never going to instantiate them, because 
+     they represent the hardware. In this manner, it's A LITTLE BIT like a hypervisor, 
+     in that the Document environment inside a browser is the "bare metal" (so to speak) 
+     for which we write code that hosts our client OS. This code references page numbers 
+     in the text book: Operating System Concepts 8th edition by Silberschatz, Galvin, 
+     and Gagne.  ISBN 978-0-470-12872-5
      ------------ */
 
 module TSOS {
@@ -17,12 +18,13 @@ module TSOS {
          * This is called from index.html's onLoad event via the onDocumentLoad function pointer.
          * TODO: Should we move this stuff into a Display Device Driver?
          */
-        public static hostInit(): void {
+        static hostInit(): void {
             // Get a global reference to the canvas.
             _Canvas = document.getElementById("display") as HTMLCanvasElement;
             // Get a global reference to the drawing context.
             _DrawingContext = _Canvas.getContext("2d");
-            // Enable the added-in canvas text functions (see canvastext.ts for provenance and details).
+            // Enable the added-in canvas text functions (see canvastext.ts for 
+            // provenance and details).
             CanvasTextFunctions.enable(_DrawingContext);
             // Clear the log text box. Use the TypeScript cast to HTMLInputElement
             (document.getElementById("taHostLog") as HTMLInputElement).value = "";
@@ -39,12 +41,12 @@ module TSOS {
 
             // get the Time based on local time
             function displayTime() {
-                let date = new Date();
-                let utc = date.toLocaleString();
+                const date = new Date();
+                const utc = date.toLocaleString();
                 document.getElementById('currentDate').innerHTML = utc;
-                let timeout = setTimeout(displayTime, 500);
+                const timeout = setTimeout(displayTime, 500);
             }
-    
+
             displayTime();
         }
 
@@ -53,14 +55,14 @@ module TSOS {
          * @param msg 
          * @param source 
          */
-        public static hostLog(msg: string, source: string = "?"): void {
+        static hostLog(msg: string, source = "?"): void {
             // Note the OS CLOCK.
             const clock: number = _OSclock;
             // Note the REAL clock in milliseconds since January 1, 1970.
             const now: number = new Date().getTime();
             // Build the log string.
-            const str: string = "({ clock:" + clock + ", source:" + source + ", msg:" + msg + ", now:" + now
-                                + " })"  + "\n";
+            const str: string = "({ clock:" + clock + ", source:" + source
+                + ", msg:" + msg + ", now:" + now + " })"  + "\n";
             // Update the log console.
             const taLog = document.getElementById("taHostLog") as HTMLInputElement;
             taLog.value = str + taLog.value;
@@ -70,7 +72,7 @@ module TSOS {
          * Activated when user clicks start button. Will start the OS.
          * @param btn 
          */
-        public static hostBtnStartOS_click(btn): void {
+        static hostBtnStartOS_click(btn): void {
             // Disable the (passed-in) start button...
             btn.disabled = true;
             // .. enable the Halt and Reset buttons ...
@@ -82,8 +84,8 @@ module TSOS {
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
             // ... Create and initialize the CPU (because it's part of the hardware)  ...
-            _CPU = new TSOS.Cpu();  // Note: We could simulate multi-core systems by instantiating more than
-                                    // one instance of the CPU here.
+            _CPU = new TSOS.Cpu();  // Note: We could simulate multi-core systems by instantiating
+                                    // more than one instance of the CPU here.
             _CPU.init();
             // Initialize memory
             _Memory = new Memory();
@@ -97,14 +99,14 @@ module TSOS {
             _hardwareClockID = setInterval(Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
             // .. and call the OS Kernel Bootstrap routine.
             _Kernel = new Kernel();
-            _Kernel.krnBootstrap();  // _GLaDOS.afterStartup() will get called in there, if configured.
+            // _GLaDOS.afterStartup() will get called in there, if configured.
+            _Kernel.krnBootstrap();
         }
 
         /**
          * When user clicks halt, the OS attempts to shutdown
-         * @param btn 
          */
-        public static hostBtnHaltOS_click(btn): void {
+        static hostBtnHaltOS_click(): void {
             this.hostLog("Emergency halt", "host");
             this.hostLog("Attempting Kernel shutdown.", "host");
             // Call the OS shutdown routine.
@@ -116,21 +118,20 @@ module TSOS {
 
         /**
          * When user clicks reset, reload the browser
-         * @param btn 
          */
-        public static hostBtnReset_click(btn): void {
+        static hostBtnReset_click(): void {
             // The easiest and most thorough way to do this is to reload (not refresh) the document.
             location.reload(true);
-            /* That boolean parameter is the 'forceget' flag. When it is true it causes the page to always
-               be reloaded from the server. If it is false or not specified the browser may reload the
-               page from its cache, which is not what we want.
+            /* That boolean parameter is the 'forceget' flag. When it is true it causes 
+               the page to always be reloaded from the server. If it is false or not 
+               specified the browser may reload the page from its cache, which is not what we want.
             */
         }
 
         /**
          * When user clicks single step, enable the next step button
          */
-        public static hostBtnSingleStep_click(): void {
+        static hostBtnSingleStep_click(): void {
             if (!_SingleStep) {
                 // Enable the NextStep button
                 (document.getElementById("btnNextStep") as HTMLButtonElement).disabled = false;
@@ -147,26 +148,26 @@ module TSOS {
         /**
          * When user clicks next step, set to true for CPU clock
          */
-        public static hostBtnNextStep_click(): void {
+        static hostBtnNextStep_click(): void {
             _NextStep = true;
         }
 
         /**
          * Update the CPU display table
          */
-        public static hostCPU(): void {
-            let table = (<HTMLTableElement>document.getElementById('tableCPU'));
+        static hostCPU(): void {
+            const table = (<HTMLTableElement>document.getElementById('tableCPU'));
             // Delete the placeholder row
             table.deleteRow(-1);
             // New row appended to table
-            let row = table.insertRow(-1);
+            const row = table.insertRow(-1);
             // PC
             let cell = row.insertCell();
             cell.innerHTML = _CPU.pc.toString(16).toUpperCase();
             // IR
             cell = row.insertCell();
             if (_CPU.isExecuting) {
-                cell.innerHTML = _Memory.memoryArray[_CPU.pc].toString(); 
+                cell.innerHTML = _Memory.memoryArray[_CPU.pc].toString();
             } else {
                 cell.innerHTML = "0";
             }
@@ -187,15 +188,16 @@ module TSOS {
         /**
          * Update the Memory table
          */
-        public static hostMemory(): void {
-            let table = (<HTMLTableElement>document.getElementById('tableMemory'));
+        static hostMemory(): void {
+            const table = (<HTMLTableElement>document.getElementById('tableMemory'));
             // Start at pc 0
             let memoryPC = 0;
             for (let i = 0; i < table.rows.length; i++) {
                 for (let j = 1; j < 9; j++) {
                     table.rows[i].cells.item(j).innerHTML = _Memory.memoryArray[memoryPC].toString().toUpperCase();
-                    // Check to see if the hex needs a leading zero. Convert to decimal, then to hex, then add leading zero
-                    let convert = parseInt(_Memory.memoryArray[memoryPC].toString(), 16);
+                    // Check to see if the hex needs a leading zero. Convert to decimal, 
+                    // then to hex, then add leading zero
+                    const convert = parseInt(_Memory.memoryArray[memoryPC].toString(), 16);
                     if (convert < 16 && convert > 0){
                         table.rows[i].cells.item(j).innerHTML = "0" + convert.toString(16).toUpperCase();
                     }
@@ -203,17 +205,17 @@ module TSOS {
                 }
             }
         }
-        
+
         /**
          * Update the resident queue table
          */
-        public static hostProcesses(): void {
-            let table = (<HTMLTableElement>document.getElementById('tableProcesses'));
+        static hostProcesses(): void {
+            const table = (<HTMLTableElement>document.getElementById('tableProcesses'));
             // Initialize an array of PCBs
-            let displayQueue: Array<TSOS.ProcessControlBlock> = [];
+            const displayQueue: Array<TSOS.ProcessControlBlock> = [];
             // For each PCB in resident queue, print out a new row for it
             for (let i = 0; i < _MemoryManager.residentQueue.getSize(); i++) {
-                let pcb = _MemoryManager.residentQueue.dequeue();
+                const pcb = _MemoryManager.residentQueue.dequeue();
                 _MemoryManager.residentQueue.enqueue(pcb);
                 displayQueue.push(pcb);
             }
@@ -222,9 +224,9 @@ module TSOS {
             }
             // Display all the other PCBs in the Resident queue
             while(displayQueue.length > 0){
-                let displayPcb = displayQueue.shift();
+                const displayPcb = displayQueue.shift();
                 // New row appended to table
-                let row = table.insertRow(-1);
+                const row = table.insertRow(-1);
                 // PID
                 let cell = row.insertCell();
                 cell.innerHTML = displayPcb.pId.toString(16).toUpperCase();
@@ -258,13 +260,13 @@ module TSOS {
         /**
          * Update the ready queue table
          */
-        public static hostReady(): void {
-            let table = (<HTMLTableElement>document.getElementById('tableReady'));
+        static hostReady(): void {
+            const table = (<HTMLTableElement>document.getElementById('tableReady'));
             // Initialize an array of PCBs
-            let displayQueue: Array<TSOS.ProcessControlBlock> = [];
+            const displayQueue: Array<TSOS.ProcessControlBlock> = [];
             // For each PCB in ready queue, print out a new row for it
             for (let i = 0; i < _MemoryManager.readyQueue.getSize(); i++) {
-                let pcb = _MemoryManager.readyQueue.dequeue();
+                const pcb = _MemoryManager.readyQueue.dequeue();
                 _MemoryManager.readyQueue.enqueue(pcb);
                 displayQueue.push(pcb);
             }
@@ -276,8 +278,8 @@ module TSOS {
             }
             // Display all the other PCBs in the Resident queue
             while (displayQueue.length > 0) {
-                let displayPcb = displayQueue.shift();
-                let row = table.insertRow(-1); // New row appended to table
+                const displayPcb = displayQueue.shift();
+                const row = table.insertRow(-1); // New row appended to table
                 // PID
                 let cell = row.insertCell();
                 cell.innerHTML = displayPcb.pId.toString(16).toUpperCase();
@@ -311,15 +313,15 @@ module TSOS {
         /**
          * Initialize memory display
          */
-        public static initMemoryDisplay(): void {
-            let table = (<HTMLTableElement>document.getElementById('tableMemory'));
+        static initMemoryDisplay(): void {
+            const table = (<HTMLTableElement>document.getElementById('tableMemory'));
             // Delete the initial dash placeholders
             table.deleteRow(0);
             // We assume each row will hold 8 memory values
             for (let i = 0; i < _Memory.memoryArray.length/8; i++) {
-                let row = table.insertRow(i);
-                let memoryAddressCell = row.insertCell(0);
-                let address = i * 8;
+                const row = table.insertRow(i);
+                const memoryAddressCell = row.insertCell(0);
+                const address = i * 8;
                 // Display address in proper memory hex notation and add leading 0s if necessary
                 let displayAddress = "0x";
                 for (let k = 0; k < 3 - address.toString(16).length; k++) {
@@ -329,7 +331,7 @@ module TSOS {
                 memoryAddressCell.innerHTML = displayAddress;
                 // Fill all the cells with 00s
                 for (let j = 1; j < 9; j++){
-                    let cell = row.insertCell(j);
+                    const cell = row.insertCell(j);
                     cell.innerHTML = "00";
                     cell.classList.add("memoryCell");
                 }
@@ -339,13 +341,13 @@ module TSOS {
         /**
          * BSOD effect
          */
-        public static melonDrop(): void {
+        static melonDrop(): void {
             // Initialize Canvas and melon variables
             let ctx;
-            let noOfMelons = 20;
-            let melons = [];
+            const noOfMelons = 20;
+            const melons = [];
             let melon;
-            let melonImage = document.getElementById("melonFall");
+            const melonImage = document.getElementById("melonFall");
 
             // Set the context
             ctx = _Canvas.getContext('2d');
@@ -362,7 +364,7 @@ module TSOS {
                     image: melonImage
                 });
             }
-            
+
             // Draw the melon on the canvas using the melonImage
             function draw() {
                 // Clear the canvas first
@@ -375,7 +377,7 @@ module TSOS {
                 // Call the move function to redraw the images to make them seem in motion
                 move();
             }
-            
+
             // Move will continuously change the y coordinates to make them seem in motion
             function move() {
                 // Loop through all of the melons
@@ -397,25 +399,24 @@ module TSOS {
         /**
          * This will update the disk display with contents of session storage
          */
-        public static hostDisk(): void {
-            let table = (<HTMLTableElement>document.getElementById('tableDisk'));
+        static hostDisk(): void {
+            const table = (<HTMLTableElement>document.getElementById('tableDisk'));
             let rowNum = 1;
             // For each row, insert the TSB, available bit, pointer, and data into separate cells
             for (let trackNum = 0; trackNum < _Disk.totalTracks; trackNum++) {
                 for (let sectorNum = 0; sectorNum < _Disk.totalSectors; sectorNum++) {
                     for (let blockNum = 0; blockNum < _Disk.totalBlocks; blockNum++) {
-                        // generate proper tsb id since firefox sucks and doesn't keep session storage ordered
-                        let tsbID = trackNum + ":" + sectorNum + ":" + blockNum;
-                        let row = table.insertRow(rowNum);
+                        const tsbID = trackNum + ":" + sectorNum + ":" + blockNum;
+                        const row = table.insertRow(rowNum);
                         rowNum++;
-                        let tsb = row.insertCell(0);
+                        const tsb = row.insertCell(0);
                         tsb.innerHTML = tsbID;
-                        let availableBit = row.insertCell(1);
+                        const availableBit = row.insertCell(1);
                         availableBit.innerHTML = JSON.parse(sessionStorage.getItem(tsbID)).availableBit;
-                        let pointer = row.insertCell(2);
-                        let pointerVal = JSON.parse(sessionStorage.getItem(tsbID)).pointer;
+                        const pointer = row.insertCell(2);
+                        const pointerVal = JSON.parse(sessionStorage.getItem(tsbID)).pointer;
                         pointer.innerHTML = pointerVal;
-                        let data = row.insertCell(3);
+                        const data = row.insertCell(3);
                         data.innerHTML = JSON.parse(sessionStorage.getItem(tsbID)).data.join("").toString();
                     }
                 }
@@ -425,7 +426,7 @@ module TSOS {
         /**
          * Initialize HDD display
          */
-        public static initDiskDisplay(): void {
+        static initDiskDisplay(): void {
             this.hostDisk();
         }
     }

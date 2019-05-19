@@ -5,11 +5,12 @@
      Requires global.ts.
 
      Routines for the hardware simulation, NOT for our client OS itself.
-     These are static because we are never going to instantiate them, because they represent the hardware.
-     In this manner, it's A LITTLE BIT like a hypervisor, in that the Document environment inside a browser
-     is the "bare metal" (so to speak) for which we write code that hosts our client OS.
-     This code references page numbers in the text book:
-     Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 978-0-470-12872-5
+     These are static because we are never going to instantiate them, because they
+     represent the hardware. In this manner, it's A LITTLE BIT like a hypervisor,
+     in that the Document environment inside a browser is the "bare metal" (so to speak)
+     for which we write code that hosts our client OS. This code references page numbers
+     in the text book: Operating System Concepts 8th edition by Silberschatz, Galvin,
+     and Gagne.  ISBN 978-0-470-12872-5
      ------------ */
 var TSOS;
 (function (TSOS) {
@@ -27,7 +28,8 @@ var TSOS;
             _Kernel.krnOnCPUClockPulse();
         };
         /**
-         *
+         * Enable Keyboard Interrupt, a HARDWARE Interrupt Request.
+         * (See pages 560-561 in our text book.)
          */
         Devices.hostEnableKeyboardInterrupt = function () {
             // Listen for key press (keydown, actually) events in the Document
@@ -52,7 +54,8 @@ var TSOS;
                 event.preventDefault();
                 // Note the pressed key code in the params (Mozilla-specific).
                 var params = new Array(event.which, event.shiftKey);
-                // Enqueue this interrupt on the kernel interrupt queue so that it gets to the Interrupt handler.
+                // Enqueue this interrupt on the kernel interrupt queue so that it 
+                // gets to the Interrupt handler.
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(KEYBOARD_IRQ, params));
             }
         };

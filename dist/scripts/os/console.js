@@ -3,18 +3,17 @@
      Console.ts
 
      The OS Console - stdIn and stdOut by default.
-     Note: This is not the Shell. The Shell is the "command line interface" (CLI) or interpreter for this console.
+     Note: This is not the Shell. The Shell is the "command line interface"
+     (CLI) or interpreter for this console.
      ------------ */
 var TSOS;
 (function (TSOS) {
     var Console = /** @class */ (function () {
-        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer) {
-            if (currentFont === void 0) { currentFont = _DefaultFontFamily; }
+        function Console(currentFontSize, currentXPosition, currentYPosition, buffer) {
             if (currentFontSize === void 0) { currentFontSize = _DefaultFontSize; }
             if (currentXPosition === void 0) { currentXPosition = 0; }
             if (currentYPosition === void 0) { currentYPosition = _DefaultFontSize; }
             if (buffer === void 0) { buffer = ""; }
-            this.currentFont = currentFont;
             this.currentFontSize = currentFontSize;
             this.currentXPosition = currentXPosition;
             this.currentYPosition = currentYPosition;
@@ -61,14 +60,14 @@ var TSOS;
                     // If the x position reaches 510, advance the line and continue drawing
                     if (this.currentXPosition > 510) {
                         _StdOut.advanceLine();
-                        // Advance the position so that it is easier to see that you are still working within
-                        // the same command line number
+                        // Advance the position so that it is easier to see that you are
+                        // still working within the same command line number
                         this.currentXPosition = 15;
                     }
                     // Draw the text at the current X and Y coordinates.
-                    _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text[i]);
+                    _DrawingContext.drawText(this.currentFontSize, this.currentXPosition, this.currentYPosition, text[i]);
                     // Move the current X position.
-                    var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text[i]);
+                    var offset = _DrawingContext.measureText(this.currentFontSize, text[i]);
                     this.currentXPosition = this.currentXPosition + offset;
                 }
             }
@@ -84,14 +83,8 @@ var TSOS;
              * Font height margin is extra spacing between the lines.
              */
             this.currentYPosition += _DefaultFontSize +
-                _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
-                _FontHeightMargin;
-        };
-        /**
-         * Clear the canvas
-         */
-        Console.prototype.clearScreen = function () {
-            _DrawingContext.clearRect(0, 0, _Canvas.width, _Canvas.height);
+                _DrawingContext.fontDescent(this.currentFontSize)
+                + _FontHeightMargin;
         };
         /**
          * Delete the previous character when backspace is pressed
@@ -99,11 +92,17 @@ var TSOS;
          */
         Console.prototype.backspaceClear = function (character) {
             // Find the width of the previous character
-            var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, character);
+            var offset = _DrawingContext.measureText(this.currentFontSize, character);
             // Change the currentXPosition
             this.currentXPosition = this.currentXPosition - offset;
             // Clear the previous character's space
             _DrawingContext.clearRect(this.currentXPosition, (this.currentYPosition - 12), 20, 20);
+        };
+        /**
+         * Clear the canvas
+         */
+        Console.prototype.clearScreen = function () {
+            _DrawingContext.clearRect(0, 0, _Canvas.width, _Canvas.height);
         };
         /**
          * Reset the x, y coordinates on the canvas

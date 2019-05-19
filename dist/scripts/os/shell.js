@@ -1,6 +1,6 @@
 ///<reference path="../globals.ts" />
-///<reference path="shellCommand.ts" />
-///<reference path="userCommand.ts" />
+///<reference path="shell-command.ts" />
+///<reference path="user-command.ts" />
 ///<reference path="../utils.ts" />
 /* ------------
    Shell.ts
@@ -68,7 +68,8 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellMelon, "melon", "- Displays wonderful melon puns for the world to see.");
             this.commandList[this.commandList.length] = sc;
             // status
-            sc = new TSOS.ShellCommand(this.shellStatus, "status", "- Changes the status display bar to whatever your heart desires.");
+            sc = new TSOS.ShellCommand(this.shellStatus, "status", "- Changes the status display bar to whatever your heart "
+                + "desires.");
             this.commandList[this.commandList.length] = sc;
             // load
             sc = new TSOS.ShellCommand(this.shellLoad, "load", "- Loads and validates the user code in the user input area. Only"
@@ -93,7 +94,8 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellKill, "kill", "- Kills the specified process ID.");
             this.commandList[this.commandList.length] = sc;
             // ls
-            sc = new TSOS.ShellCommand(this.shellLs, "ls", "- Lists files currently on disk. ls -l will show hidden files as well.");
+            sc = new TSOS.ShellCommand(this.shellLs, "ls", "- Lists files currently on disk. ls -l will show hidden "
+                + " files as well.");
             this.commandList[this.commandList.length] = sc;
             // getschedule
             sc = new TSOS.ShellCommand(this.shellGetSchedule, "getschedule", "- Returns the current scheduling algorithm.");
@@ -108,7 +110,8 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellDeleteFile, "delete", "<filename> - Delete the specified file from disk.");
             this.commandList[this.commandList.length] = sc;
             // write <filename> "data"
-            sc = new TSOS.ShellCommand(this.shellWriteFile, "write", "<filename> \"data\" - Write data to the specified file on disk.");
+            sc = new TSOS.ShellCommand(this.shellWriteFile, "write", "<filename> \"data\" - Write data to the specified file "
+                + "on disk.");
             this.commandList[this.commandList.length] = sc;
             // read <filename>
             sc = new TSOS.ShellCommand(this.shellReadFile, "read", "<filename> - Read the specified file from disk.");
@@ -137,9 +140,9 @@ var TSOS;
             var cmd = userCommand.command;
             var args = userCommand.args;
             // Determine the command and execute it.
-            // TypeScript/JavaScript may not support associative arrays in all browsers so we have to iterate over the
-            // command list in attempt to find a match.  TODO: Is there a better way? Probably. Someone work it out
-            // and tell me in class.
+            /* TypeScript/JavaScript may not support associative arrays in all browsers so
+               we have to iterate over the command list in attempt to find a match.
+               TODO: Is there a better way? Probably. Someone work it out and tell me in class.*/
             var index = 0;
             var found = false;
             var fn;
@@ -161,11 +164,12 @@ var TSOS;
                 this.execute(fn, args);
             }
             else {
-                // It's not found, so check for curses and apologies before declaring the command invalid.
-                if (this.curses.indexOf("[" + TSOS.Utils.rot13(cmd) + "]") >= 0) { // Check for curses.
+                // It's not found, so check for curses and apologies before declaring 
+                // the command invalid.
+                if (this.curses.indexOf("[" + TSOS.Utils.rot13(cmd) + "]") >= 0) {
                     this.execute(this.shellCurse);
                 }
-                else if (this.apologies.indexOf("[" + cmd + "]") >= 0) { // Check for apologies.
+                else if (this.apologies.indexOf("[" + cmd + "]") >= 0) {
                     this.execute(this.shellApology);
                 }
                 else { // It's just a bad command.
@@ -181,7 +185,8 @@ var TSOS;
         Shell.prototype.execute = function (fn, args) {
             // We just got a command, so advance the line...
             _StdOut.advanceLine();
-            // ... call the command function passing in the args with some über-cool functional programming ...
+            // ... call the command function passing in the args with some 
+            // über-cool functional programming ...
             fn(args);
             // Check to see if we need to advance the line again
             if (_StdOut.currentXPosition > 0) {
@@ -203,7 +208,7 @@ var TSOS;
             // 3. Separate on spaces so we can determine the command and command-line args, if any.
             var tempList = buffer.split(" ");
             // 4. Take the first (zeroth) element and use that as the command.
-            var cmd = tempList.shift(); // Yes, you can do that to an array in JavaScript.  See the Queue class.
+            var cmd = tempList.shift();
             // 4.1 Remove any left-over spaces.
             cmd = cmd.trim();
             // 4.2 Record it in the return value.
@@ -269,7 +274,8 @@ var TSOS;
             _StdOut.putText("Commands:");
             for (var i in _OsShell.commandList) {
                 _StdOut.advanceLine();
-                _StdOut.putText("  " + _OsShell.commandList[i].command + " " + _OsShell.commandList[i].description);
+                _StdOut.putText("  " + _OsShell.commandList[i].command + " "
+                    + _OsShell.commandList[i].description);
             }
         };
         /**
@@ -279,7 +285,6 @@ var TSOS;
             _StdOut.putText("Shutting down...");
             // Call Kernel shutdown routine.
             _Kernel.krnShutdown();
-            // TODO: Stop the final prompt from being displayed.  If possible.  Not a high priority.  (Damn OCD!)
         };
         /**
          * Clears the CLI
@@ -303,7 +308,8 @@ var TSOS;
                         _StdOut.putText("curse issues all of your derogatory remarks for you!");
                         break;
                     case "apology":
-                        _StdOut.putText("apology mends your relationship with MelonOS because it has feelings too.");
+                        _StdOut.putText("apology mends your relationship with MelonOS because it"
+                            + "has feelings too.");
                         break;
                     case "ver":
                         _StdOut.putText("ver displays the current version.");
@@ -324,10 +330,12 @@ var TSOS;
                         _StdOut.putText("trace displays the clock intervals.");
                         break;
                     case "rot13":
-                        _StdOut.putText("rot13 converts characters in the string to character + 13. It was one of the first ciphers created.");
+                        _StdOut.putText("rot13 converts characters in the string to character "
+                            + "+ 13. It was one of the first ciphers created.");
                         break;
                     case "prompt":
-                        _StdOut.putText("prompt changes the initial prompt to the specific string.");
+                        _StdOut.putText("prompt changes the initial prompt to the specific "
+                            + "string.");
                         break;
                     case "date":
                         _StdOut.putText("date displays the current date.");
@@ -336,15 +344,16 @@ var TSOS;
                         _StdOut.putText("whereami displays the current location.");
                         break;
                     case "melon":
-                        _StdOut.putText("melon will give you juicy puns to use with all of your friends!");
+                        _StdOut.putText("melon will give you juicy puns to use with all of your "
+                            + "friends!");
                         break;
                     case "status":
-                        _StdOut.putText("status changes the status display bar to whatever string your"
-                            + " heart desires.");
+                        _StdOut.putText("status changes the status display bar to whatever string "
+                            + "your heart desires.");
                         break;
                     case "load":
-                        _StdOut.putText("load validates the user input program to ensure only hex digits"
-                            + " and spaces exist.");
+                        _StdOut.putText("load validates the user input program to ensure only hex "
+                            + "digits and spaces exist.");
                         break;
                     case "dropit":
                         _StdOut.putText("dropit can not be undone.. Please don't drop the melons."
@@ -354,7 +363,8 @@ var TSOS;
                         _StdOut.putText("run will run the current process loaded in memory.");
                         break;
                     case "clearmem":
-                        _StdOut.putText("clearmem will *cough* init *cough* clear all memory partitions.");
+                        _StdOut.putText("clearmem will *cough* init *cough* clear all memory "
+                            + "partitions.");
                         break;
                     case "runall":
                         _StdOut.putText("runall will execute all programs in memory.");
@@ -366,31 +376,39 @@ var TSOS;
                         _StdOut.putText("kill <id> will terminate the corresponding process");
                         break;
                     case "quantum":
-                        _StdOut.putText("quantum <int> will change the round round scheduling time.");
+                        _StdOut.putText("quantum <int> will change the round round scheduling "
+                            + "time.");
                         break;
                     case "ls":
-                        _StdOut.putText("ls lists all non-hidden files on disk. Use ls -l to see hidden files.");
+                        _StdOut.putText("ls lists all non-hidden files on disk. Use ls -l to see "
+                            + "hidden files.");
                         break;
                     case "format":
                         _StdOut.putText("format initializes and clears the disk.");
                         break;
                     case "delete":
-                        _StdOut.putText("delete <filename> will delete the specified file from disk.");
+                        _StdOut.putText("delete <filename> will delete the specified file from "
+                            + "disk.");
                         break;
                     case "write":
-                        _StdOut.putText("write <filename> \"disk\" will write data to the specified file on disk.");
+                        _StdOut.putText("write <filename> \"disk\" will write data to the "
+                            + "specified file on disk.");
                         break;
                     case "read":
                         _StdOut.putText("read <filename> will read the specified file on disk.");
                         break;
                     case "create":
-                        _StdOut.putText("create <filename> will create the specified file on disk.");
+                        _StdOut.putText("create <filename> will create the specified file on "
+                            + "disk.");
                         break;
                     case "getschedule":
-                        _StdOut.putText("getschedule will display the current CPU scheduling algorithm.");
+                        _StdOut.putText("getschedule will display the current CPU scheduling "
+                            + "algorithm.");
                         break;
                     case "setschedule":
-                        _StdOut.putText("setschedule <algorithm> will set the CPU scheduling algorithm to fcfs (First come first serve), rr (Round robin), or priority.");
+                        _StdOut.putText("setschedule <algorithm> will set the CPU scheduling "
+                            + "algorithm to fcfs (First come first serve), rr (Round robin), "
+                            + "or priority.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -482,7 +500,8 @@ var TSOS;
                     _StdOut.putText("It's not pulp fiction.");
                     break;
                 case 2:
-                    _StdOut.putText("This may sound a little 'fruity,' but we think you'll like it.");
+                    _StdOut.putText("This may sound a little 'fruity,' but we think "
+                        + "you'll like it.");
                     break;
                 case 3:
                     _StdOut.putText("Who says you cant(alope)?");
@@ -526,9 +545,9 @@ var TSOS;
             // Check for anything besides hex or spaces (A-Fa-f0-9)
             if (hexRegex.test(userInputProgram)) {
                 // Remove white space, new lines
-                userInputProgram = userInputProgram.replace(/\r?\n|\r/g, " "); //removes newlines
-                userInputProgram = userInputProgram.replace(/\s+/g, " ").trim(); //removes sequential spaces
-                userInputProgram = userInputProgram.trim(); //remove leading and trailing spaces
+                userInputProgram = userInputProgram.replace(/\r?\n|\r/g, " ");
+                userInputProgram = userInputProgram.replace(/\s+/g, " ").trim();
+                userInputProgram = userInputProgram.trim();
                 // Split the program into 2-bit hex
                 var splitProgram = userInputProgram.split(" ");
                 // If priority arg is a number
@@ -542,11 +561,13 @@ var TSOS;
                     // Invalid args
                 }
                 else {
-                    _StdOut.putText("Usage: load [priority] Please supply a priority integer or use the default (1). 0 is the lowest.");
+                    _StdOut.putText("Usage: load [priority] Please supply a priority "
+                        + "integer or use the default (1). 0 is the lowest.");
                 }
             }
             else {
-                _StdOut.putText("Program must only contain hexadecimal values (A-F, a-f, 0-9) or spaces.");
+                _StdOut.putText("Program must only contain hexadecimal values (A-F, "
+                    + "a-f, 0-9) or spaces.");
             }
         };
         /**
@@ -568,7 +589,8 @@ var TSOS;
                 var waitQueueLength = _MemoryManager.residentQueue.getSize();
                 // Check to see if CPU is already executing
                 if (_CPU.isExecuting) {
-                    _StdOut.putText("CPU is already in execution. Please wait until the current process is completed.");
+                    _StdOut.putText("CPU is already in execution. Please wait until "
+                        + "the current process is completed.");
                 }
                 else {
                     // Find the correct processId by looping through the waiting queue
@@ -613,7 +635,8 @@ var TSOS;
                 }
             }
             else {
-                _StdOut.putText("There are no programs loaded. Please load a process to be executed.");
+                _StdOut.putText("There are no programs loaded. Please load a "
+                    + "process to be executed.");
             }
         };
         /**
@@ -671,7 +694,8 @@ var TSOS;
                 // Make sure the number is above 0. 0 will make melons enter the black hole
                 if (parseInt(args[0]) > 0) {
                     // Notify the user that the quantum has been changed
-                    _StdOut.putText("Quantum has been changed from " + _Scheduler.quantum + " to " + args[0]);
+                    _StdOut.putText("Quantum has been changed from " + _Scheduler.quantum
+                        + " to " + args[0]);
                     // Change the quantum
                     _Scheduler.changeQuantum(args[0]);
                 }
@@ -705,7 +729,8 @@ var TSOS;
                             numOfSwaps++;
                             continue;
                         }
-                        _StdOut.putText(f['name'] + " - Date Created: " + f['month'] + "/" + f['day'] + "/" + f['year'] + ", Size: " + f['size']);
+                        _StdOut.putText(f['name'] + " - Date Created: " + f['month']
+                            + "/" + f['day'] + "/" + f['year'] + ", Size: " + f['size']);
                         _StdOut.advanceLine();
                     }
                     // Let them know there's only swaps
@@ -815,7 +840,6 @@ var TSOS;
                 // Check if it is a swap file
                 if (args[0].includes("$")) {
                     _StdOut.putText("Swap files cannot be deleted.");
-                    // Back out of the function
                     return;
                 }
                 // Return the status of the file deletion
@@ -849,7 +873,8 @@ var TSOS;
                 }
                 // Check to make sure the user has put quotes
                 if (string.charAt(0) != "\"" || string.charAt(string.length - 2) != "\"") {
-                    _StdOut.putText("Usage: write <filename> \"<text>\"  Please supply a filename and text surrounded by quotes.");
+                    _StdOut.putText("Usage: write <filename> \"<text>\"  Please supply a "
+                        + "filename and text surrounded by quotes.");
                     return;
                 }
                 string = string.trim();
@@ -859,18 +884,22 @@ var TSOS;
                     return;
                 }
                 var info = _DiskDriver.writeFile(args[0], string);
-                if (info === SUCCESS) {
-                    _StdOut.putText("The file " + args[0] + " has been successfully written to.");
-                }
-                else if (info === FILENAME_DOESNT_EXIST) {
-                    _StdOut.putText("The file " + args[0] + " does not exist.");
-                }
-                else if (info === DISK_IS_FULL) {
-                    _StdOut.putText("Unable to write to the file: " + args[0] + ". Not enough disk space to write.");
+                switch (info) {
+                    case SUCCESS:
+                        _StdOut.putText("The file " + args[0]
+                            + " has been successfully written to.");
+                    case FILENAME_DOESNT_EXIST:
+                        _StdOut.putText("The file " + args[0] + " does not exist.");
+                    case DISK_IS_FULL:
+                        _StdOut.putText("Unable to write to the file: " + args[0]
+                            + ". Not enough disk space to write.");
+                    default:
+                        _StdOut.putText("Unknown status returned from file write");
                 }
             }
             else {
-                _StdOut.putText("Usage: write <filename> \"<text>\"  Please supply a filename and text surrounded by quotes.");
+                _StdOut.putText("Usage: write <filename> \"<text>\"  Please supply "
+                    + "a filename and text surrounded by quotes.");
             }
         };
         /**
@@ -909,7 +938,6 @@ var TSOS;
                 // Filenames must be 60 characters or less
                 if (args[0].length > 60) {
                     _StdOut.putText("File name is too long. It must be 60 characters or less.");
-                    // Back out of the function
                     return;
                 }
                 // Return the status of the file creation
@@ -934,10 +962,12 @@ var TSOS;
          */
         Shell.prototype.shellGetSchedule = function () {
             if (_Scheduler.algorithm === RR) {
-                _StdOut.putText("Current CPU scheduling algorithm is Round Robin and the quantum is " + _Scheduler.quantum + ".");
+                _StdOut.putText("Current CPU scheduling algorithm is Round Robin and the "
+                    + "quantum is " + _Scheduler.quantum + ".");
             }
             else if (_Scheduler.algorithm === FCFS) {
-                _StdOut.putText("Current CPU scheduling algorithm is First Come First Serve and the quantum is " + _Scheduler.quantum + ".");
+                _StdOut.putText("Current CPU scheduling algorithm is First Come First "
+                    + "Serve and the quantum is " + _Scheduler.quantum + ".");
                 // Priority
             }
             else {
@@ -955,7 +985,8 @@ var TSOS;
                 _StdOut.putText("CPU Scheduling algorithm set to " + args[0]);
             }
             else {
-                _StdOut.putText("Usage: setschedule <algorithm>  Please supply an algorithm (rr, fcfs, or priority).");
+                _StdOut.putText("Usage: setschedule <algorithm>  Please supply an "
+                    + "algorithm (rr, fcfs, or priority).");
             }
         };
         return Shell;
